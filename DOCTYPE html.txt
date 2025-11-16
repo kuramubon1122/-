@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ===================================================================== -->
+    <!-- ========================= SEO対策 強化部分 ========================== -->
+    <!-- ===================================================================== -->
+
+    <!-- 1. 最適化されたタイトル -->
+    <title>【Luaコード生成】にゃんこ大戦争 ステータスエディタ v4.0 | 簡単チートコード作成</title>
+
+    <!-- 2. 検索結果に表示される説明文 (Meta Description) -->
+    <meta name="description" content="検索パターンと数値を入力するだけで、にゃんこ大戦争のステータスを変更するLuaスクリプトを簡単・自動生成。面倒なオフセット計算は不要で、GameGuardian用のチートコードをすぐに作成できます。">
+
+    <!-- 3. サイトの正規URLを検索エンジンに伝える (Canonical URL) - ※要変更 -->
+    <link rel="canonical" href="https://sites.google.com/d/1gtfIHdAVFOI4dAzHGipCeV5Fw1H-2MKA/p/18S7ZcT3gIEReKdzHxVaaGY-jHknwRwPX/edit">
+
+    <!-- 4. OGP (Open Graph Protocol) - SNSでシェアされた際の表示設定 ※要変更 -->
+    <meta property="og:title" content="【Luaコード生成】にゃんこ大戦争 ステータスエディタ v4.0">
+    <meta property="og:description" content="検索パターン入力だけで、にゃんこ大戦争のステータスを変更するLuaスクリプトを簡単・自動生成。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com/nyanko-status-editor.html">
+    <meta property="og:image" content="https://your-domain.com/images/nyanko-ogp-image.png"> <!-- シェア時に表示させたい画像のURL -->
+    <meta property="og:site_name" content="にゃんこ大戦争 攻略ツール">
+    <meta property="og:locale" content="ja_JP">
+
+    <!-- 5. Twitter Card - Twitterでシェアされた際の表示設定 ※要変更 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="【Luaコード生成】にゃんこ大戦争 ステータスエディタ v4.0">
+    <meta name="twitter:description" content="検索パターン入力だけで、にゃんこ大戦争のステータスを変更するLuaスクリプトを簡単・自動生成。">
+    <meta name="twitter:image" content="https://your-domain.com/images/nyanko-ogp-image.png"> <!-- シェア時に表示させたい画像のURL -->
+
+    <!-- 6. 構造化データ (JSON-LD) - ページ内容を検索エンジンが深く理解するために記述 -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "にゃんこ大戦争 ステータスエディタ v4.0",
+        "abstract": "にゃんこ大戦争のキャラクターのステータスを変更するためのLuaスクリプトを自動生成するウェブツールです。",
+        "operatingSystem": "Android, iOS (GameGuardian等が必要)",
+        "applicationCategory": "GameTool",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "JPY"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Your Name" // あなたの名前 or ハンドル名
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://your-domain.com/nyanko-status-editor.html" // このページの正規URL
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": "このツールは無料で使えますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、このステータスエディタは完全に無料でご利用いただけます。会員登録やログインも一切不要です。"
+          }
+        },{
+          "@type": "Question",
+          "name": "生成されたコードはどのように使いますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "生成されたコードは、GameGuardianなどのメモリ編集アプリでLuaスクリプトとして実行することで、ゲーム内のステータスを変更するために使用します。ご利用は自己責任でお願いします。"
+          }
+        },{
+          "@type": "Question",
+          "name": "逆算モードとは何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "逆算モードは、ゲーム内から取得した連続する数値列（検索パターン）が、それぞれどのステータス項目（体力、攻撃力など）に対応するのかを自動で解析するための機能です。"
+          }
+        }]
+      }
+    ]
+    </script>
+    
+    <!-- ===================================================================== -->
+    <!-- ======================= 元のコード（ここから）======================== -->
+    <!-- ===================================================================== -->
+    
+    <style>
+        :root {
+            --primary-color: #98FB98; --secondary-color: #3CB371; --bg-color: #F0FFF0;
+            --widget-bg: #fff; --text-color: #333; --error-color: #d32f2f; --red-check: #ff6b6b;
+            --radius: 12px; --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background-color: var(--bg-color); color: var(--text-color);
+            margin: 0; padding: 20px;
+        }
+        .page-wrapper {
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        #manual-section { flex: 1; min-width: 300px; }
+        #main-content { flex: 3; min-width: 600px; }
+
+        .widget {
+            background-color: var(--widget-bg); padding: 20px; margin-bottom: 20px;
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
+        h1, h2, h3 {
+            color: var(--secondary-color); border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px; margin-top: 0;
+        }
+        .input-area { margin-bottom: 15px; }
+        .input-area label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"], input[type="number"], input[type="search"] {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;
+            font-size: 16px; box-sizing: border-box; transition: border-color 0.3s;
+        }
+        input.is-invalid { border-color: var(--error-color); box-shadow: 0 0 5px rgba(211, 47, 47, 0.5); }
+        
+        .top-wrapper { display: flex; align-items: center; gap: 15px; }
+        .top-wrapper .input-area { flex-grow: 1; margin-bottom: 0; }
+        .rev-calc-area { display: flex; align-items: center; gap: 5px; padding-top: 20px; }
+        
+        .menu-tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 10px 15px; border: 1px solid #ccc; background-color: #f0f0f0;
+            border-radius: 8px 8px 0 0; cursor: pointer; transition: background-color 0.3s, border-color 0.3s;
+            font-size: 14px; border-bottom: none;
+        }
+        .tab-btn.active { background-color: var(--widget-bg); border-color: #ccc; border-bottom: 1px solid var(--widget-bg); position: relative; top: 1px;}
+        
+        .content-wrapper { border: 1px solid #ccc; padding: 20px; border-radius: 0 var(--radius) var(--radius) var(--radius); }
+        .category-content, #search-results-wrapper { display: none; }
+        .category-content.active, #search-results-wrapper.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px; }
+        .status-item { display: flex; align-items: center; padding: 8px; border-radius: 8px; transition: background-color 0.3s; }
+        .status-item:hover { background-color: #f9f9f9; }
+        .status-item .checks { display: flex; gap: 6px; }
+        .status-item input[type="checkbox"] {
+            appearance: none; width: 20px; height: 20px; border-radius: 5px;
+            cursor: pointer; position: relative; transition: transform 0.2s ease;
+        }
+        .status-item input[type="checkbox"]:checked { transform: scale(1.1); }
+        .status-item input[type="checkbox"]:checked::after {
+            content: '✔'; font-size: 16px; color: white;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .status-item input[type="checkbox"].green { background-color: #ccc; }
+        .status-item input[type="checkbox"].green:checked { background-color: var(--secondary-color); }
+        .status-item input[type="checkbox"].red { background-color: #ccc; }
+        .status-item input[type="checkbox"].red:checked { background-color: var(--red-check); }
+
+        .status-item label { flex-grow: 1; font-size: 14px; cursor: pointer; margin: 0 10px; }
+        .status-item .offset { color: #999; font-size: 12px; }
+        .status-item input[type="number"] { flex-shrink: 0; width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; text-align: right; }
+        
+        .batch-controls {
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; padding: 10px;
+            background-color: #f9f9f9; border-radius: 8px; margin-bottom: 15px;
+        }
+        .batch-controls label { font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .batch-controls input[type="number"] { width: 120px; }
+
+        .action-btn, #reverse-btn {
+            display: block; width: 100%; padding: 15px; font-size: 18px; font-weight: bold; color: white;
+            border: none; border-radius: var(--radius); cursor: pointer; transition: background-color 0.3s; margin-top: 20px;
+        }
+        .action-btn { background-color: var(--secondary-color); }
+        .action-btn:hover { background-color: #2e8b57; }
+        #reverse-btn { background-color: #3498db; display: none; }
+        #reverse-btn:hover { background-color: #2980b9; }
+        
+        #result-area, #rev-result-area { margin-top: 20px; display: none; }
+        #rev-result-area ul { list-style-type: none; padding: 15px; margin: 0; background-color: #f5f5f5; border-radius: 8px; }
+        #rev-result-area li { padding: 8px; border-bottom: 1px solid #ddd; }
+        #rev-result-area li:last-child { border-bottom: none; }
+        
+        #result-code-wrap { position: relative; }
+        #result-code-wrap pre {
+            background-color: #2d2d2d; color: #f0f0f0; padding: 15px; padding-top: 40px; padding-right: 80px;
+            border-radius: 8px; white-space: pre-wrap; word-wrap: break-word;
+        }
+        #copy-btn {
+            position: absolute; top: 10px; right: 10px; padding: 8px 12px; background-color: var(--secondary-color);
+            color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s;
+        }
+        #copy-btn:hover { background-color: #2e8b57; }
+
+        .lua-prefix-area .prefix-option { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .lua-prefix-area input[type="number"] { width: 100px; }
+
+        .manual-accordion details { margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .manual-accordion summary { padding: 15px; font-weight: bold; cursor: pointer; background-color: #f9f9f9; border-radius: 8px 8px 0 0; }
+        .manual-accordion div { padding: 15px; border-top: 1px solid #ddd; }
+        .manual-accordion p { margin-top: 0; line-height: 1.6; }
+        .manual-accordion code { background-color: #e8e8e8; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+        .manual-accordion .important { color: #d35400; font-weight: bold; }
+        .manual-accordion .example { color: #2980b9; }
+
+        @media (max-width: 960px) {
+            .page-wrapper { flex-direction: column; }
+            #main-content { min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <!-- 7. セマンティックHTMLの改善 (`<aside>`は適切なのでそのまま) -->
+    <aside id="manual-section">
+        <section class="widget"> <!-- divからsectionに変更 -->
+            <h2>使い方ガイド</h2>
+            <div class="manual-accordion">
+                <details open>
+                    <summary>1. 基本的な流れ</summary>
+                    <div>
+                        <p>1. <b>検索パターン</b>に、ゲーム内で見つけた連続する数値列を入力します。</p>
+                        <p>2. <b>リファイン値</b>が自動で設定されますが、必要であれば手動で修正します。</p>
+                        <p>3. <b>検索範囲</b>（Cb/Other）を選択します。</p>
+                        <p>4. 下のメニューから変更したい項目を探し、数値を入力します。数値を入力すると緑のチェックが自動で付きます。</p>
+                        <p>5. <b>コード生成</b>ボタンを押し、表示されたコードをコピーして使用します。</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>2. 検索パターンの入力規則</summary>
+                    <div>
+                        <p>検索パターンは、このツールが広大なメモリの中から目的のデータを見つけるための「地図」です。</p>
+                        <p class="important">最も重要なルールは、数値列が「連続するDWORD値」であることです。</p>
+                        <p><b>コスト</b>の値を基準（オフセット0）とし、それより前の値から順に`;`（セミコロン）で区切って入力してください。</p>
+                        <p class="example">例：体力;KB数;...;コスト;...;再生産時間 のように、メモリ上で連続している順番で記述します。</p>
+                        <p>値は `1,000` や `1000D` のように入力しても、自動で `1000` として解釈されます。</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>3. 逆算モード詳解</summary>
+                    <div>
+                        <p>「逆算モード」は、検索パターンから各数値がどのステータス項目に対応するかを調べる機能です。</p>
+                        <p>1. <b>逆算モード</b>にチェックを入れると、専用の「逆算実行」ボタンが表示されます。</p>
+                        <p>2. 検索パターンを入力すると、<span class="important">5000以上の最大値</span>が自動でリファイン値（コスト=オフセット0）として認識されます。</p>
+                        <p>3. <b>高度なオフセット指定</b>: 特定の値を通常とは異なるオフセットとして扱いたい場合、`値(オフセット)`の形式で入力できます。</p>
+                        <p class="example">例: `440;3(-20);5000;150(200)`</p>
+                        <p>この場合、`5000`が基準(0)、`3`はオフセット`-20`、`150`はオフセット`+200`として計算されます。`440`は`3`の前にあり、オフセットが指定されていないため、`-20`の前の連続する値、つまり`-24`として自動計算されます。</p>
+                    </div>
+                </details>
+                 <details>
+                    <summary>4. 一括操作機能</summary>
+                    <div>
+                        <p>各カテゴリや検索結果の上部にあるコントロールで、表示されている項目を一括で操作できます。</p>
+                        <p><b><span style="color: var(--secondary-color);">■</span> 一括選択 (緑)</b>: チェックを入れると、全ての項目の緑チェックがONになります。コード生成の対象を選択する際に便利です。</p>
+                        <p><b><span style="color: var(--red-check);">■</span> 一括変更選択 (赤)</b>: チェックを入れると、全ての項目の赤チェックがONになります。</p>
+                        <p><b>一括入力</b>: ここに数値を入力すると、<span class="important">赤チェックが付いている全ての項目</span>の値を一括で変更できます。</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </aside>
+
+    <main id="main-content">
+        <section class="widget"> <!-- divからsectionに変更 -->
+            <h1>にゃんこ大戦争 ステータスエディタ v4.0</h1>
+            <h2>1. 検索＆リファイン設定</h2>
+            <div class="top-wrapper">
+                <div class="input-area">
+                    <label for="dword-in">検索パターン (全角は自動で半角に)</label>
+                    <input type="text" id="dword-in" value="440;3;56;34;30;560;5000;150">
+                </div>
+                <div class="rev-calc-area">
+                    <input type="checkbox" id="rev-calc-check">
+                    <label for="rev-calc-check">逆算モード</label>
+                </div>
+            </div>
+            <div class="input-area">
+                <label>検索範囲</label>
+                <div id="range-opts">
+                    <label><input type="checkbox" id="range-cb" value="Cb"> Cb</label>
+                    <label><input type="checkbox" id="range-other" value="Other" checked> Other</label>
+                </div>
+            </div>
+            <div class="input-area">
+                <label for="refine-in">リファイン値 (コストなど)</label>
+                <input type="number" id="refine-in" value="5000">
+            </div>
+             <div class="input-area lua-prefix-area">
+                <label>Luaコード 先頭条件分岐 (任意)</label>
+                <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-none" value="none" checked>
+                    <label for="prefix-none">なし</label>
+                </div>
+                <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-elseif" value="elseif_ax_val">
+                    <label for="prefix-elseif">elseif Ax ==</label>
+                    <input type="number" id="lua-prefix-val" placeholder="2">
+                    <label for="prefix-elseif">then</label>
+                </div>
+                 <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-if-nil" value="if_ax_nil">
+                    <label for="prefix-if-nil">if Ax == nil then return end</label>
+                </div>
+                 <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-if-1" value="if_ax_1">
+                    <label for="prefix-if-1">if Ax == 1 then</label>
+                </div>
+                 <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-if-val" value="if_ax_val">
+                    <label for="prefix-if-val">if Ax ==</label>
+                     <input type="number" id="lua-prefix-val2" placeholder="2">
+                    <label for="prefix-if-val">then</label>
+                </div>
+            </div>
+        </section>
+        
+        <section id="rev-result-area" class="widget" style="display: none;"> <!-- style属性を追記して初期状態で非表示に -->
+            <h2>逆算結果</h2>
+            <ul id="rev-result-list"></ul>
+        </section>
+
+        <section class="widget"> <!-- divからsectionに変更 -->
+            <h2>2. 項目検索＆変更</h2>
+            <div id="search-wrapper">
+                 <input type="search" id="search-box" placeholder="項目名で検索 (大文字/小文字, ひらがな/カタカナ対応)">
+            </div>
+            <div id="search-results-wrapper"></div>
+            <!-- navタグでナビゲーションであることを明示 -->
+            <nav class="menu-tabs">
+                <button class="tab-btn active" data-target="cat-basic">基本部</button>
+                <button class="tab-btn" data-target="cat-basic2">基本部2</button>
+                <button class="tab-btn" data-target="cat-perf">性能部</button>
+                <button class="tab-btn" data-target="cat-prob">確率性能部</button>
+                <button class="tab-btn" data-target="cat-invalid">無効系</button>
+                <button class="tab-btn" data-target="cat-other">その他</button>
+            </nav>
+            <div class="content-wrapper">
+                <div id="cat-basic" class="category-content active"></div>
+                <div id="cat-basic2" class="category-content"></div>
+                <div id="cat-perf" class="category-content"></div>
+                <div id="cat-prob" class="category-content"></div>
+                <div id="cat-invalid" class="category-content"></div>
+                <div id="cat-other" class="category-content"></div>
+            </div>
+        </section>
+
+        <button id="gen-btn" class="action-btn">コード生成</button>
+        <button id="reverse-btn" class="action-btn">逆算実行</button>
+
+        <section id="result-area" class="widget" style="display: none;"> <!-- style属性を追記して初期状態で非表示に -->
+            <h2>3. 生成されたコード</h2>
+            <div id="result-code-wrap">
+                <pre><code id="result-code"></code></pre>
+                <button id="copy-btn">コピー</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+// --- データストア ---
+const statusData = [
+    { offset: -24, name: '体力' }, { offset: -20, name: 'KB数' }, { offset: -16, name: '速度[2x]' }, { offset: -12, name: '攻撃力' },
+    { offset: -8, name: '攻撃間隔' }, { offset: -4, name: '感知射程[4x]' }, { offset: 0, name: 'コスト[100x]' }, { offset: 4, name: '再生産時間' },
+    { offset: 8, name: 'キャラの感知範囲(前方)[4x]*' }, { offset: 12, name: 'キャラの感知範囲(後方)[4x]*' }, { offset: 16, name: '対赤' },
+    { offset: 24, name: '攻撃種類(0=単/1=範)' }, { offset: 28, name: '攻撃発生(時間)' }, { offset: 32, name: 'キャラ出現y軸範囲(上)*' },
+    { offset: 36, name: 'キャラ出現y軸範囲(下)*' }, { offset: 40, name: '対浮' }, { offset: 44, name: '対黒' }, { offset: 48, name: '対メ' },
+    { offset: 52, name: '対白' }, { offset: 56, name: '対天' }, { offset: 60, name: '対エ' }, { offset: 64, name: '対ゾ' },
+    { offset: 68, name: 'めっぽう強い' }, { offset: 72, name: 'ふっとばす(確率)' }, { offset: 76, name: '動きを止める(確率)' },
+    { offset: 80, name: '動きを止める(時間)' }, { offset: 84, name: '動きを遅くする(確率)' }, { offset: 88, name: '動きを遅くする(時間)' },
+    { offset: 92, name: '打たれ強い' }, { offset: 96, name: '超ダメージ' }, { offset: 100, name: 'クリティカル(確率)' },
+    { offset: 104, name: '攻撃ターゲット限定' }, { offset: 108, name: '撃破時お金アップ' }, { offset: 112, name: '城破壊が得意' },
+    { offset: 116, name: '波動(確率)' }, { offset: 120, name: '波動(レベル)' }, { offset: 124, name: '攻撃力ダウン(確率)' },
+    { offset: 128, name: '攻撃力ダウン(時間)' }, { offset: 132, name: '攻撃力ダウン(何%にするか)' }, { offset: 136, name: '攻撃力アップ(発動する残り体力の割合)' },
+    { offset: 140, name: '攻撃力アップ(倍率) 100(χ-1)' }, { offset: 144, name: '生き残る(確率)' }, { offset: 148, name: 'メタル' },
+    { offset: 152, name: '攻撃射程(遠方&前方)[4x]*' }, { offset: 156, name: '攻撃射程(遠方&後方)[4x]*' }, { offset: 160, name: '波動無効' },
+    { offset: 164, name: '波動ストッパー' }, { offset: 168, name: 'ふっとばし無効' }, { offset: 172, name: '動きを止める無効' },
+    { offset: 176, name: '動きを遅くする無効' }, { offset: 180, name: '攻撃力ダウン無効' }, { offset: 184, name: 'ゾンビキラー' },
+    { offset: 188, name: '魔女キラー' }, { offset: 196, name: '※攻撃回数へ' }, { offset: 200, name: '※攻撃回数へ' },
+    { offset: 204, name: '※攻撃回数へ' }, { offset: 208, name: '※攻撃回数へ' }, { offset: 212, name: '二撃目威力' },
+    { offset: 216, name: '三撃目威力' }, { offset: 220, name: '二撃目発生f' }, { offset: 224, name: '三撃目発生f' },
+    { offset: 228, name: '特性付与(一撃目)' }, { offset: 232, name: '特性付与(二撃目)' }, { offset: 236, name: '特性付与(三撃目)' },
+    { offset: 240, name: '生産演出*' }, { offset: 244, name: '魂エフェクトの種類*' }, { offset: 256, name: 'バリアブレイカー(確率)' },
+    { offset: 260, name: 'ワープ(確率)' }, { offset: 264, name: 'ワープ(時間)' }, { offset: 268, name: 'ワープ範囲(前方)[4x]*' },
+    { offset: 272, name: 'ワープ範囲(後方)[4x]*' }, { offset: 276, name: 'ワープ無効' }, { offset: 284, name: '使徒キラー' },
+    { offset: 288, name: '対古' }, { offset: 292, name: '古代の呪い無効' }, { offset: 296, name: '超打たれ強い' },
+    { offset: 300, name: '極ダメージ' }, { offset: 304, 'name': '渾身の一撃(確率)' }, { offset: 308, 'name': '渾身の一撃(倍率) 100(χ-1)' },
+    { offset: 312, name: '攻撃無効(確率)' }, { offset: 316, name: '攻撃無効(時間)[25x]' }, { offset: 320, name: '烈波(確率)' },
+    { offset: 324, name: '烈波発生範囲(前方)[4x]*' }, { offset: 328, name: '烈波発生範囲(後方)[4x]*' }, { offset: 332, name: '烈波(レベル)' },
+    { offset: 336, name: '毒撃無効' }, { offset: 340, name: '烈波無効' }, { offset: 344, name: '呪い(確率)' }, { offset: 348, name: '呪い(時間)' },
+    { offset: 352, name: '小波動化(波動onの時のみ有効)' }, { offset: 356, name: 'シールドブレイカー(確率)' }, { offset: 360, name: '対悪' },
+    { offset: 364, name: '超生命体特攻' }, { offset: 368, name: '魂攻撃' }, { offset: 392, name: '超獣特攻' }, { offset: 408, name: '烈波カウンター' },
+    { offset: 412, name: '召喚*' }, { offset: 420, name: '超賢者特攻' }, { offset: 424, name: 'メタルキラー' },
+    { offset: 428, name: '爆破(確率)' }, { offset: 432, name: '爆破発生範囲(前方)[4x]*' }, { offset: 436, name: '爆破発生範囲(後方)[4x]*' },
+    { offset: 440, name: '爆破無効' },
+].map(item => ({ ...item, checkedGreen: false, checkedRed: false, value: '' }));
+
+document.addEventListener('DOMContentLoaded', () => {
+    const d = document;
+    const getEl = (id) => d.getElementById(id);
+    
+    const genBtn = getEl('gen-btn'), copyBtn = getEl('copy-btn'), resultCodeEl = getEl('result-code'),
+          resultArea = getEl('result-area'), revCalcCheck = getEl('rev-calc-check'),
+          revResultArea = getEl('rev-result-area'), revResultList = getEl('rev-result-list'),
+          searchBox = getEl('search-box'), searchResultsWrapper = getEl('search-results-wrapper'),
+          menuTabs = d.querySelector('.menu-tabs'), dwordIn = getEl('dword-in'), refineIn = getEl('refine-in'),
+          reverseBtn = getEl('reverse-btn');
+
+    const toHalf = (s) => s ? s.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)) : '';
+    const cleanNumStr = (s) => s.replace(/,/g, '').replace(/[a-zA-Z]/g, '').trim();
+    const hiraToKana = (s) => s.replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
+    const kanaToHira = (s) => s.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+    
+    const copyToClip = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            copyBtn.textContent = 'コピー完了！';
+        } catch (err) {
+            try {
+                const ta = d.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                d.body.appendChild(ta);
+                ta.select();
+                d.execCommand('copy');
+                d.body.removeChild(ta);
+                copyBtn.textContent = 'コピー完了！';
+            } catch (copyErr) {
+                copyBtn.textContent = 'コピー失敗';
+                alert('コピーに失敗しました。');
+            }
+        } finally {
+            setTimeout(() => { copyBtn.textContent = 'コピー'; }, 2000);
+        }
+    };
+
+    const createItemHTML = (item) => `
+        <div class="status-item" data-offset="${item.offset}">
+            <div class="checks">
+                <input type="checkbox" class="green" data-check-type="green" data-offset="${item.offset}" ${item.checkedGreen ? 'checked' : ''}>
+                <input type="checkbox" class="red" data-check-type="red" data-offset="${item.offset}" ${item.checkedRed ? 'checked' : ''}>
+            </div>
+            <span class="offset">${item.offset}:</span>
+            <label for="check-${item.offset}">${item.name}</label>
+            <input type="number" data-offset="${item.offset}" value="${item.value}" placeholder="1" step="1">
+        </div>`;
+    
+    const createBatchControlsHTML = (targetId) => `
+        <div class="batch-controls" data-controls-id="${targetId}">
+            <label><input type="checkbox" class="batch-check" data-check-type="green"> <span style="color:var(--secondary-color)">■</span>一括選択</label>
+            <label><input type="checkbox" class="batch-check" data-check-type="red"> <span style="color:var(--red-check)">■</span>一括変更選択</label>
+            <input type="number" class="batch-value" placeholder="一括入力 (赤チェック対象)">
+        </div>`;
+
+    const renderItems = (container, items) => {
+        container.innerHTML = createBatchControlsHTML(container.id) + `<div class="status-grid">${items.map(createItemHTML).join('')}</div>`;
+    };
+
+    const init = () => {
+        const categories = { basic: [], basic2: [], perf: [], prob: [], invalid: [], other: [] };
+        const basicMainOffsets = new Set([-24, -20, -16, -12, -8, -4, 0, 4]);
+        const perfKeywords = new Set(['魔女キラー', 'ゾンビキラー', 'メタルキラー', '超賢者特攻', '烈波カウンター', '超獣特攻', '魂攻撃', '攻撃ターゲット限定', '撃破時お金アップ', '超打たれ強い', '極ダメージ', '召喚', '使徒キラー', '城破壊が得意', '超ダメージ', 'めっぽう強い', '波動ストッパー']);
+        const probKeywords = new Set();
+        const probOffsets = new Set();
+
+        statusData.forEach(item => {
+            if (item.name.includes('確率')) {
+                probOffsets.add(item.offset);
+                const match = item.name.match(/(.+)\(確率\)/);
+                if (match) probKeywords.add(match[1]);
+            }
+        });
+
+        statusData.forEach(item => {
+            if (item.name.includes('無効')) { categories.invalid.push(item); return; }
+            if (basicMainOffsets.has(item.offset)) { categories.basic.push(item); return; }
+            
+            let isProbRelated = probOffsets.has(item.offset) || probOffsets.has(item.offset - 4) || probOffsets.has(item.offset - 8) || item.name.includes('レベル') || item.name.includes('攻撃力アップ');
+            if (!isProbRelated) {
+                for(const keyword of probKeywords) {
+                    if (item.name.includes(keyword) && (item.name.includes('%') || item.name.includes('％') || item.name.includes('割合'))) {
+                         isProbRelated = true; break;
+                    }
+                }
+            }
+            if (isProbRelated) { categories.prob.push(item); return; }
+            
+            if (perfKeywords.has(item.name) || item.name.startsWith('対')) { categories.perf.push(item); return; }
+            
+            if (item.offset >= -24 && item.offset <= 64 || item.offset === 440) { categories.basic2.push(item); return; }
+
+            categories.other.push(item);
+        });
+
+        for (const catId in categories) {
+            renderItems(getEl(`cat-${catId}`), categories[catId]);
+        }
+    };
+    
+    const executeReverseCalculation = () => {
+        resultArea.style.display = 'none';
+        const refineValue = parseInt(cleanNumStr(refineIn.value), 10);
+        if (isNaN(refineValue)) return alert('有効なリファイン値がありません。');
+
+        const rawValues = dwordIn.value.split(';');
+        let valuesWithOffsets = [];
+        const unprocessed = [];
+
+        rawValues.forEach(valStr => {
+            const match = valStr.trim().match(/(\d+)\s*\((\-?\d+)\)/);
+            if (match) {
+                valuesWithOffsets.push({ value: parseInt(match[1]), offset: parseInt(match[2]) });
+            } else {
+                unprocessed.push(valStr);
+            }
+        });
+
+        const refineIndex = unprocessed.map(v => parseInt(cleanNumStr(v), 10)).indexOf(refineValue);
+        if (refineIndex === -1) return alert(`検索パターン内に基準値 ${refineValue} が見つかりません。`);
+
+        unprocessed.forEach((valStr, index) => {
+            const offset = (index - refineIndex) * 4;
+            if (!valuesWithOffsets.some(v => v.offset === offset)) {
+                 valuesWithOffsets.push({ value: parseInt(cleanNumStr(valStr), 10), offset: offset });
+            }
+        });
+        
+        revResultList.innerHTML = '';
+        valuesWithOffsets.sort((a, b) => a.offset - b.offset).forEach(({value, offset}) => {
+            const item = statusData.find(it => it.offset === offset);
+            const li = d.createElement('li');
+            li.innerHTML = `オフセット <b>${offset}</b>: 値 <b>${value}</b> → <b>${item ? item.name : '(該当なし)'}</b>`;
+            revResultList.appendChild(li);
+        });
+        revResultArea.style.display = 'block';
+    };
+
+    const genCode = () => {
+        revResultArea.style.display = 'none';
+        d.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        
+        const refineVal = parseInt(cleanNumStr(refineIn.value), 10);
+        if (isNaN(refineVal)) {
+            alert('有効なリファイン値がありません。');
+            return refineIn.classList.add('is-invalid');
+        }
+
+        const dwordVals = dwordIn.value.split(';').map(s => parseInt(cleanNumStr(s), 10)).filter(n => !isNaN(n));
+        if (dwordVals.length === 0) {
+            alert('有効なDWORD値がありません。');
+            return dwordIn.classList.add('is-invalid');
+        }
+
+        const hexPattern = "h " + dwordVals.map(num => {
+            const buf = new ArrayBuffer(4);
+            new DataView(buf).setInt32(0, num, true);
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(' ');
+        }).join(' ');
+
+        const edits = [];
+        statusData.filter(item => item.checkedGreen).forEach(item => {
+            const valStr = item.value;
+            const value = (valStr.trim() === '') ? 1 : parseInt(valStr, 10);
+            if (valStr.includes('.') || isNaN(value)) {
+                d.querySelectorAll(`[data-offset="${item.offset}"]`).forEach(el => el.classList.add('is-invalid'));
+                throw new Error(`無効な数値です: 「${item.name}」`);
+            }
+            edits.push(`{offset = ${item.offset}, value = ${value}}`);
+        });
+        
+        const rangeParts = [];
+        if (getEl('range-cb').checked) rangeParts.push('gg.REGION_CODE_APP');
+        if (getEl('range-other').checked) rangeParts.push('gg.REGION_OTHER');
+        const rangeSetting = rangeParts.length > 0 ? rangeParts.join(' | ') : 'gg.REGION_OTHER';
+
+        let prefixCode = '';
+        const selectedPrefix = d.querySelector('input[name="lua-prefix"]:checked');
+        if (selectedPrefix && selectedPrefix.value !== 'none') {
+            const type = selectedPrefix.value;
+            if (type === 'elseif_ax_val') prefixCode = `elseif Ax == ${getEl('lua-prefix-val').value || '2'} then\n\n`;
+            else if (type === 'if_ax_nil') prefixCode = `if Ax == nil then return end\n\n`;
+            else if (type === 'if_ax_1') prefixCode = `if Ax == 1 then\n\n`;
+            else if (type === 'if_ax_val') prefixCode = `if Ax == ${getEl('lua-prefix-val2').value || '2'} then\n\n`;
+        }
+
+        const editStr = edits.length > 0 ? '    ' + edits.join(',\n    ') : '';
+        const luaScript = `${prefixCode}gg.clearResults()
+gg.setRanges(${rangeSetting})
+local hexPattern = "${hexPattern}"
+gg.searchNumber(hexPattern, gg.TYPE_HEX)
+local hexResults = gg.getResults(99999)
+if #hexResults == 0 then gg.alert("HEXパターンが見つかりませんでした") return end
+gg.toast("見つかったアドレス数: " .. #hexResults)
+local dwordList = {}
+for _, v in ipairs(hexResults) do table.insert(dwordList, { address = v.address, flags = gg.TYPE_DWORD }) end
+dwordList = gg.getValues(dwordList)
+local refinedList = {}
+for _, v in ipairs(dwordList) do if v.value == ${refineVal} then table.insert(refinedList, v) end end
+if #refinedList == 0 then gg.toast("${refineVal}は見つかりませんでした") return end
+local editSettings = {
+${editStr}
+}
+if #editSettings > 0 then
+  for _, setting in ipairs(editSettings) do
+    local editList = {}
+    for _, v in ipairs(refinedList) do
+      table.insert(editList, { address = v.address + setting.offset, flags = gg.TYPE_DWORD, value = setting.value })
+    end
+    gg.setValues(editList)
+  end
+  gg.toast("複数オフセットの値を書き換えました")
+else
+  gg.toast("変更項目が未選択のため、書き込みませんでした。")
+end
+gg.clearResults()`;
+
+        resultCodeEl.textContent = luaScript.trim();
+        resultArea.style.display = 'block';
+    };
+
+    const syncUI = (offset) => {
+        const data = statusData.find(i => i.offset == offset);
+        if (!data) return;
+        d.querySelectorAll(`.status-item[data-offset="${offset}"]`).forEach(itemEl => {
+            const chkGreen = itemEl.querySelector('.green');
+            const chkRed = itemEl.querySelector('.red');
+            const val = itemEl.querySelector('input[type="number"]');
+            if (chkGreen.checked !== data.checkedGreen) chkGreen.checked = data.checkedGreen;
+            if (chkRed.checked !== data.checkedRed) chkRed.checked = data.checkedRed;
+            if (val.value !== data.value) val.value = data.value;
+        });
+    };
+
+    let rafId;
+    const performSearch = () => {
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+            const query = searchBox.value.trim().toLowerCase();
+            if (!query) {
+                searchResultsWrapper.innerHTML = ''; 
+                searchResultsWrapper.classList.remove('active');
+                return;
+            }
+            const queryHira = kanaToHira(query);
+            const results = statusData.filter(item => {
+                const nameLower = item.name.toLowerCase();
+                const nameHira = kanaToHira(nameLower);
+                return nameLower.includes(query) || nameHira.includes(queryHira);
+            });
+            
+            if (results.length > 0) {
+                searchResultsWrapper.innerHTML = createBatchControlsHTML('search-results-wrapper') + `<div class="status-grid">${results.map(createItemHTML).join('')}</div>`;
+            } else {
+                searchResultsWrapper.innerHTML = '<p>該当する項目はありません。</p>';
+            }
+            searchResultsWrapper.classList.add('active');
+        });
+    };
+
+    genBtn.addEventListener('click', () => { try { genCode(); } catch (e) { alert(e.message); } });
+    reverseBtn.addEventListener('click', executeReverseCalculation);
+    copyBtn.addEventListener('click', () => copyToClip(resultCodeEl.textContent));
+    
+    revCalcCheck.addEventListener('change', (e) => {
+        const isReverse = e.target.checked;
+        genBtn.style.display = isReverse ? 'none' : 'block';
+        reverseBtn.style.display = isReverse ? 'block' : 'none';
+    });
+
+    dwordIn.addEventListener('input', () => {
+        const values = dwordIn.value.split(';').map(s => parseInt(cleanNumStr(s), 10)).filter(n => !isNaN(n) && n >= 5000);
+        if (values.length > 0) {
+            refineIn.value = Math.max(...values);
+        }
+    });
+    
+    menuTabs.addEventListener('click', (e) => {
+        if (e.target.classList.contains('tab-btn')) {
+            d.querySelector('.tab-btn.active').classList.remove('active');
+            d.querySelector('.category-content.active').classList.remove('active');
+            e.target.classList.add('active');
+            getEl(e.target.dataset.target).classList.add('active');
+        }
+    });
+    
+    searchBox.addEventListener('input', performSearch);
+    
+    d.body.addEventListener('input', (e) => {
+        const target = e.target;
+        const controls = target.closest('.batch-controls');
+        if (controls) {
+            const container = getEl(controls.dataset.controlsId) || controls.parentElement;
+            const items = Array.from(container.querySelectorAll('.status-item'));
+            const checkType = target.dataset.checkType;
+            if (checkType) { // Batch check
+                const isChecked = target.checked;
+                const prop = checkType === 'green' ? 'checkedGreen' : 'checkedRed';
+                items.forEach(item => {
+                    const offset = item.dataset.offset;
+                    const data = statusData.find(i => i.offset == offset);
+                    if (data) data[prop] = isChecked;
+                    syncUI(offset);
+                });
+            }
+            if (target.matches('.batch-value')) { // Batch value
+                const value = target.value;
+                if (value.trim() === '') return;
+                items.forEach(item => {
+                    const offset = item.dataset.offset;
+                    const data = statusData.find(i => i.offset == offset);
+                    if (data && data.checkedRed) {
+                        data.value = value;
+                        if(!data.checkedGreen) data.checkedGreen = true;
+                        syncUI(offset);
+                    }
+                });
+            }
+            return;
+        }
+
+        const itemDiv = target.closest('.status-item');
+        if (itemDiv) {
+            const offset = itemDiv.dataset.offset;
+            const data = statusData.find(i => i.offset == offset);
+            if (!data) return;
+
+            if (target.matches('input[type="checkbox"]')) {
+                const prop = target.dataset.checkType === 'green' ? 'checkedGreen' : 'checkedRed';
+                data[prop] = target.checked;
+            }
+            if (target.matches('input[type="number"]')) {
+                data.value = target.value;
+                if (target.value.trim() !== '' && !data.checkedGreen) {
+                    data.checkedGreen = true;
+                }
+            }
+            syncUI(offset);
+        }
+    });
+
+    init();
+});
+</script>
+
+</body>
+</html>
