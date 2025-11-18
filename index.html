@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
     <title>くらむぼんのホームページ</title>
     <style>
@@ -57,7 +58,9 @@
                 <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
             </div>
             <div class="youtube-container">
-                <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA?si=SZ7U0PjuVURPrfOl" target="_blank" class="youtube-link"><img src="チャンネルアイコン.jpg" alt="YouTubeチャンネルアイコン"></a>
+                <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA?si=SZ7U0PjuVURPrfOl" target="_blank" class="youtube-link">
+                    <img src="チャンネルアイコン.jpg" alt="YouTubeチャンネルアイコン" fetchpriority="high">
+                </a>
                 <div class="explain">
                     <p>2023年チャンネル開設。</p>
                     <div class="divider"></div>
@@ -82,7 +85,9 @@
         <section class="widget">
             <h1>文章暗号化BOT</h1>
             <div class="youtube-container">
-                <a href="https://line.me/R/ti/p/@630pniaf" target="_blank" class="youtube-link"><img src="暗号化BOTアイコン.jpg" alt="暗号化BOTアイコン"></a>
+                <a href="https://line.me/R/ti/p/@630pniaf" target="_blank" class="youtube-link">
+                    <img src="暗号化BOTアイコン.jpg" alt="暗号化BOTアイコン" loading="lazy">
+                </a>
                 <div class="explain">
                     <p>LINEで使える暗号化BOT</p>
                     <div class="divider"></div>
@@ -95,9 +100,11 @@
 
     <!-- ▼▼▼ ここからJavaScriptの修正箇所 ▼▼▼ -->
     <script>
+        // --- 設定値 ---
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxy6KEmjZxwgLDygZ-Eom3qbsaE0k5iZ3XBLRN0tRHzdN-KVk7kecZVhPSzQofssrTd/exec';
-        const CACHE_KEY = 'youtube_video_cache'; // sessionStorageに保存する際のキー
+        const CACHE_KEY = 'youtube_video_cache';
 
+        // --- DOM要素の取得 ---
         const sliderRoot = document.getElementById('slider-root');
         const slider = document.querySelector('.video-slider');
         const popularVideosTitle = document.getElementById('popular-videos-title');
@@ -105,6 +112,7 @@
         const prevBtn = document.getElementById('prev-btn');
         const loadingIndicator = document.getElementById('loading-indicator');
 
+        // --- スライダーの状態管理変数 ---
         let videos = [];
         let currentIndex = 0;
         let itemWidth = 0;
@@ -112,15 +120,46 @@
         let autoScrollInterval;
         let isTransitioning = false;
 
-        function moveSlider(index, withAnimation = true) { /* (変更なし) */ if(isTransitioning&&withAnimation)return;if(withAnimation){isTransitioning=true;slider.style.transition='transform 0.5s ease-in-out';}else{slider.style.transition='none';} slider.style.transform=`translateX(-${index*itemWidth}px)`;currentIndex=index; }
-        function nextSlide() { /* (変更なし) */ if(isTransitioning)return;moveSlider(currentIndex+1); }
-        function prevSlide() { /* (変更なし) */ if(isTransitioning)return;moveSlider(currentIndex-1); }
-        function startAutoScroll() { /* (変更なし) */ stopAutoScroll();autoScrollInterval=setInterval(nextSlide,3500); }
-        function stopAutoScroll() { /* (変更なし) */ clearInterval(autoScrollInterval); }
-        function resetAutoScroll() { /* (変更なし) */ stopAutoScroll();startAutoScroll(); }
+        // --- スライダー操作関数 ---
+        function moveSlider(index, withAnimation = true) {
+            if (isTransitioning && withAnimation) return;
+            if (withAnimation) {
+                isTransitioning = true;
+                slider.style.transition = 'transform 0.5s ease-in-out';
+            } else {
+                slider.style.transition = 'none';
+            }
+            slider.style.transform = `translateX(-${index * itemWidth}px)`;
+            currentIndex = index;
+        }
 
+        function nextSlide() {
+            if (isTransitioning) return;
+            moveSlider(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            if (isTransitioning) return;
+            moveSlider(currentIndex - 1);
+        }
+        
+        // --- 自動スクロール関連の関数 ---
+        function startAutoScroll() {
+            stopAutoScroll();
+            autoScrollInterval = setInterval(nextSlide, 3500);
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+        }
+        
+        function resetAutoScroll() {
+             stopAutoScroll();
+             startAutoScroll();
+        }
+
+        // --- スライダーの組み立てと表示を行う関数 ---
         function setupSlider(videoData) {
-            // setupSliderは引数で動画データを受け取るように変更
             videos = videoData;
 
             if (videos.length === 0) {
@@ -131,63 +170,88 @@
             loadingIndicator.style.display = 'none';
             popularVideosTitle.style.display = 'block';
             sliderRoot.style.display = 'block';
+
             visibleItems = window.innerWidth <= 600 ? 2 : 3;
+
             const clonesEnd = videos.slice(0, visibleItems);
             const clonesStart = videos.slice(-visibleItems);
             const allItems = [...clonesStart, ...videos, ...clonesEnd];
-            slider.innerHTML = allItems.map(video => `<div class="video-item"><a href="${video.url}" target="_blank" rel="noopener noreferrer"><img src="${video.thumbnail}" alt="${video.title}" loading="lazy"><p class="video-title">${video.title}</p></a></div>`).join('');
+            
+            slider.innerHTML = allItems.map(video => `
+                <div class="video-item">
+                    <a href="${video.url}" target="_blank" rel="noopener noreferrer">
+                        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+                        <p class="video-title">${video.title}</p>
+                    </a>
+                </div>
+            `).join('');
+
             itemWidth = slider.querySelector('.video-item').getBoundingClientRect().width;
             moveSlider(visibleItems, false);
-            slider.addEventListener('transitionend', () => { isTransitioning=false;if(currentIndex>=videos.length+visibleItems){moveSlider(visibleItems,false);} if(currentIndex<=visibleItems-1){moveSlider(videos.length+visibleItems-1,false);} });
+            
+            slider.addEventListener('transitionend', () => {
+                isTransitioning = false;
+                if (currentIndex >= videos.length + visibleItems) {
+                    moveSlider(visibleItems, false);
+                }
+                if (currentIndex <= visibleItems - 1) {
+                    moveSlider(videos.length + visibleItems - 1, false);
+                }
+            });
+            
             nextBtn.addEventListener('click', () => { nextSlide(); resetAutoScroll(); });
             prevBtn.addEventListener('click', () => { prevSlide(); resetAutoScroll(); });
+
             sliderRoot.addEventListener('mouseenter', stopAutoScroll);
             sliderRoot.addEventListener('mouseleave', startAutoScroll);
-            if (videos.length > visibleItems) { startAutoScroll(); } else { nextBtn.style.display = 'none'; prevBtn.style.display = 'none'; }
+
+            if (videos.length > visibleItems) {
+                startAutoScroll();
+                nextBtn.style.display = 'flex';
+                prevBtn.style.display = 'flex';
+            } else {
+                nextBtn.style.display = 'none';
+                prevBtn.style.display = 'none';
+            }
         }
 
-        /**
-         * 動画情報を取得するメイン関数 (キャッシュ機能付き)
-         */
+        // --- 動画情報を取得するメイン関数 (キャッシュ機能付き) ---
         async function fetchVideos() {
-            // 1. sessionStorageからキャッシュされたデータを試みる
             const cachedData = sessionStorage.getItem(CACHE_KEY);
 
             if (cachedData) {
                 console.log('キャッシュから動画データを読み込みました。');
                 const videoData = JSON.parse(cachedData);
-                setupSlider(videoData); // キャッシュされたデータでスライダーを即時表示
-                return; // GASへの通信は行わない
+                setupSlider(videoData);
+                return;
             }
 
-            // 2. キャッシュがない場合のみ、GASにデータをリクエスト
             console.log('キャッシュが見つからないため、GASから動画データを取得します。');
             try {
                 const response = await fetch(GAS_WEB_APP_URL);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
                 const videoData = await response.json();
                 
-                // 取得したデータをsessionStorageに保存
                 sessionStorage.setItem(CACHE_KEY, JSON.stringify(videoData));
                 console.log('動画データをキャッシュに保存しました。');
                 
-                setupSlider(videoData); // 取得したデータでスライダーを表示
+                setupSlider(videoData);
             } catch (error) {
                 console.error('動画の読み込みエラー:', error);
                 loadingIndicator.innerHTML = '<p>動画の読み込みに失敗しました。時間をおいて再読み込みしてください。</p>';
             }
         }
 
+        // --- イベントリスナー ---
         document.addEventListener('DOMContentLoaded', fetchVideos);
 
         window.addEventListener('resize', () => {
             stopAutoScroll();
             if (videos.length > 0) {
-                // ウィンドウサイズ変更時もキャッシュされたデータを使って再描画
                 setupSlider(videos);
             }
         });
     </script>
-    <!-- ▲▲▲ JavaScriptの修正箇所ここまで ▲▲▲ -->
 </body>
 </html>
