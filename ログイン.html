@@ -2,13 +2,34 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン・新規登録</title>
+    
+    <!-- ▼▼▼ 修正点1: SEOのためのメタディスクリプションを追加 ▼▼▼ -->
+    <meta name="description" content="くらむぼんのホームページのログイン・新規登録ページです。アカウントを作成して、限定コンテンツにアクセスしましょう。">
+
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
+    <title>ログイン・新規登録 - くらむぼんのホームページ</title>
     <style>
-        :root { --primary-color: #98FB98; --secondary-color: #3CB371; --bg-color: #F0FFF0; --widget-bg: #fff; --text-color: #333; --error-color: #d32f2f; --success-color: #2e7d32; --radius: 12px; --shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        :root { 
+            --primary-color: #98FB98; 
+            /* ▼▼▼ 修正点2: コントラスト比改善のため、少し濃い緑に変更 ▼▼▼ */
+            --secondary-color: #2E8B57; /* MediumSeaGreen */
+            --bg-color: #F0FFF0; 
+            --widget-bg: #fff; 
+            --text-color: #333; 
+            --error-color: #d32f2f; 
+            --success-color: #2e7d32; 
+            --radius: 12px; 
+            --shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
         body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-        .page-container { width: 100%; max-width: 500px; }
+        
+        /* ▼▼▼ 修正点3: メインランドマークとしてmainタグを使用 ▼▼▼ */
+        main { 
+            width: 100%; 
+            max-width: 500px; 
+        }
+
         .widget { background-color: var(--widget-bg); padding: 25px 30px; margin-bottom: 25px; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 5px solid var(--secondary-color); box-sizing: border-box; }
         h2 { color: var(--secondary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-top: 0; text-align: center; margin-bottom: 25px; }
         .input-area { margin-bottom: 20px; }
@@ -23,16 +44,14 @@
         .toggle-link { color: var(--secondary-color); cursor: pointer; text-decoration: underline; }
         #register-widget { display: none; }
 
-        /* ▼▼▼ スタイル変更箇所 ▼▼▼ */
         .top-nav {
             display: flex;
             gap: 15px;
-            justify-content: center; /* 中央揃えに変更 */
+            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
         }
         
-        /* ナビゲーションボタンのスタイルを追加 */
         .nav-btn {
             display: inline-flex;
             align-items: center;
@@ -48,36 +67,32 @@
             transition: background-color 0.3s, transform 0.2s;
         }
         .nav-btn:hover {
-            background-color: #2e8b57;
+            background-color: #256d45; /* ホバー色も調整 */
             transform: translateY(-2px);
         }
-        /* ▲▲▲ スタイル変更箇所 ▲▲▲ */
-
     </style>
 </head>
 <body>
 
-    <div class="page-container">
-    
-        <!-- ▼▼▼ HTML構造の変更箇所 ▼▼▼ -->
+    <main>
         <!-- ナビゲーション専用ウィジェット -->
         <section class="widget">
             <h2>メニュー</h2>
-            <div class="top-nav">
+            <nav class="top-nav">
                 <a href="index.html" class="nav-btn">ホーム</a>
                 <a href="にゃんこ大戦争.html" class="nav-btn">ステータス編集</a>
                 <a href="開発者について.html" class="nav-btn">開発者について</a>
                 <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
-            </div>
+            </nav>
         </section>
 
         <!-- ログインウィジェット -->
         <section id="login-widget" class="widget">
-            <!-- ここからナビゲーションボタンを削除 -->
             <h2>ログイン</h2>
-            <form id="login-form">
-                <div class="input-area"><label for="login-username">ユーザー名</label><input type="text" id="login-username" required></div>
-                <div class="input-area"><label for="login-password">パスワード</label><input type="password" id="login-password" required></div>
+            <!-- ▼▼▼ 修正点4: 「偽サイト」警告対策でactionを追加 ▼▼▼ -->
+            <form id="login-form" action="?">
+                <div class="input-area"><label for="login-username">ユーザー名</label><input type="text" id="login-username" name="username" autocomplete="username" required></div>
+                <div class="input-area"><label for="login-password">パスワード</label><input type="password" id="login-password" name="password" autocomplete="current-password" required></div>
                 <button type="submit" id="login-btn" class="action-btn">ログイン</button>
                 <p id="login-message" class="message-area error-message"></p>
             </form>
@@ -85,14 +100,14 @@
                 アカウントをお持ちでないですか？ <span id="show-register" class="toggle-link">新規登録</span>
             </div>
         </section>
-        <!-- ▲▲▲ HTML構造の変更箇所 ▲▲▲ -->
 
         <!-- 新規登録ウィジェット -->
         <section id="register-widget" class="widget">
             <h2>新規登録</h2>
-            <form id="register-form">
-                <div class="input-area"><label for="register-username">ユーザー名 (4～32文字)</label><input type="text" id="register-username" required minlength="4" maxlength="32"></div>
-                <div class="input-area"><label for="register-password">パスワード (8～32文字)</label><input type="password" id="register-password" required minlength="8" maxlength="32"></div>
+             <!-- ▼▼▼ 修正点4: 「偽サイト」警告対策でactionを追加 ▼▼▼ -->
+            <form id="register-form" action="?">
+                <div class="input-area"><label for="register-username">ユーザー名 (4～32文字)</label><input type="text" id="register-username" name="new-username" autocomplete="username" required minlength="4" maxlength="32"></div>
+                <div class="input-area"><label for="register-password">パスワード (8～32文字)</label><input type="password" id="register-password" name="new-password" autocomplete="new-password" required minlength="8" maxlength="32"></div>
                 <button type="submit" id="register-btn" class="action-btn">登録する</button>
                 <p id="register-message" class="message-area"></p>
             </form>
@@ -100,14 +115,12 @@
                 すでにアカウントをお持ちですか？ <span id="show-login" class="toggle-link">ログイン</span>
             </div>
         </section>
-    </div>
+    </main>
 
     <script>
-        // ★★★ GASのURLはご提示いただいたものに設定済みです ★★★
+        // JavaScript部分は変更ありません
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyg8vbJ8E71deMuMgd9J55-fbdfBc_b0RdI6ouOUY3ZmtM3sH0S2uvQ8IV4X4P1zR3o/exec';
         const LOGGED_IN_PAGE = 'にゃんこ大戦争.html';
-
-        // --- JavaScript部分は変更ありません ---
         const loginWidget = document.getElementById('login-widget');
         const registerWidget = document.getElementById('register-widget');
         const showRegisterLink = document.getElementById('show-register');
