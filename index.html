@@ -1,152 +1,77 @@
 <!DOCTYPE html>
-<!-- ▼ SEO: OGP(SNS共有)設定のためにprefixを追加 ▼ -->
 <html lang="ja" prefix="og: http://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- ▼ SEO: 具体的なキーワードを入れ、より魅力的なタイトルに修正 ▼ -->
     <title>くらむぼん公式サイト｜YouTube活動とLINE BOT開発</title>
-    <!-- ▼ SEO: ページ内容をより具体的に記述 ▼ -->
     <meta name="description" content="くらむぼんの公式サイト。YouTubeチャンネルでの活動報告や、開発したLINE「文章暗号化BOT」の情報を発信しています。">
-    
-    <!-- ▼ SEO: URLを正規化し、検索評価の重複を防ぐ canonical タグ ▼ -->
     <link rel="canonical" href="https://nyankohack.tokyo/">
+    
+    <!-- ファイル名はご指定の通り変更していません -->
+    <link rel="icon" type="image/png" href="チャンネルアイコン.jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="チャンネルアイコン.jpg">
 
-    <!-- ▼ Favicon設定の最適化: 複数のデバイスに対応 ▼ -->
-    <!-- ※ファイル名は "kuramubon-icon.png" のような英数字を推奨します -->
-    <link rel="icon" type="image/png" href="kuramubon-icon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="kuramubon-icon.png">
-
-    <!-- ▼ SEO: OGP (Open Graph Protocol) タグ / SNSでシェアされた際の表示を設定 ▼ -->
+    <!-- OGP (SNS共有) タグ -->
     <meta property="og:url" content="https://nyankohack.tokyo/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="くらむぼん公式サイト｜YouTubeとLINE BOT開発">
     <meta property="og:description" content="YouTubeチャンネルや開発したLINE BOTの情報を発信しています。">
     <meta property="og:site_name" content="くらむぼん公式サイト">
-    <meta property="og:image" content="https://nyankohack.tokyo/kuramubon-icon.png">
+    <meta property="og:image" content="https://nyankohack.tokyo/チャンネルアイコン.jpg">
 
-    <!-- ▼ SEO: Twitterカード タグ / Twitterでシェアされた際の表示を設定 ▼ -->
+    <!-- Twitterカード タグ -->
     <meta name="twitter:card" content="summary">
-    <!-- <meta name="twitter:site" content="@[あなたのTwitter ID]"> もしあれば -->
     <meta name="twitter:title" content="くらむぼん公式サイト">
     <meta name="twitter:description" content="YouTubeやLINE BOT開発の情報を発信中！">
-    <meta name="twitter:image" content="https://nyankohack.tokyo/kuramubon-icon.png">
+    <meta name="twitter:image" content="https://nyankohack.tokyo/チャンネルアイコン.jpg">
 
     <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
 
-    <!-- ▼ SEO: 構造化データ(JSON-LD) / 検索エンジンにサイトの情報を正確に伝える ▼ -->
+    <!-- 構造化データ -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Person",
       "name": "くらむぼん",
       "url": "https://nyankohack.tokyo/",
-      "sameAs": [
-        "https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA"
-      ]
+      "sameAs": ["https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA"]
     }
     </script>
-
     <style>
-        /* --- 基本設定とカラーパレット --- */
         :root {
-            /* ライトモードの配色 */
-            --primary-color: #98FB98;
-            --secondary-color: #2E8B57;
-            --bg-color: #F0FFF0;
-            --widget-bg: #FFFFFF;
-            --text-color: #333333;
-            --border-color: #E0E0E0;
-            --shadow-color: rgba(0,0,0,0.1);
-            --radius: 12px;
+            --primary-color: #98FB98; --secondary-color: #2E8B57; --bg-color: #F0FFF0;
+            --widget-bg: #FFFFFF; --text-color: #333333; --border-color: #E0E0E0;
+            --shadow-color: rgba(0,0,0,0.1); --radius: 12px;
         }
-
-        /* ▼ 機能追加: ダークモード対応 ▼ */
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary-color: #2E8B57;
-                --secondary-color: #98FB98;
-                --bg-color: #121212;
-                --widget-bg: #1E1E1E;
-                --text-color: #E0E0E0;
-                --border-color: #444444;
+                --primary-color: #2E8B57; --secondary-color: #98FB98; --bg-color: #121212;
+                --widget-bg: #1E1E1E; --text-color: #E0E0E0; --border-color: #444444;
                 --shadow-color: rgba(0,0,0,0.4);
             }
         }
-
-        /* --- 基本レイアウト --- */
         html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column; /* ヘッダー・フッターのために縦並びに */
-            align-items: center;
-            min-height: 100vh;
-        }
+        body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         #page-container { width: 100%; max-width: 800px; }
-
-        /* ▼ 機能追加: ヘッダーとフッターのスタイル ▼ */
-        .site-header, .site-footer {
-            width: 100%;
-            padding: 20px 0;
-        }
-        .site-footer {
-            text-align: center;
-            font-size: 0.9em;
-            color: #888;
-            margin-top: 20px;
-        }
-        
-        /* --- 共通コンポーネント --- */
-        .widget {
-            background-color: var(--widget-bg);
-            padding: 25px;
-            margin-bottom: 20px;
-            border-radius: var(--radius);
-            box-shadow: 0 4px 8px var(--shadow-color);
-            border-left: 5px solid var(--secondary-color);
-        }
-        /* ▼ SEO: h1はページに一つが原則のため、セクションタイトルはh2に統一 ▼ */
+        .site-header, .site-footer { width: 100%; padding: 20px 0; }
+        .site-footer { text-align: center; font-size: 0.9em; color: #888; margin-top: 20px; }
+        .widget { background-color: var(--widget-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px var(--shadow-color); border-left: 5px solid var(--secondary-color); }
         h1, h2, h3 { color: var(--secondary-color); margin-top: 0; }
-        h1 { text-align: center; font-size: 2.5em; } /* サイトタイトル */
-        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; } /* セクションタイトル */
-        h3 { font-size: 1.5em; border-bottom: none; } /* ウィジェット内の小見出し */
-
+        h1 { text-align: center; font-size: 2.5em; }
+        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
+        h3 { font-size: 1.5em; border-bottom: none; }
         nav { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-        .nav-btn {
-            padding: 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            font-weight: bold;
-            border-radius: var(--radius);
-            transition: background-color 0.3s, transform 0.2s;
-        }
+        .nav-btn { padding: 15px; background-color: var(--secondary-color); color: white; text-decoration: none; text-align: center; font-weight: bold; border-radius: var(--radius); transition: background-color 0.3s, transform 0.2s; }
         .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
         .divider { height: 2px; background-color: var(--border-color); width: 100%; margin: 25px 0; }
-
-        /* --- コンテンツ特有のスタイル --- */
         .profile-container { display: flex; align-items: center; gap: 20px; margin-top: 25px; }
-        .profile-link img {
-            width: 200px; height: 200px;
-            object-fit: cover;
-            border-radius: var(--radius);
-            display: block;
-        }
+        .profile-link img { width: 200px; height: 200px; object-fit: cover; border-radius: var(--radius); display: block; }
         .profile-link:hover img { opacity: 0.85; }
         .explain p { margin: 0; line-height: 1.6; }
         .explain code { background-color: var(--border-color); padding: 2px 5px; border-radius: 4px; }
-
-        /* --- 動画スライダー --- */
         #loading-indicator { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 10px; }
         .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--secondary-color); animation: spin 1s ease infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .video-slider-wrapper { position: relative; margin-top: 20px; }
         .video-slider-container { overflow: hidden; }
         .video-slider { display: flex; }
@@ -155,21 +80,11 @@
         .video-item img { width: 100%; border-radius: var(--radius); box-shadow: 0 4px 8px var(--shadow-color); transition: transform 0.3s; aspect-ratio: 16 / 9; object-fit: cover; }
         .video-item a:hover img { transform: scale(1.05); }
         .video-title { margin-top: 8px; font-size: 14px; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; height: 2.8em; }
-        
-        .slider-nav {
-            position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px;
-            background-color: rgba(0, 0, 0, 0.5); color: white; border: none; border-radius: 50%;
-            font-size: 24px; cursor: pointer; z-index: 10;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.3s, background-color 0.3s;
-            opacity: 0; pointer-events: none;
-        }
+        .slider-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background-color: rgba(0, 0, 0, 0.5); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10; display: flex; justify-content: center; align-items: center; transition: opacity 0.3s, background-color 0.3s; opacity: 0; pointer-events: none; }
         .video-slider-wrapper:hover .slider-nav { opacity: 1; pointer-events: auto; }
         .slider-nav:hover { background-color: rgba(0, 0, 0, 0.8); }
         #prev-btn { left: -20px; }
         #next-btn { right: -20px; }
-
-        /* --- レスポンシブ対応 --- */
         @media (max-width: 600px) {
             .profile-container { flex-direction: column; }
             .video-item { flex: 0 0 50%; }
@@ -179,16 +94,9 @@
     </style>
 </head>
 <body>
-
     <div id="page-container">
-        <!-- ▼ 機能追加: サイトヘッダー ▼ -->
-        <header class="site-header">
-            <!-- ▼ SEO: <h1>は見出し階層のトップ。ページに1つが理想 ▼ -->
-            <h1>くらむぼん公式サイト</h1>
-        </header>
-
+        <header class="site-header"><h1>くらむぼん公式サイト</h1></header>
         <main id="main-content">
-            <!-- ▼ 構造化: aria-labelledbyでセクションの目的を明示 ▼ -->
             <section class="widget" aria-labelledby="profile-title">
                 <h2 id="profile-title">プロフィール &amp; 活動</h2>
                 <nav>
@@ -196,11 +104,8 @@
                     <a href="開発者について.html" class="nav-btn">開発者について</a>
                     <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
                 </nav>
-
                 <div class="profile-container">
-                    <!-- ▼ SEO: リンク先が外部サイトであることを明示 ▼ -->
                     <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA" target="_blank" rel="noopener noreferrer" class="profile-link">
-                        <!-- ▼ 画像ファイル名は日本語を避け、英数字を推奨します (例: kuramubon-icon.png) ▼ -->
                         <img src="チャンネルアイコン.jpg" alt="YouTubeチャンネルアイコン" width="200" height="200" fetchpriority="high">
                     </a>
                     <div class="explain">
@@ -210,14 +115,9 @@
                         <p>総トロ74000以上。<br>最高マスター1</p>
                     </div>
                 </div>
-
                 <div class="divider"></div>
-
                 <h3 id="popular-videos-title" style="display: none;">人気の動画</h3>
-                <div id="loading-indicator">
-                    <div class="spinner"></div>
-                    <p>動画を読み込み中...</p>
-                </div>
+                <div id="loading-indicator"><div class="spinner"></div><p>動画を読み込み中...</p></div>
                 <div id="slider-root" style="display: none;">
                     <div class="video-slider-wrapper">
                         <div class="video-slider-container"><div class="video-slider"></div></div>
@@ -226,12 +126,10 @@
                     </div>
                 </div>
             </section>
-
             <section class="widget" aria-labelledby="bot-title">
                 <h2 id="bot-title">文章暗号化BOT</h2>
                 <div class="profile-container">
                     <a href="https://line.me/R/ti/p/@630pniaf" target="_blank" rel="noopener noreferrer" class="profile-link">
-                        <!-- ▼ 画像ファイル名は日本語を避け、英数字を推奨します (例: crypto-bot-icon.png) ▼ -->
                         <img src="暗号化BOTアイコン.jpg" alt="文章暗号化BOTのアイコン" width="200" height="200" fetchpriority="high">
                     </a>
                     <div class="explain">
@@ -243,154 +141,29 @@
                 </div>
             </section>
         </main>
-
-        <!-- ▼ 機能追加: サイトフッター ▼ -->
-        <footer class="site-footer">
-            <p>&copy; 2024 くらむぼん. All Rights Reserved.</p>
-        </footer>
+        <footer class="site-footer"><p>&copy; 2024 くらむぼん. All Rights Reserved.</p></footer>
     </div>
-
     <script>
-        // --- 設定値 ---
+        // (JavaScriptは変更なし)
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxy6KEmjZxwgLDygZ-Eom3qbsaE0k5iZ3XBLRN0tRHzdN-KVk7kecZVhPSzQofssrTd/exec';
         const CACHE_KEY = 'youtube_video_cache';
-
-        // --- DOM要素の取得 ---
         const sliderRoot = document.getElementById('slider-root');
         const slider = document.querySelector('.video-slider');
         const popularVideosTitle = document.getElementById('popular-videos-title');
         const nextBtn = document.getElementById('next-btn');
         const prevBtn = document.getElementById('prev-btn');
         const loadingIndicator = document.getElementById('loading-indicator');
-
-        // --- スライダーの状態管理変数 ---
-        let videos = [];
-        let currentIndex = 0;
-        let itemWidth = 0;
-        let visibleItems = 3;
-        let autoScrollInterval;
-        let isTransitioning = false;
-
-        // --- スライダー操作関数 ---
-        function moveSlider(index, withAnimation = true) {
-            if (isTransitioning && withAnimation) return;
-            if (withAnimation) {
-                isTransitioning = true;
-                slider.style.transition = 'transform 0.5s ease-in-out';
-            } else {
-                slider.style.transition = 'none';
-            }
-            slider.style.transform = `translateX(-${index * itemWidth}px)`;
-            currentIndex = index;
-        }
-
-        function nextSlide() {
-            if (isTransitioning) return;
-            moveSlider(currentIndex + 1);
-        }
-
-        function prevSlide() {
-            if (isTransitioning) return;
-            moveSlider(currentIndex - 1);
-        }
-        
-        // --- 自動スクロール関連の関数 ---
-        function startAutoScroll() {
-            stopAutoScroll();
-            autoScrollInterval = setInterval(nextSlide, 3500);
-        }
-
-        function stopAutoScroll() {
-            clearInterval(autoScrollInterval);
-        }
-        
-        function resetAutoScroll() {
-             stopAutoScroll();
-             startAutoScroll();
-        }
-
-        // --- スライダーの組み立てと表示を行う関数 ---
-        function setupSlider(videoData) {
-            videos = videoData;
-
-            if (videos.length === 0) {
-                loadingIndicator.innerHTML = '<p>表示する動画がありません。</p>';
-                return;
-            }
-
-            loadingIndicator.style.display = 'none';
-            popularVideosTitle.style.display = 'block';
-            sliderRoot.style.display = 'block';
-
-            visibleItems = window.innerWidth <= 600 ? 2 : 3;
-            const clonesEnd = videos.slice(0, visibleItems);
-            const clonesStart = videos.slice(-visibleItems);
-            const allItems = [...clonesStart, ...videos, ...clonesEnd];
-            
-            slider.innerHTML = allItems.map(video => `
-                <div class="video-item">
-                    <a href="${video.url}" target="_blank" rel="noopener noreferrer">
-                        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy" width="480" height="360">
-                        <p class="video-title">${video.title}</p>
-                    </a>
-                </div>
-            `).join('');
-
-            itemWidth = slider.querySelector('.video-item').getBoundingClientRect().width;
-            moveSlider(visibleItems, false);
-            
-            slider.addEventListener('transitionend', () => {
-                isTransitioning = false;
-                if (currentIndex >= videos.length + visibleItems) {
-                    moveSlider(visibleItems, false);
-                }
-                if (currentIndex <= visibleItems - 1) {
-                    moveSlider(videos.length + visibleItems - 1, false);
-                }
-            });
-            
-            nextBtn.addEventListener('click', () => { nextSlide(); resetAutoScroll(); });
-            prevBtn.addEventListener('click', () => { prevSlide(); resetAutoScroll(); });
-            sliderRoot.addEventListener('mouseenter', stopAutoScroll);
-            sliderRoot.addEventListener('mouseleave', startAutoScroll);
-
-            if (videos.length > visibleItems) {
-                startAutoScroll();
-                nextBtn.style.display = 'flex';
-                prevBtn.style.display = 'flex';
-            } else {
-                nextBtn.style.display = 'none';
-                prevBtn.style.display = 'none';
-            }
-        }
-
-        // --- 動画情報を取得するメイン関数 (キャッシュ機能付き) ---
-        async function fetchVideos() {
-            try {
-                const cachedData = sessionStorage.getItem(CACHE_KEY);
-                if (cachedData) {
-                    setupSlider(JSON.parse(cachedData));
-                    return;
-                }
-                const response = await fetch(GAS_WEB_APP_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const videoData = await response.json();
-                sessionStorage.setItem(CACHE_KEY, JSON.stringify(videoData));
-                setupSlider(videoData);
-            } catch (error) {
-                console.error('動画の読み込みエラー:', error);
-                loadingIndicator.innerHTML = '<p>動画の読み込みに失敗しました。時間をおいて再読み込みしてください。</p>';
-            }
-        }
-
-        // --- イベントリスナー ---
+        let videos = [], currentIndex = 0, itemWidth = 0, visibleItems = 3, autoScrollInterval, isTransitioning = false;
+        function moveSlider(index, withAnimation = true) { if (isTransitioning && withAnimation) return; if (withAnimation) { isTransitioning = true; slider.style.transition = 'transform 0.5s ease-in-out'; } else { slider.style.transition = 'none'; } slider.style.transform = `translateX(-${index * itemWidth}px)`; currentIndex = index; }
+        function nextSlide() { if (isTransitioning) return; moveSlider(currentIndex + 1); }
+        function prevSlide() { if (isTransitioning) return; moveSlider(currentIndex - 1); }
+        function startAutoScroll() { stopAutoScroll(); autoScrollInterval = setInterval(nextSlide, 3500); }
+        function stopAutoScroll() { clearInterval(autoScrollInterval); }
+        function resetAutoScroll() { stopAutoScroll(); startAutoScroll(); }
+        function setupSlider(videoData) { videos = videoData; if (videos.length === 0) { loadingIndicator.innerHTML = '<p>表示する動画がありません。</p>'; return; } loadingIndicator.style.display = 'none'; popularVideosTitle.style.display = 'block'; sliderRoot.style.display = 'block'; visibleItems = window.innerWidth <= 600 ? 2 : 3; const clonesEnd = videos.slice(0, visibleItems); const clonesStart = videos.slice(-visibleItems); const allItems = [...clonesStart, ...videos, ...clonesEnd]; slider.innerHTML = allItems.map(video => `<div class="video-item"><a href="${video.url}" target="_blank" rel="noopener noreferrer"><img src="${video.thumbnail}" alt="${video.title}" loading="lazy" width="480" height="360"><p class="video-title">${video.title}</p></a></div>`).join(''); itemWidth = slider.querySelector('.video-item').getBoundingClientRect().width; moveSlider(visibleItems, false); slider.addEventListener('transitionend', () => { isTransitioning = false; if (currentIndex >= videos.length + visibleItems) { moveSlider(visibleItems, false); } if (currentIndex <= visibleItems - 1) { moveSlider(videos.length + visibleItems - 1, false); } }); nextBtn.addEventListener('click', () => { nextSlide(); resetAutoScroll(); }); prevBtn.addEventListener('click', () => { prevSlide(); resetAutoScroll(); }); sliderRoot.addEventListener('mouseenter', stopAutoScroll); sliderRoot.addEventListener('mouseleave', startAutoScroll); if (videos.length > visibleItems) { startAutoScroll(); nextBtn.style.display = 'flex'; prevBtn.style.display = 'flex'; } else { nextBtn.style.display = 'none'; prevBtn.style.display = 'none'; } }
+        async function fetchVideos() { try { const cachedData = sessionStorage.getItem(CACHE_KEY); if (cachedData) { setupSlider(JSON.parse(cachedData)); return; } const response = await fetch(GAS_WEB_APP_URL); if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); const videoData = await response.json(); sessionStorage.setItem(CACHE_KEY, JSON.stringify(videoData)); setupSlider(videoData); } catch (error) { console.error('動画の読み込みエラー:', error); loadingIndicator.innerHTML = '<p>動画の読み込みに失敗しました。時間をおいて再読み込みしてください。</p>'; } }
         document.addEventListener('DOMContentLoaded', fetchVideos);
-        window.addEventListener('resize', () => {
-            if (videos.length > 0) {
-                stopAutoScroll();
-                setupSlider(videos);
-            }
-        });
+        window.addEventListener('resize', () => { if (videos.length > 0) { stopAutoScroll(); setupSlider(videos); } });
     </script>
 </body>
 </html>
