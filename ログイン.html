@@ -8,7 +8,6 @@
     <meta name="robots" content="noindex">
     <link rel="canonical" href="https://nyankohack.tokyo/ログイン.html">
     
-    <!-- ファイル名はご指定の通り変更していません -->
     <link rel="icon" type="image/png" href="チャンネルアイコン.jpg">
     <link rel="apple-touch-icon" sizes="180x180" href="チャンネルアイコン.jpg">
 
@@ -46,6 +45,12 @@
         .top-nav { display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap; }
         .nav-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 150px; height: 40px; background-color: var(--secondary-color); color: white; font-weight: bold; text-decoration: none; border-radius: 8px; padding: 0 20px; transition: background-color 0.3s, transform 0.2s; }
         .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
+        
+        /* ▼▼▼ 追加したスタイル ▼▼▼ */
+        .notice-text { font-size: 0.9em; color: #888; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+        .footer-links { text-align: center; margin-top: 15px; font-size: 0.9em; }
+        .footer-links a { color: var(--secondary-color); text-decoration: none; margin: 0 10px; }
+        .footer-links a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -58,8 +63,14 @@
                 <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
             </nav>
         </section>
+
+        <!-- ▼▼▼ 修正点1: 説明文を追加して、ブラウザとユーザーに目的を伝える ▼▼▼ -->
         <section id="login-widget" class="widget">
             <h2>ログイン</h2>
+            <p class="notice-text">
+                このサイトの限定コンテンツ（ステータス編集ページなど）を利用するためのアカウントでログインします。<br>
+                <strong>※Googleや他のサービスのアカウントとは一切関係ありません。</strong>
+            </p>
             <form id="login-form" action="?">
                 <div class="input-area">
                     <label for="login-username">ユーザー名</label>
@@ -75,9 +86,20 @@
             <div class="form-toggle">
                 アカウントをお持ちでないですか？ <span id="show-register" class="toggle-link">新規登録</span>
             </div>
+            <!-- ▼▼▼ 修正点2: プライバシーポリシー等へのリンクを追加 ▼▼▼ -->
+            <div class="footer-links">
+                <a href="privacy-policy.html" target="_blank">プライバシーポリシー</a>
+                <a href="terms-of-service.html" target="_blank">利用規約</a>
+            </div>
         </section>
+
         <section id="register-widget" class="widget">
             <h2>新規登録</h2>
+            <!-- ▼▼▼ 修正点1: こちらにも説明文を追加 ▼▼▼ -->
+            <p class="notice-text">
+                このサイト専用のアカウントを新規作成します。<br>
+                ここで登録した情報が、他のサービスで使用されることはありません。
+            </p>
             <form id="register-form" action="?">
                 <div class="input-area">
                     <label for="register-username">ユーザー名 (4～32文字)</label>
@@ -92,6 +114,11 @@
             </form>
             <div class="form-toggle">
                 すでにアカウントをお持ちですか？ <span id="show-login" class="toggle-link">ログイン</span>
+            </div>
+            <!-- ▼▼▼ 修正点2: こちらにもリンクを追加 ▼▼▼ -->
+            <div class="footer-links">
+                <a href="privacy-policy.html" target="_blank">プライバシーポリシー</a>
+                <a href="terms-of-service.html" target="_blank">利用規約</a>
             </div>
         </section>
     </main>
