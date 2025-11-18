@@ -2,11 +2,18 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ggコードジェネレーター</title>
+    
+    <!-- ▼▼▼ 修正点1: モバイル表示最適化とSEOのためのmetaタグを追加 ▼▼▼ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GameGuardian（GG）用のLuaスクリプトをステップ・バイ・ステップで簡単に生成できるツールです。値の検索からリファイン、書き換えまでをサポートします。">
+    
+    <title>Lua Editor - GGコードジェネレーター</title>
     <style>
+        /* === 基本設定 === */
         :root {
             --primary-color: #98FB98;
-            --secondary-color: #3CB371;
+            /* ▼▼▼ 修正点2: コントラスト比改善のため、少し濃い緑に変更 ▼▼▼ */
+            --secondary-color: #2E8B57; /* MediumSeaGreen */
             --bg-color: #F0FFF0;
             --widget-bg: #fff;
             --text-color: #333;
@@ -31,36 +38,6 @@
             max-width: 800px;
         }
 
-        /* --- ここから修正・追加したCSS --- */
-
-        /* ナビゲーションウィジェットのコンテナ */
-        .top-nav {
-            display: flex;
-            gap: 15px; /* ウィジェット間の隙間 */
-            margin-bottom: 20px; /*下のコンテンツとのマージン*/
-        }
-
-        /* ナビゲーションウィジェットのスタイル */
-        .nav-btn {
-            flex: 1; /* 利用可能なスペースを均等に分割 */
-            padding: 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            font-weight: bold;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .nav-btn:hover {
-            background-color: #2e8b57; /* 少し濃い緑に */
-            transform: translateY(-2px); /* 少し浮き上がる効果 */
-        }
-        
-        /* --- ここまで修正・追加したCSS --- */
-
         .widget {
             background-color: var(--widget-bg);
             padding: 25px;
@@ -77,17 +54,45 @@
             margin-top: 0;
         }
 
+        /* === ナビゲーション === */
+        .top-nav {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            border-radius: var(--radius);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: #256d45; /* ホバー色も調整 */
+            transform: translateY(-2px);
+        }
+
+        /* === フォーム要素 === */
         .input-area {
             margin-bottom: 20px;
         }
-
         .input-area label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
             font-size: 1.1em;
         }
-
         input[type="text"], select {
             width: 100%;
             padding: 12px;
@@ -97,21 +102,20 @@
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
-
         input[type="text"]:focus, select:focus {
             outline: none;
             border-color: var(--secondary-color);
         }
 
+        /* === ボタン === */
         .button-wrapper {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-
         .action-btn, .back-btn {
             display: inline-block;
-            flex: 1; /* ボタンの幅を均等に */
+            flex: 1;
             padding: 15px;
             font-size: 18px;
             font-weight: bold;
@@ -122,56 +126,58 @@
             transition: background-color 0.3s;
             text-align: center;
         }
-        
         .action-btn {
             background-color: var(--secondary-color);
         }
         .action-btn:hover {
-            background-color: #2e8b57;
+            background-color: #256d45;
         }
-        
         .back-btn {
             background-color: #888;
         }
         .back-btn:hover {
             background-color: #666;
         }
-
-        /* 最初の選択肢など、ボタンが1つの場合は全幅にする */
         .single-button-wrapper .action-btn {
             width: 100%;
             flex: none;
         }
 
-        /* 各ステップのコンテナ */
+        /* === ステップ表示制御 === */
         .step {
-            display: none; /* 初期状態ではすべて非表示 */
+            display: none;
         }
         .step.active {
-            display: block; /* activeクラスが付いたものだけ表示 */
+            display: block;
             animation: fadeIn 0.5s ease;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 結果表示エリア */
+        /* === 結果表示エリア === */
         #result-code-wrap {
             position: relative;
         }
-
         #result-code {
-            background-color: #000000; /* 背景を黒に */
+            background-color: #2d2d2d; /* ダークな背景色 */
             color: #f0f0f0;
             padding: 20px;
-            padding-top: 50px; /* ボタンのスペース確保 */
+            padding-top: 50px;
             border-radius: 8px;
             white-space: pre-wrap;
             word-wrap: break-word;
             font-family: 'Courier New', Courier, monospace;
             font-size: 1.1em;
+        }
+        .result-display pre {
+             background-color:#f0f0f0;
+             padding:15px;
+             border-radius:8px;
+             white-space: pre-wrap;
+             word-wrap: break-word;
+             font-family: 'Courier New', Courier, monospace;
         }
 
         #copy-btn {
@@ -186,32 +192,27 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-
         #copy-btn:hover {
-            background-color: #2e8b57;
+            background-color: #256d45;
         }
-        
         #copy-btn.copied {
             background-color: #99ac2c;
         }
-
     </style>
 </head>
 <body>
 
 <main id="main-content">
-
-    <!-- 横並びのナビゲーションウィジェット -->
-    <div class="top-nav">
-        <a href="index.html" class="nav-btn">ホーム</a>
-        <a href="ログイン.html" class="nav-btn">ステータス編集</a>
-        <a href="開発者について.html" class="nav-btn">開発者について</a>
-        <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
-    </div>
-
-    <!-- メインコンテンツのウィジェット -->
     <section class="widget">
-        <h1>ggコード生成ツール</h1>
+        <h1>GGコード生成ツール</h1>
+
+        <!-- ナビゲーション -->
+        <nav class="top-nav">
+            <a href="index.html" class="nav-btn">ホーム</a>
+            <a href="ログイン.html" class="nav-btn">ステータス編集</a>
+            <a href="開発者について.html" class="nav-btn">開発者について</a>
+            <a href="Lua_editor.html" class="nav-btn" style="background-color: #256d45;">Lua editor</a>
+        </nav>
 
         <!-- Step 0: 初期選択 -->
         <div id="step0" class="step active">
@@ -295,7 +296,6 @@
 </main>
 
 <script>
-    // ユーザーの入力を保存するオブジェクト
     const userData = {
         searchType: '',
         searchValue: '',
@@ -303,7 +303,6 @@
         editValue: ''
     };
 
-    // 指定されたステップを表示し、他を非表示にする関数
     function showStep(stepId) {
         document.querySelectorAll('.step').forEach(step => {
             step.classList.remove('active');
@@ -311,7 +310,6 @@
         document.getElementById(stepId).classList.add('active');
     }
 
-    // 前のステップに戻る関数
     function goBack(currentStep) {
         let prevStep;
         switch (currentStep) {
@@ -326,7 +324,6 @@
         }
     }
 
-    // コードを生成し、表示する関数
     function generateCode(stage) {
         if (stage >= 1) {
             userData.searchType = document.getElementById('search-type').value;
@@ -344,13 +341,13 @@
         switch (stage) {
             case 1:
                 code = `gg.searchNumber("${userData.searchValue}", ${userData.searchType})\ngg.getResults(99999)`;
-                document.getElementById('result-area-1').innerHTML = `<pre style="background-color:#f0f0f0; padding:15px; border-radius:8px;">${code}</pre>`;
+                document.getElementById('result-area-1').innerHTML = `<pre>${code}</pre>`;
                 break;
             case 2:
                 code = `gg.searchNumber("${userData.searchValue}", ${userData.searchType})\n`;
                 code += `gg.getResults(99999)\n`;
                 code += `gg.refineNumber("${userData.refineValue}")`;
-                document.getElementById('result-area-2').innerHTML = `<pre style="background-color:#f0f0f0; padding:15px; border-radius:8px;">${code}</pre>`;
+                document.getElementById('result-area-2').innerHTML = `<pre>${code}</pre>`;
                 break;
             case 3:
                 code = `gg.searchNumber("${userData.searchValue}", ${userData.searchType})\n`;
@@ -362,7 +359,6 @@
         }
     }
     
-    // クリップボードにコードをコピーする関数
     function copyCode() {
         const codeToCopy = document.getElementById('result-code').textContent;
         const copyButton = document.getElementById('copy-btn');
@@ -380,7 +376,6 @@
             alert('コードのコピーに失敗しました。');
         });
     }
-
 </script>
 
 </body>
