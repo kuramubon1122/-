@@ -1,113 +1,183 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <title>ログインページ</title>
     <meta charset="UTF-8">
+    
+    <!-- ▼▼▼ 修正点1: モバイル表示最適化とSEOのためのmetaタグを追加 ▼▼▼ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ウェブサイト開発者「くらむぼん」のプロフィールページです。ADHDの当事者であり、YouTubeでの活動についても紹介しています。">
+
+    <title>開発者について - くらむぼんのホームページ</title>
+    
     <style>
+        /* === 基本設定 === */
         :root {
             --primary-color: #98FB98; 
-            --secondary-color: #3CB371; 
+            --secondary-color: #2E8B57; /* コントラスト比改善のため濃い緑に */
             --bg-color: #F0FFF0;
             --widget-bg: #fff; 
             --text-color: #333; 
-            --error-color: #d32f2f; 
-            --red-check: #ff6b6b;
             --radius: 12px; 
             --shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        /* secondary-colorを使いたい場合 */
-        .secondary-bg {
-            background-color: var(--secondary-color);
-            color: white; /* 文字色も変更 */
-            padding: 10px;
-            border-radius: var(--radius);
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
+        main {
+            width: 100%;
+            max-width: 800px;
+        }
 
+        .widget {
+            background-color: var(--widget-bg);
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
 
+        h1, h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+        }
 
+        h1 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
 
+        hr.divider {
+            border: none;
+            height: 2px;
+            background-color: #e0e0e0;
+            width: 100%;
+            margin: 25px 0;
+        }
+
+        /* === ナビゲーション === */
         .top-nav {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-start; /* 左寄せでも中央寄せでもOK */
-    align-items: center;          /* 縦中央揃え */
-    flex-wrap: wrap;              /* 横に並ばなければ折り返す */
-    margin-bottom: 30px;
-}
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
 
-.nav-btn {
-    display: inline-flex;        /* 横並び確保 */
-    align-items: center;          /* 高さ中央揃え */
-    justify-content: center;
-    min-width: 150px;             /* 横幅指定 */
-    height: 40px;                 /* 高さ指定で縦長防止 */
-    background-color: #808080;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 8px;
-    padding: 0 20px;              /* 横の余白 */
-    transition: background-color 0.3s;
-}
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+            height: 40px;
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: #256d45;
+            transform: translateY(-2px);
+        }
 
-.nav-btn:hover {
-    background-color: #666;
-}
+        /* === プロフィールカード === */
+        .profile-card {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
 
-
+        .profile-card h2 {
+            color: white; /* h2の文字色を白に上書き */
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            font-size: 1.2em; /* フォントサイズ調整 */
+            line-height: 1.6; /* 行間調整 */
+        }
         
+        /* === リンクセクション === */
+        .link-section {
+            display: flex;
+            flex-wrap: wrap; /* スマホ表示で折り返すように */
+            align-items: center;
+            gap: 20px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: var(--radius);
+        }
+        
+        .link-section img {
+            border-radius: 50%; /* 円形に */
+            object-fit: cover;
+        }
 
+        .link-section .link-content {
+            flex: 1; /* 残りのスペースを埋める */
+        }
+        .link-section h2 {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 15px;
+        }
 
     </style>
 </head>
 <body>
+    <main>
+        <div class="widget">
+            <h1>開発者について</h1>
 
+            <!-- ナビゲーション -->
+            <nav class="top-nav">
+                <a href="index.html" class="nav-btn">ホーム</a>
+                <a href="ログイン.html" class="nav-btn">ステータス編集</a>
+                <a href="開発者について.html" class="nav-btn" style="background-color: #256d45;">開発者について</a>
+                <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
+            </nav>
 
-    <main id="main-content">
-    <section class="widget">
-        <div class="header-with-nav">
-            <h1 style="color:#3CB371;">開発者について</h1>
-<div style="height:2px; background-color:#4076c6; width:100%; margin:20px 0;"></div>
+            <hr class="divider">
 
-            <div class="top-nav">
-                <a href="index.html" class="nav-btn" style="background-color:#99ac2c; color:white;">ホーム</a>
-                <a href="ログイン.html" class="nav-btn" style="background-color:#99ac2c; color:white;">ステータス編集</a>
-                <a href="開発者について.html" class="nav-btn" style="background-color:#99ac2c; color:white;">開発者について</a>
-                <a href="Lua_editor.html" class="nav-btn" style="background-color:#99ac2c; color:white;">Lua editor</a>
+            <!-- プロフィールカード -->
+            <div class="profile-card">
+                <h2>
+                    開発者: くらむぼん<br>
+                    ADHD診断済み。インチュニブ服用。
+                </h2>
+            </div>
 
+            <hr class="divider">
+
+            <!-- リンクセクション -->
+            <div class="link-section">
+                <!-- ▼▼▼ 修正点: CLS対策でwidth/heightを追加、LCPなのでfetchpriorityを設定 ▼▼▼ -->
+                <img src="チャンネルアイコン.jpg" alt="チャンネルアイコン" width="100" height="100" fetchpriority="high">
+                <div class="link-content">
+                    <h2>YouTubeチャンネル</h2>
+                    <!-- ▼▼▼ 修正点: SEOのためリンクテキストを具体的に変更 ▼▼▼ -->
+                    <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA?si=SZ7U0PjuVURPrfOl" target="_blank" class="nav-btn">
+                        YouTubeチャンネルはこちら
+                    </a>
+                </div>
             </div>
         </div>
-
-
-<div style="display: flex; flex-direction: column; gap: 20px;">
-    <section class="secondary-bg">
-        <h2><b>開発者┃くらむぼん<br><br>ADHD診断済み。インチュニブ服用。</b></h2>
-    </section>
-
-<div style="height:2px; background-color:#7849c9; width:100%; margin:20px 0;"></div>
-
-
-
-    <section class="secondary-bg" style="display: flex; align-items: center; gap: 20px;">
-    <img src="チャンネルアイコン.jpg" 
-         alt="チャンネルアイコン"
-         style="width:100px; height:100px; border-radius:50%; object-fit: cover;">
-    <div>
-        <h2><b>YouTubeチャンネル</b></h2>
-        <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA?si=SZ7U0PjuVURPrfOl"
-           target="_blank"
-           class="nav-btn"
-           style="background-color:#99ac2c; color:white;">
-            ここをクリック
-        </a>
-    </div>
-</section>
-
-
-
-
-
+    </main>
 </body>
 </html>
