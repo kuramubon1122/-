@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ggコードジェネレーター</title>
+    <style>
+        :root {
+            --primary-color: #98FB98;
+            --secondary-color: #3CB371;
+            --bg-color: #F0FFF0;
+            --widget-bg: #fff;
+            --text-color: #333;
+            --radius: 12px;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        #main-content {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* --- ここから修正・追加したCSS --- */
+
+        /* ナビゲーションウィジェットのコンテナ */
+        .top-nav {
+            display: flex;
+            gap: 15px; /* ウィジェット間の隙間 */
+            margin-bottom: 20px; /*下のコンテンツとのマージン*/
+        }
+
+        /* ナビゲーションウィジェットのスタイル */
+        .nav-btn {
+            flex: 1; /* 利用可能なスペースを均等に分割 */
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: #2e8b57; /* 少し濃い緑に */
+            transform: translateY(-2px); /* 少し浮き上がる効果 */
+        }
+        
+        /* --- ここまで修正・追加したCSS --- */
+
+        .widget {
+            background-color: var(--widget-bg);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        h1, h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        .input-area label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn, .back-btn {
+            display: inline-block;
+            flex: 1; /* ボタンの幅を均等に */
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+        
+        .action-btn {
+            background-color: var(--secondary-color);
+        }
+        .action-btn:hover {
+            background-color: #2e8b57;
+        }
+        
+        .back-btn {
+            background-color: #888;
+        }
+        .back-btn:hover {
+            background-color: #666;
+        }
+
+        /* 最初の選択肢など、ボタンが1つの場合は全幅にする */
+        .single-button-wrapper .action-btn {
+            width: 100%;
+            flex: none;
+        }
+
+        /* 各ステップのコンテナ */
+        .step {
+            display: none; /* 初期状態ではすべて非表示 */
+        }
+        .step.active {
+            display: block; /* activeクラスが付いたものだけ表示 */
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 結果表示エリア */
+        #result-code-wrap {
+            position: relative;
+        }
+
+        #result-code {
+            background-color: #000000; /* 背景を黒に */
+            color: #f0f0f0;
+            padding: 20px;
+            padding-top: 50px; /* ボタンのスペース確保 */
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1em;
+        }
+
+        #copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #copy-btn:hover {
+            background-color: #2e8b57;
+        }
+        
+        #copy-btn.copied {
+            background-color: #99ac2c;
+        }
+
+    </style>
+</head>
+<body>
+
+<main id="main-content">
+
+    <!-- 横並びのナビゲーションウィジェット -->
+    <div class="top-nav">
+        <a href="index.html" class="nav-btn">ホーム</a>
+        <a href="ログイン.html" class="nav-btn">ステータス編集</a>
+        <a href="開発者について.html" class="nav-btn">開発者について</a>
+        <a href="Lua_editor.html" class="nav-btn">Lua editor</a>
+    </div>
+
+    <!-- メインコンテンツのウィジェット -->
+    <section class="widget">
+        <h1>ggコード生成ツール</h1>
+
+        <!-- Step 0: 初期選択 -->
+        <div id="step0" class="step active">
+            <div class="input-area single-button-wrapper">
+                <label>操作を選択してください</label>
+                <button class="action-btn" onclick="showStep('step1')">1. 値検索</button>
+            </div>
+        </div>
+        
+        <!-- Step 1: 検索タイプの選択 -->
+        <div id="step1" class="step">
+            <div class="input-area">
+                <label for="search-type">検索する値の型を選択してください</label>
+                <select id="search-type">
+                    <option value="gg.TYPE_WORD">gg.TYPE_WORD</option>
+                    <option value="gg.TYPE_DWORD">gg.TYPE_DWORD</option>
+                    <option value="gg.TYPE_QWORD">gg.TYPE_QWORD</option>
+                    <option value="gg.TYPE_FLOAT">gg.TYPE_FLOAT</option>
+                    <option value="gg.TYPE_DOUBLE">gg.TYPE_DOUBLE</option>
+                    <option value="gg.TYPE_HEX">gg.TYPE_HEX</option>
+                </select>
+            </div>
+            <div class="button-wrapper">
+                <button class="back-btn" onclick="goBack('step1')">戻る</button>
+                <button class="action-btn" onclick="showStep('step2')">進む</button>
+            </div>
+        </div>
+
+        <!-- Step 2: 検索値の入力 -->
+        <div id="step2" class="step">
+            <div class="input-area">
+                <label for="search-value">検索値を入力してください</label>
+                <input type="text" id="search-value" placeholder="例: 100">
+            </div>
+            <div class="button-wrapper">
+                <button class="back-btn" onclick="goBack('step2')">戻る</button>
+                <button class="action-btn" onclick="generateCode(1); showStep('step3');">進む</button>
+            </div>
+        </div>
+
+        <!-- Step 3: リファイン値の入力 -->
+        <div id="step3" class="step">
+            <h2>生成されたコード (ステップ1)</h2>
+            <div id="result-area-1" class="result-display"></div>
+            <div class="input-area">
+                <label for="refine-value">リファイン値を入力してください</label>
+                <input type="text" id="refine-value" placeholder="例: 200">
+            </div>
+            <div class="button-wrapper">
+                <button class="back-btn" onclick="goBack('step3')">戻る</button>
+                <button class="action-btn" onclick="generateCode(2); showStep('step4');">進む</button>
+            </div>
+        </div>
+
+        <!-- Step 4: 変更後値の入力 -->
+        <div id="step4" class="step">
+            <h2>生成されたコード (ステップ2)</h2>
+            <div id="result-area-2" class="result-display"></div>
+            <div class="input-area">
+                <label for="edit-value">変更後の値を入力してください</label>
+                <input type="text" id="edit-value" placeholder="例: 999">
+            </div>
+            <div class="button-wrapper">
+                <button class="back-btn" onclick="goBack('step4')">戻る</button>
+                <button class="action-btn" onclick="generateCode(3); showStep('step5');">進む</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: 最終結果表示 -->
+        <div id="step5" class="step">
+            <h2>最終的に生成されたコード</h2>
+            <div id="result-code-wrap">
+                <pre id="result-code"></pre>
+                <button id="copy-btn" onclick="copyCode()">コピー</button>
+            </div>
+            <div class="button-wrapper">
+                <button class="back-btn" onclick="goBack('step5')">戻る</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // ユーザーの入力を保存するオブジェクト
+    const userData = {
+        searchType: '',
+        searchValue: '',
+        refineValue: '',
+        editValue: ''
+    };
+
+    // 指定されたステップを表示し、他を非表示にする関数
+    function showStep(stepId) {
+        document.querySelectorAll('.step').forEach(step => {
+            step.classList.remove('active');
+        });
+        document.getElementById(stepId).classList.add('active');
+    }
+
+    // 前のステップに戻る関数
+    function goBack(currentStep) {
+        let prevStep;
+        switch (currentStep) {
+            case 'step1': prevStep = 'step0'; break;
+            case 'step2': prevStep = 'step1'; break;
+            case 'step3': prevStep = 'step2'; break;
+            case 'step4': prevStep = 'step3'; break;
+            case 'step5': prevStep = 'step4'; break;
+        }
+        if (prevStep) {
+            showStep(prevStep);
+        }
+    }
+
+    // コードを生成し、表示する関数
+    function generateCode(stage) {
+        if (stage >= 1) {
+            userData.searchType = document.getElementById('search-type').value;
+            userData.searchValue = document.getElementById('search-value').value;
+        }
+        if (stage >= 2) {
+            userData.refineValue = document.getElementById('refine-value').value;
+        }
+        if (stage >= 3) {
+            userData.editValue = document.getElementById('edit-value').value;
+        }
+        
+        let code = '';
+        
+        switch (stage) {
+            case 1:
+                code = `gg.searchNumber("${userData.searchValue}", ${userData.searchType})\ngg.getResults(99999)`;
+                document.getElementById('result-area-1').innerHTML = `<pre style="background-color:#f0f0f0; padding:15px; border-radius:8px;">${code}</pre>`;
+                break;
+            case 2:
+                code = `gg.searchNumber("${userData.searchValue}", ${userData.searchType})\n`;
+                code += `gg.getResults(99999)\n`;
+                code += `gg.refineNumber("${userData.refineValue}")`;
+                document.getElementById('result-area-2').innerHTML = `<pre style="background-color:#f0f0f0; padding:15px; border-radius:8px;">${code}</pre>`;
+                break;
+            case 3:
+                code = `gg.searchNumber("${userData.searchValue}", ${userData.searchType})\n`;
+                code += `gg.getResults(99999)\n`;
+                code += `gg.refineNumber("${userData.refineValue}")\n`;
+                code += `gg.editAll("${userData.editValue}")`;
+                document.getElementById('result-code').textContent = code;
+                break;
+        }
+    }
+    
+    // クリップボードにコードをコピーする関数
+    function copyCode() {
+        const codeToCopy = document.getElementById('result-code').textContent;
+        const copyButton = document.getElementById('copy-btn');
+        
+        navigator.clipboard.writeText(codeToCopy).then(() => {
+            copyButton.textContent = 'コピー完了!';
+            copyButton.classList.add('copied');
+            
+            setTimeout(() => {
+                copyButton.textContent = 'コピー';
+                copyButton.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('コピーに失敗しました', err);
+            alert('コードのコピーに失敗しました。');
+        });
+    }
+
+</script>
+
+</body>
+</html>

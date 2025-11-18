@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<!-- ドキュメントタイプ宣言: HTML5を使用していることをブラウザに伝えます -->
+<html lang="ja">
+<!-- HTMLドキュメントのルート要素。言語を日本語(ja)に設定しています -->
+<head>
+    <!-- ドキュメントのメタデータ（ブラウザには表示されない情報）を定義します -->
+    <meta charset="UTF-8">
+    <!-- 文字エンコーディングをUTF-8に設定し、様々な言語の文字を正しく表示できるようにします -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ビューポートの設定: レスポンシブデザインのために、デバイスの幅に合わせて表示を調整します -->
+    
+    <!-- ===================================================================== -->
+    <!-- ========================= SEO対策 強化部分 ========================== -->
+    <!-- ===================================================================== -->
+
+    <!-- 1. 最適化されたタイトル: 検索エンジンの結果やブラウザのタブに表示されるページのタイトル -->
+    <title>【Luaコード生成】にゃんこ大戦争 ステータスエディタ v4.0 | 簡単チートコード作成</title>
+
+    <!-- 2. 検索結果に表示される説明文 (Meta Description): 検索結果スニペットに表示される短い要約 -->
+    <meta name="description" content="検索パターンと数値を入力するだけで、にゃんこ大戦争のステータスを変更するLuaスクリプトを簡単・自動生成。面倒なオフセット計算は不要で、GameGuardian用のチートコードをすぐに作成できます。">
+
+    <!-- 3. サイトの正規URLを検索エンジンに伝える (Canonical URL) - ※要変更 -->
+    <!-- 複数URLで同じコンテンツが存在する場合に、正規のURLを検索エンジンに伝えます（重複コンテンツ対策） -->
+    <link rel="canonical" href="https://sites.google.com/d/1gtfIHdAVFOI4dAzHGipCeV5Fw1H-2MKA/p/18S7ZcT3gIEReKdzHxVaaGY-jHknwRwPX/edit">
+
+    <!-- 4. OGP (Open Graph Protocol) - SNSでシェアされた際の表示設定 ※要変更 -->
+    <!-- Facebook, LINEなどのSNSでページがシェアされた際に、どのように表示されるかを設定します -->
+    <meta property="og:title" content="【Luaコード生成】にゃんこ大戦争 ステータスエディタ v4.0">
+    <meta property="og:description" content="検索パターン入力だけで、にゃんこ大戦争のステータスを変更するLuaスクリプトを簡単・自動生成。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com/nyanko-status-editor.html">
+    <meta property="og:image" content="https://your-domain.com/images/nyanko-ogp-image.png"> <!-- シェア時に表示させたい画像のURL -->
+    <meta property="og:site_name" content="にゃんこ大戦争 攻略ツール">
+    <meta property="og:locale" content="ja_JP">
+
+    <!-- 5. Twitter Card - Twitterでシェアされた際の表示設定 ※要変更 -->
+    <!-- Twitterでページがシェアされた際に、カード形式で表示される内容を設定します -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="【Luaコード生成】にゃんこ大戦争 ステータスエディタ v4.0">
+    <meta name="twitter:description" content="検索パターン入力だけで、にゃんこ大戦争のステータスを変更するLuaスクリプトを簡単・自動生成。">
+    <meta name="twitter:image" content="https://your-domain.com/images/nyanko-ogp-image.png"> <!-- シェア時に表示させたい画像のURL -->
+
+    <!-- 6. 構造化データ (JSON-LD) - ページ内容を検索エンジンが深く理解するために記述 -->
+    <!-- 検索エンジンがページのコンテンツをより正確に理解し、リッチリザルト表示などに活用するためのデータ形式 -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "にゃんこ大戦争 ステータスエディタ v4.0",
+        "abstract": "にゃんこ大戦争のキャラクターのステータスを変更するためのLuaスクリプトを自動生成するウェブツールです。",
+        "operatingSystem": "Android, iOS (GameGuardian等が必要)",
+        "applicationCategory": "GameTool",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "JPY"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Your Name" // あなたの名前 or ハンドル名
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://your-domain.com/nyanko-status-editor.html" // このページの正規URL
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": "このツールは無料で使えますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、このステータスエディタは完全に無料でご利用いただけます。会員登録やログインも一切不要です。"
+          }
+        },{
+          "@type": "Question",
+          "name": "生成されたコードはどのように使いますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "生成されたコードは、GameGuardianなどのメモリ編集アプリでLuaスクリプトとして実行することで、ゲーム内のステータスを変更するために使用します。ご利用は自己責任でお願いします。"
+          }
+        },{
+          "@type": "Question",
+          "name": "逆算モードとは何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "逆算モードは、検索パターンから各数値がどのステータス項目（体力、攻撃力など）に対応するのかを自動で解析するための機能です。"
+          }
+        }]
+      }
+    ]
+    </script>
+    
+    <!-- ===================================================================== -->
+    <!-- ========================== スタイルシート ============================ -->
+    <!-- ===================================================================== -->
+    
+    <style>
+        /* CSSカスタムプロパティ（変数）を定義し、色や影などの共通スタイルを管理します */
+        :root {
+            --primary-color: #98FB98; /* メインの色（薄緑） */
+            --secondary-color: #3CB371; /* サブの色（濃い緑） */
+            --bg-color: #F0FFF0; /* 背景色（非常に薄い緑） */
+            --widget-bg: #fff; /* ウィジェットの背景色（白） */
+            --text-color: #333; /* テキストの色（濃い灰色） */
+            --error-color: #d32f2f; /* エラー表示の色（赤） */
+            --red-check: #ff6b6b; /* 赤いチェックボックスの色（ピンクがかった赤） */
+            --radius: 12px; /* 角の丸み */
+            --shadow: 0 4px 8px rgba(0,0,0,0.1); /* ボックスシャドウ */
+        }
+
+        /* トップナビゲーションバーのスタイル */
+        .top-nav {
+            display: flex; /* Flexboxを有効にし、子要素を横並びにします */
+            gap: 15px; /* 子要素間の間隔 */
+            justify-content: flex-start; /* 子要素を左寄せに配置 */
+            align-items: center;          /* 子要素を垂直方向の中央に配置 */
+            flex-wrap: wrap;              /* 子要素が収まらない場合に折り返します */
+            margin-bottom: 30px; /* 下方向のマージン */
+        }
+
+        /* ナビゲーションボタンのスタイル */
+        .nav-btn {
+            display: inline-flex;        /* Flexboxを有効にし、横並びに配置（インライン要素として振る舞う） */
+            align-items: center;          /* 垂直方向の中央揃え */
+            justify-content: center;      /* 水平方向の中央揃え */
+            min-width: 150px;             /* 最小幅 */
+            height: 40px;                 /* 高さ */
+            background-color: #808080; /* 背景色（灰色） */
+            color: white; /* 文字色 */
+            font-weight: bold; /* フォントの太さ */
+            text-decoration: none; /* テキスト装飾（下線など）を削除 */
+            border-radius: 8px; /* 角の丸み */
+            padding: 0 20px;              /* 左右のパディング */
+            transition: background-color 0.3s; /* 背景色の変化にアニメーションを適用 */
+        }
+
+        /* ナビゲーションボタンにマウスがホバーしたときのスタイル */
+        .nav-btn:hover {
+            background-color: #666; /* 背景色を少し濃い灰色に変更 */
+        }
+
+        /* HTML要素全体のスクロール挙動を滑らかにします */
+        html { scroll-behavior: smooth; }
+        /* body要素の基本的なスタイル */
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; /* フォントファミリー */
+            background-color: var(--bg-color); /* 背景色をカスタム変数から取得 */
+            color: var(--text-color); /* 文字色をカスタム変数から取得 */
+            margin: 0; /* マージンをリセット */
+            padding: 20px; /* パディング */
+        }
+        /* ページ全体のラッパー要素のスタイル */
+        .page-wrapper {
+            display: flex; /* Flexboxを有効にし、子要素（サイドバーとメインコンテンツ）を横並びにします */
+            gap: 20px; /* 子要素間の間隔 */
+            max-width: 1600px; /* 最大幅 */
+            margin: 0 auto; /* 中央揃え */
+        }
+        /* マニュアルセクションのスタイル */
+        #manual-section { 
+            flex: 1; /* 1の比率で幅を伸縮させます */
+            min-width: 300px; /* 最小幅 */
+        }
+        /* メインコンテンツセクションのスタイル */
+        #main-content { 
+            flex: 3; /* 3の比率で幅を伸縮させます */
+            min-width: 600px; /* 最小幅 */
+        }
+
+        /* 各ウィジェット（カード形式のコンポーネント）のスタイル */
+        .widget {
+            background-color: var(--widget-bg); /* 背景色をカスタム変数から取得 */
+            padding: 20px; /* パディング */
+            margin-bottom: 20px; /* 下方向のマージン */
+            border-radius: var(--radius); /* 角の丸み */
+            box-shadow: var(--shadow); /* ボックスシャドウ */
+            border-left: 5px solid var(--secondary-color); /* 左側に装飾的なボーダー */
+        }
+        /* 見出し（h1, h2, h3）のスタイル */
+        h1, h2, h3 {
+            color: var(--secondary-color); /* 文字色をカスタム変数から取得 */
+            border-bottom: 2px solid var(--primary-color); /* 下線 */
+            padding-bottom: 10px; /* 下線とテキストの間のパディング */
+            margin-top: 0; /* 上方向のマージンをリセット */
+        }
+        /* 入力エリアのスタイル */
+        .input-area { margin-bottom: 15px; }
+        .input-area label { 
+            display: block; /* ブロック要素として表示し、改行させます */
+            margin-bottom: 8px; /* 下方向のマージン */
+            font-weight: bold; /* フォントを太くします */
+        }
+        /* テキスト、数値、検索入力フィールドのスタイル */
+        input[type="text"], input[type="number"], input[type="search"] {
+            width: 100%; /* 親要素の幅いっぱいに広げます */
+            padding: 10px; /* パディング */
+            border: 1px solid #ccc; /* ボーダー */
+            border-radius: 8px; /* 角の丸み */
+            font-size: 16px; /* フォントサイズ */
+            box-sizing: border-box; /* パディングとボーダーを幅に含めます */
+            transition: border-color 0.3s; /* ボーダー色の変化にアニメーションを適用 */
+        }
+        /* 無効な入力フィールドのスタイル */
+        input.is-invalid { 
+            border-color: var(--error-color); /* ボーダー色をエラーカラーに変更 */
+            box-shadow: 0 0 5px rgba(211, 47, 47, 0.5); /* 赤いシャドウを追加 */
+        }
+        
+        /* トップラッパー要素のスタイル */
+        .top-wrapper { 
+            display: flex; /* Flexboxを有効にし、子要素を横並びにします */
+            align-items: center; /* 子要素を垂直方向の中央に配置 */
+            gap: 15px; /* 子要素間の間隔 */
+        }
+        .top-wrapper .input-area { 
+            flex-grow: 1; /* 残りのスペースを埋めるように伸縮 */
+            margin-bottom: 0; /* 下方向のマージンをリセット */
+        }
+        /* 逆算モードエリアのスタイル */
+        .rev-calc-area { 
+            display: flex; /* Flexboxを有効にし、子要素を横並びにします */
+            align-items: center; /* 垂直方向の中央揃え */
+            gap: 5px; /* 子要素間の間隔 */
+            padding-top: 20px; /* 上方向のパディング */
+        }
+        
+        /* メニュータブのスタイル */
+        .menu-tabs { 
+            display: flex; /* Flexboxを有効にし、ボタンを横並びにします */
+            gap: 5px; /* ボタン間の間隔 */
+            margin-bottom: 15px; /* 下方向のマージン */
+            flex-wrap: wrap; /* ボタンが収まらない場合に折り返します */
+        }
+        /* タブボタンのスタイル */
+        .tab-btn {
+            padding: 10px 15px; /* パディング */
+            border: 1px solid #ccc; /* ボーダー */
+            background-color: #f0f0f0; /* 背景色 */
+            border-radius: 8px 8px 0 0; /* 上部の角を丸くします */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            transition: background-color 0.3s, border-color 0.3s; /* 背景色とボーダー色の変化にアニメーション */
+            font-size: 14px; /* フォントサイズ */
+            border-bottom: none; /* 下のボーダーを削除 */
+        }
+        /* アクティブなタブボタンのスタイル */
+        .tab-btn.active { 
+            background-color: var(--widget-bg); /* 背景色をウィジェットの背景色に変更 */
+            border-color: #ccc; /* ボーダー色 */
+            border-bottom: 1px solid var(--widget-bg); /* 下のボーダーをウィジェットの背景色と同じにして、コンテンツと一体化 */
+            position: relative; /* 相対位置指定 */
+            top: 1px; /* 少し下にずらして、下のボーダーが消えたように見せます */
+        }
+        
+        /* コンテンツラッパーのスタイル */
+        .content-wrapper { 
+            border: 1px solid #ccc; /* ボーダー */
+            padding: 20px; /* パディング */
+            border-radius: 0 var(--radius) var(--radius) var(--radius); /* 左上以外を丸くします */
+        }
+        /* カテゴリコンテンツと検索結果ラッパーの初期状態を非表示に設定 */
+        .category-content, #search-results-wrapper { display: none; }
+        /* アクティブなカテゴリコンテンツと検索結果ラッパーを表示し、フェードインアニメーションを適用 */
+        .category-content.active, #search-results-wrapper.active { display: block; animation: fadeIn 0.5s ease; }
+        /* フェードインアニメーションの定義 */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ステータス項目をグリッドレイアウトで表示 */
+        .status-grid { 
+            display: grid; /* グリッドレイアウトを有効にします */
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* 画面幅に合わせて列数を自動調整 */
+            gap: 15px; /* グリッドアイテム間の間隔 */
+        }
+        /* 個々のステータス項目のスタイル */
+        .status-item { 
+            display: flex; /* Flexboxを有効にし、子要素を横並びにします */
+            align-items: center; /* 垂直方向の中央揃え */
+            padding: 8px; /* パディング */
+            border-radius: 8px; /* 角の丸み */
+            transition: background-color 0.3s; /* 背景色の変化にアニメーション */
+        }
+        /* ステータス項目にマウスがホバーしたときのスタイル */
+        .status-item:hover { background-color: #f9f9f9; } /* 背景色を薄い灰色に変更 */
+        /* チェックボックス群のスタイル */
+        .status-item .checks { display: flex; gap: 6px; } /* Flexboxでチェックボックスを横並びに */
+        /* カスタムチェックボックスの基本スタイル */
+        .status-item input[type="checkbox"] {
+            appearance: none; /* デフォルトのチェックボックスのスタイルを無効化 */
+            width: 20px; height: 20px; /* サイズ */
+            border-radius: 5px; /* 角の丸み */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            position: relative; /* 相対位置指定 */
+            transition: transform 0.2s ease; /* 変形にアニメーション */
+        }
+        /* チェックされたチェックボックスのスタイル */
+        .status-item input[type="checkbox"]:checked { transform: scale(1.1); } /* 少し拡大 */
+        /* チェックされたチェックボックスに✔アイコンを表示 */
+        .status-item input[type="checkbox"]:checked::after {
+            content: '✔'; /* コンテンツとしてチェックマーク */
+            font-size: 16px; /* フォントサイズ */
+            color: white; /* 文字色 */
+            position: absolute; /* 絶対位置指定 */
+            top: 50%; left: 50%; transform: translate(-50%, -50%); /* 完全に中央揃え */
+        }
+        /* 緑色のチェックボックスのスタイル */
+        .status-item input[type="checkbox"].green { background-color: #ccc; } /* 初期背景色 */
+        .status-item input[type="checkbox"].green:checked { background-color: var(--secondary-color); } /* チェック時の背景色 */
+        /* 赤色のチェックボックスのスタイル */
+        .status-item input[type="checkbox"].red { background-color: #ccc; } /* 初期背景色 */
+        .status-item input[type="checkbox"].red:checked { background-color: var(--red-check); } /* チェック時の背景色 */
+
+        /* ステータス項目ラベルのスタイル */
+        .status-item label { 
+            flex-grow: 1; /* 残りのスペースを埋めるように伸縮 */
+            font-size: 14px; /* フォントサイズ */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            margin: 0 10px; /* 左右のマージン */
+        }
+        /* オフセット表示のスタイル */
+        .status-item .offset { 
+            color: #999; /* 文字色 */
+            font-size: 12px; /* フォントサイズ */
+        }
+        /* ステータス項目の数値入力フィールドのスタイル */
+        .status-item input[type="number"] { 
+            flex-shrink: 0; /* 縮小しない */
+            width: 80px; /* 幅 */
+            padding: 5px; /* パディング */
+            border: 1px solid #ccc; /* ボーダー */
+            border-radius: 5px; /* 角の丸み */
+            text-align: right; /* テキストを右寄せ */
+        }
+        
+        /* 一括操作コントロールのスタイル */
+        .batch-controls {
+            display: flex; /* Flexboxを有効にし、子要素を横並びにします */
+            flex-wrap: wrap; /* 子要素が収まらない場合に折り返します */
+            gap: 15px; /* 子要素間の間隔 */
+            align-items: center; /* 垂直方向の中央揃え */
+            padding: 10px; /* パディング */
+            background-color: #f9f9f9; /* 背景色 */
+            border-radius: 8px; /* 角の丸み */
+            margin-bottom: 15px; /* 下方向のマージン */
+        }
+        .batch-controls label { 
+            font-weight: bold; /* フォントを太くします */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            display: flex; /* Flexboxを有効にし、チェックボックスとテキストを横並びに */
+            align-items: center; /* 垂直方向の中央揃え */
+            gap: 5px; /* 子要素間の間隔 */
+        }
+        .batch-controls input[type="number"] { width: 120px; } /* 数値入力フィールドの幅 */
+
+        /* アクションボタン（コード生成、逆算実行）のスタイル */
+        .action-btn, #reverse-btn, #download-lua-btn { /* download-lua-btnも追加 */
+            display: block; /* ブロック要素として表示し、幅いっぱいに広げます */
+            width: 100%; /* 幅いっぱいに広げます */
+            padding: 15px; /* パディング */
+            font-size: 18px; /* フォントサイズ */
+            font-weight: bold; /* フォントの太さ */
+            color: white; /* 文字色 */
+            border: none; /* ボーダーを削除 */
+            border-radius: var(--radius); /* 角の丸み */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            transition: background-color 0.3s; /* 背景色の変化にアニメーション */
+            margin-top: 20px; /* 上方向のマージン */
+        }
+        /* コード生成ボタンのスタイル */
+        .action-btn { background-color: var(--secondary-color); } /* 背景色をカスタム変数から取得 */
+        .action-btn:hover { background-color: #2e8b57; } /* ホバー時の背景色 */
+        /* 逆算実行ボタンのスタイル */
+        #reverse-btn { 
+            background-color: #3498db; /* 背景色（青） */
+            display: none; /* 初期状態では非表示 */
+        }
+        #reverse-btn:hover { background-color: #2980b9; } /* ホバー時の背景色 */
+        /* Luaダウンロードボタンのスタイル */
+        #download-lua-btn {
+            background-color: #e67e22; /* 背景色（オレンジ） */
+            margin-top: 10px; /* 上方向のマージン */
+        }
+        #download-lua-btn:hover { background-color: #d35400; } /* ホバー時の背景色 */
+        
+        /* 結果表示エリアと逆算結果エリアのスタイル */
+        #result-area, #rev-result-area, #download-lua-section { /* download-lua-sectionも追加 */
+            margin-top: 20px; /* 上方向のマージン */
+            display: none; /* 初期状態では非表示 */
+        }
+        /* 逆算結果リストのスタイル */
+        #rev-result-area ul { 
+            list-style-type: none; /* リストのマーカーを削除 */
+            padding: 15px; /* パディング */
+            margin: 0; /* マージンをリセット */
+            background-color: #f5f5f5; /* 背景色 */
+            border-radius: 8px; /* 角の丸み */
+        }
+        /* 逆算結果リストアイテムのスタイル */
+        #rev-result-area li { 
+            padding: 8px; /* パディング */
+            border-bottom: 1px solid #ddd; /* 下線 */
+        }
+        #rev-result-area li:last-child { border-bottom: none; } /* 最後のアイテムの下線を削除 */
+        
+        /* コード表示エリアのラッパー */
+        #result-code-wrap { position: relative; } /* 子要素の絶対位置指定の基準 */
+        /* コード表示エリア（<pre>タグ）のスタイル */
+        #result-code-wrap pre {
+            background-color: #2d2d2d; /* 背景色（濃い灰色） */
+            color: #f0f0f0; /* 文字色（薄い灰色） */
+            padding: 15px; /* パディング */
+            padding-top: 40px; /* 上部パディングを増やしてコピーボタンのスペースを確保 */
+            padding-right: 80px; /* 右部パディングを増やしてコピーボタンのスペースを確保 */
+            border-radius: 8px; /* 角の丸み */
+            white-space: pre-wrap; /* 自動改行を有効にします */
+            word-wrap: break-word; /* 長い単語も改行させます */
+        }
+        /* コピーボタンのスタイル */
+        #copy-btn {
+            position: absolute; /* 絶対位置指定 */
+            top: 10px; right: 10px; /* 右上配置 */
+            padding: 8px 12px; /* パディング */
+            background-color: var(--secondary-color); /* 背景色をカスタム変数から取得 */
+            color: white; /* 文字色 */
+            border: none; /* ボーダーを削除 */
+            border-radius: 5px; /* 角の丸み */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            transition: background-color 0.2s; /* 背景色の変化にアニメーション */
+        }
+        #copy-btn:hover { background-color: #2e8b57; } /* ホバー時の背景色 */
+
+        /* Luaコード先頭条件分岐エリアのスタイル */
+        .lua-prefix-area .prefix-option { 
+            display: flex; /* Flexboxを有効にし、子要素を横並びに */
+            align-items: center; /* 垂直方向の中央揃え */
+            gap: 10px; /* 子要素間の間隔 */
+            margin-bottom: 5px; /* 下方向のマージン */
+        }
+        .lua-prefix-area input[type="number"] { width: 100px; } /* 数値入力フィールドの幅 */
+
+        /* マニュアルアコーディオンのスタイル */
+        .manual-accordion details { 
+            margin-bottom: 10px; /* 下方向のマージン */
+            border: 1px solid #ddd; /* ボーダー */
+            border-radius: 8px; /* 角の丸み */
+        }
+        .manual-accordion summary { 
+            padding: 15px; /* パディング */
+            font-weight: bold; /* フォントを太くします */
+            cursor: pointer; /* カーソルをポインターに変更 */
+            background-color: #f9f9f9; /* 背景色 */
+            border-radius: 8px 8px 0 0; /* 上部の角を丸くします */
+        }
+        .manual-accordion div { 
+            padding: 15px; /* パディング */
+            border-top: 1px solid #ddd; /* 上線 */
+        }
+        .manual-accordion p { margin-top: 0; line-height: 1.6; } /* パラグラフのスタイル */
+        .manual-accordion code { 
+            background-color: #e8e8e8; /* コードスニペットの背景色 */
+            padding: 2px 5px; /* パディング */
+            border-radius: 4px; /* 角の丸み */
+            font-family: monospace; /* 等幅フォント */
+        }
+        .manual-accordion .important { color: #d35400; font-weight: bold; } /* 重要なテキストのスタイル */
+        .manual-accordion .example { color: #2980b9; } /* 例テキストのスタイル */
+
+        /* レスポンシブデザイン: 画面幅が960px以下の場合のスタイル */
+        @media (max-width: 960px) {
+            .page-wrapper { flex-direction: column; } /* Flexアイテムを縦方向に並べます */
+            #main-content { min-width: unset; } /* 最小幅をリセット */
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    // ★★★ ご提示いただいた最新のGASウェブアプリURLを設定済みです ★★★
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyOQZoEFgTBVeY2HolX2U2AZyMWzmrRFPjQ9mE45T6XT5AG5hs4jwZAyhrSEMRiZgEH/exec';
+    const LOGIN_PAGE = 'ログイン.html'; // ログインページのファイル名
+
+    // --- Cookieから指定された名前の値を取得する関数 ---
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+    
+    // --- Cookieを削除する関数 ---
+    function deleteCookie(name) {
+      document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    /**
+     * ページの読み込み時に実行されるメインの認証・記録関数
+     */
+    async function verifyAndRecordAccess() {
+        // ブラウザから 'session_token' という名前のCookieを取得
+        const token = getCookie('session_token');
+
+        // もしCookie（トークン）がなければ、未ログインとみなしログインページへ強制的に移動
+        if (!token) {
+            alert('ログインが必要です。');
+            window.location.href = LOGIN_PAGE;
+            return;
+        }
+
+        try {
+            // GASに対して、'recordAccess' アクションを実行するようPOSTリクエストを送信
+            const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                // 送信するデータ。自分のセッショントークンをGASに渡す
+                body: JSON.stringify({ action: 'recordAccess', token: token })
+            });
+            
+            // GASからの返答をJSON形式で受け取る
+            const result = await response.json();
+
+            // GASが「成功(success)」と返信しなかった場合（トークンが無効だった場合など）
+            if (result.status !== 'success') {
+                // 無効なCookieが残っている可能性があるので削除する
+                deleteCookie('session_token');
+                // エラーメッセージを表示して、ログインページへ強制的に移動
+                alert(result.message || 'セッションが無効です。再度ログインしてください。');
+                window.location.href = LOGIN_PAGE;
+            } else {
+                // 認証成功！GAS側でアクセス回数が記録された
+                console.log(`認証成功: ようこそ、${result.username}さん`);
+                // ここでユーザー名を表示するなどの処理を追加できます
+                // 例: <h1 id="welcome-user"></h1> のような要素があれば...
+                // const userEl = document.getElementById('welcome-user');
+                // if (userEl) userEl.textContent = `${result.username}さん、ようこそ！`;
+            }
+        } catch (error) {
+            // 通信エラーなど、予期せぬ問題が発生した場合
+            console.error('認証エラー:', error);
+            alert('認証中にエラーが発生しました。ログインページに戻ります。');
+            window.location.href = LOGIN_PAGE;
+        }
+    }
+
+    // このページのHTMLが読み込まれ始めたら、すぐに認証処理を開始する
+    verifyAndRecordAccess();
+</script>
+
+
+
+
+<!-- ページ全体のコンテンツをラップするコンテナ -->
+<div class="page-wrapper">
+    <!-- 7. セマンティックHTMLの改善 (`<aside>`は適切なのでそのまま) -->
+    <!-- 補足情報や関連コンテンツを含むサイドバーとして機能します -->
+    <aside id="manual-section">
+        <!-- ウィジェット形式で表示されるセクション -->
+        <section class="widget">
+            <h2>使い方ガイド</h2>
+            <!-- アコーディオン形式で開閉するマニュアルコンテンツ -->
+            <div class="manual-accordion">
+                <details open> <!-- デフォルトで開いているセクション -->
+                    <summary>1. 基本的な流れ</summary>
+                    <div>
+                        <p>0.<b>コスト値の検索方法について</b>は以下の動画を閲覧してください。</p>
+                        <!-- YouTube埋め込み動画 -->
+                        <p><iframe width="240" height="160"
+src="https://www.youtube.com/embed/rjJ0LMUkkMQ?si=VTl7bLEAVYRl_F"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen>
+</iframe>
+</p>
+                        <p>1. <b>検索パターン</b>に、ゲーム内で見つけた連続する数値列を入力します。</p>
+                        <p>2. <b>リファイン値</b>が自動で設定されますが、必要であれば手動で修正します。</p>
+                        <p>3. <b>検索範囲</b>（Cb/Other）を選択します。</p>
+                        <p>4. 下のメニューから変更したい項目を探し、数値を入力します。数値を入力すると緑のチェックが自動で付きます。</p>
+                        <p>5. <b>コード生成</b>ボタンを押し、表示されたコードをコピーして使用します。</p>
+                        <p><h4>使い方ビデオ</h4></p>
+                        <!-- YouTube埋め込み動画 -->
+                        <p><iframe width="240" height="160"
+src="https://www.youtube.com/embed/QRl1QLRN32U"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen>
+</iframe>
+</p>
+                    </div>
+                </details>
+                <details> <!-- 閉じているセクション -->
+                    <summary>2. 検索パターンの入力規則</summary>
+                    <div>
+                        <p>検索パターンは、このツールが広大なメモリの中から目的のデータを見つけるための「地図」です。</p>
+                        <p class="important">最も重要なルールは、数値列が「連続するDWORD値」であることです。</p>
+                        <p><b>コスト</b>の値を基準（オフセット0）とし、それより前の値から順に<code>;</code>（セミコロン）で区切って入力してください。</p>
+                        <p class="example">例：<code>体力;KB数;...;コスト;...;再生産時間</code> のように、メモリ上で連続している順番で記述します。</p>
+                        <p>値は <code>1,000</code> や <code>1000D</code> のように入力しても、自動で <code>1000</code> として解釈されます。</p>
+                    </div>
+                </details>
+                <details> <!-- 閉じているセクション -->
+                    <summary>3. 逆算モード詳解</summary>
+                    <div>
+                        <p>「逆算モード」は、検索パターンから各数値がどのステータス項目に対応するかを調べる機能です。</p>
+                        <p>1. <b>逆算モード</b>にチェックを入れると、専用の「逆算実行」ボタンが表示されます。</p>
+                        <p>2. 検索パターンを入力すると、<span class="important">5000以上の最大値</span>が自動でリファイン値（コスト=オフセット0）として認識されます。</p>
+                        <p>3. <b>高度なオフセット指定</b>: 特定の値を通常とは異なるオフセットとして扱いたい場合、<code>値(オフセット)</code>の形式で入力できます。</p>
+                        <p class="example">例: <code>440;3(-20);5000;150(200)</code></p>
+                        <p>この場合、<code>5000</code>が基準(0)、<code>3</code>はオフセット<code>-20</code>、<code>150</code>はオフセット<code>+200</code>として計算されます。<code>440</code>は<code>3</code>の前にあり、オフセットが指定されていないため、<code>-20</code>の前の連続する値、つまり<code>-24</code>として自動計算されます。</p>
+                    </div>
+                </details>
+                 <details> <!-- 閉じているセクション -->
+                    <summary>4. 一括操作機能</summary>
+                    <div>
+                        <p>各カテゴリや検索結果の上部にあるコントロールで、表示されている項目を一括で操作できます。</p>
+                        <p><b><span style="color: var(--secondary-color);">■</span> 一括選択 (緑)</b>: チェックを入れると、全ての項目の緑チェックがONになります。コード生成の対象を選択する際に便利です。</p>
+                        <p><b><span style="color: var(--red-check);">■</span> 一括変更選択 (赤)</b>: チェックを入れると、全ての項目の赤チェックがONになります。</p>
+                        <p><b>一括入力</b>: ここに数値を入力すると、<span class="important">赤チェックが付いている全ての項目</span>の値を一括で変更できます。</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </aside>
+
+    <!-- メインコンテンツ領域 -->
+    <main id="main-content">
+        <!-- ページのタイトルとナビゲーションボタン -->
+        <section class="widget">
+            <h1>にゃんこ大戦争 ステータスエディタ v4.0</h1>
+            <div class="top-nav">
+                <a href="index.html" class="nav-btn" style="background-color:#3CB371; color:white;">ホーム</a>
+                <a href="にゃんこ大戦争.html" class="nav-btn" style="background-color:#3CB371; color:white;">ステータス編集</a>
+                <a href="開発者について.html" class="nav-btn" style="background-color:#3CB371; color:white;">開発者について</a>
+                <a href="Lua_editor.html" class="nav-btn" style="background-color:#3CB371; color:white;">Lua editor</a>
+            </div>
+
+            <h2>1. 検索＆リファイン設定</h2>
+            <div class="top-wrapper">
+                <!-- 検索パターン入力エリア -->
+                <div class="input-area">
+                    <label for="dword-in">検索パターン (全角は自動で半角に)</label>
+                    <input type="text" id="dword-in" value="440;3;56;34;30;560;5000;150">
+                </div>
+                <!-- 逆算モード切り替えチェックボックス -->
+                <div class="rev-calc-area">
+                    <input type="checkbox" id="rev-calc-check">
+                    <label for="rev-calc-check">逆算モード</label>
+                </div>
+            </div>
+            <!-- 検索範囲選択エリア -->
+            <div class="input-area">
+                <label>検索範囲</label>
+                <div id="range-opts">
+                    <label><input type="checkbox" id="range-cb" value="Cb"> Cb</label>
+                    <label><input type="checkbox" id="range-other" value="Other" checked> Other</label>
+                </div>
+            </div>
+            <!-- リファイン値入力エリア -->
+            <div class="input-area">
+                <label for="refine-in">リファイン値 (コストなど)</label>
+                <input type="number" id="refine-in" value="5000">
+            </div>
+             <!-- Luaコードの先頭に条件分岐を追加するオプション -->
+             <div class="input-area lua-prefix-area">
+                <label>Luaコード 先頭条件分岐 (任意)</label>
+                <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-none" value="none" checked>
+                    <label for="prefix-none">なし</label>
+                </div>
+                <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-elseif" value="elseif_ax_val">
+                    <label for="prefix-elseif">elseif Ax ==</label>
+                    <input type="number" id="lua-prefix-val" placeholder="2">
+                    <label for="prefix-elseif">then</label>
+                </div>
+                 <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-if-nil" value="if_ax_nil">
+                    <label for="prefix-if-nil">if Ax == nil then return end</label>
+                </div>
+                 <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-if-1" value="if_ax_1">
+                    <label for="prefix-if-1">if Ax == 1 then</label>
+                </div>
+                 <div class="prefix-option">
+                    <input type="radio" name="lua-prefix" id="prefix-if-val" value="if_ax_val">
+                     <label for="prefix-if-val">if Ax ==</label>
+                     <input type="number" id="lua-prefix-val2" placeholder="2">
+                    <label for="prefix-if-val">then</label>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 逆算結果を表示するエリア（逆算モード時に表示） -->
+        <section id="rev-result-area" class="widget" style="display: none;">
+            <h2>逆算結果</h2>
+            <ul id="rev-result-list"></ul>
+        </section>
+
+        <section class="widget">
+            <h2>2. 項目検索＆変更</h2>
+            <!-- 項目検索ボックス -->
+            <div id="search-wrapper">
+                 <input type="search" id="search-box" placeholder="項目名で検索 (大文字/小文字, ひらがな/カタカナ対応)">
+            </div>
+            <!-- 検索結果を表示するエリア -->
+            <div id="search-results-wrapper"></div>
+            <!-- navタグでナビゲーションであることを明示 -->
+            <!-- ステータス項目をカテゴリ別に切り替えるタブメニュー -->
+            <nav class="menu-tabs">
+                <button class="tab-btn active" data-target="cat-basic">基本部</button>
+                <button class="tab-btn" data-target="cat-basic2">基本部2</button>
+                <button class="tab-btn" data-target="cat-perf">性能部</button>
+                <button class="tab-btn" data-target="cat-prob">確率性能部</button>
+                <button class="tab-btn" data-target="cat-invalid">無効系</button>
+                <button class="tab-btn" data-target="cat-other">その他</button>
+            </nav>
+            <!-- 各カテゴリのコンテンツを表示するラッパー -->
+            <div class="content-wrapper">
+                <!-- カテゴリごとのステータス項目が動的に挿入される場所 -->
+                <div id="cat-basic" class="category-content active"></div>
+                <div id="cat-basic2" class="category-content"></div>
+                <div id="cat-perf" class="category-content"></div>
+                <div id="cat-prob" class="category-content"></div>
+                <div id="cat-invalid" class="category-content"></div>
+                <div id="cat-other" class="category-content"></div>
+            </div>
+        </section>
+
+        <!-- コード生成ボタン -->
+        <button id="gen-btn" class="action-btn">コード生成</button>
+        <!-- 逆算実行ボタン（逆算モード時に表示） -->
+        <button id="reverse-btn" class="action-btn">逆算実行</button>
+
+        <!-- 生成されたLuaコードを表示するエリア -->
+        <section id="result-area" class="widget" style="display: none;">
+            <h2>3. 生成されたコード</h2>
+            <div id="result-code-wrap">
+                <!-- 生成されたコードが表示される要素 -->
+                <pre><code id="result-code"></code></pre>
+                <!-- コードをクリップボードにコピーするボタン -->
+                <button id="copy-btn">コピー</button>
+            </div>
+        </section>
+
+        <!-- 新しいセクション: 生成されたLuaコードをファイルとしてダウンロードする機能 -->
+        <section id="download-lua-section" class="widget" style="display: none;">
+            <h2>4. Luaファイルをダウンロード</h2>
+            <p>生成されたコードをLuaファイルとしてダウンロードできます。</p>
+            <!-- ダウンロードボタン。ファイル名はJavaScriptで動的に設定されます -->
+            <button id="download-lua-btn" class="action-btn">Aにゃんこ_'現在日時'.lua を生成しダウンロード</button>
+        </section>
+
+        <div class="Lua-Creation-Tools">
+            <h4>GG Lua Creation Tools</h4>
+        </div>
+    </main>
+</div>
+             
+<!-- ===================================================================== -->
+<!-- =========================== JavaScript ============================== -->
+<!-- ===================================================================== -->
+<script>
+// --- データストア ---
+// 各ステータス項目に関するデータ（オフセット、名前、チェック状態、値）を定義した配列
+const statusData = [
+    { offset: -24, name: '体力' }, { offset: -20, name: 'KB数' }, { offset: -16, name: '速度[2x]' }, { offset: -12, name: '攻撃力' },
+    { offset: -8, name: '攻撃間隔' }, { offset: -4, name: '感知射程[4x]' }, { offset: 0, name: 'コスト[100x]' }, { offset: 4, name: '再生産時間' },
+    { offset: 8, name: 'キャラの感知範囲(前方)[4x]*' }, { offset: 12, name: 'キャラの感知範囲(後方)[4x]*' }, { offset: 16, name: '対赤' },
+    { offset: 24, name: '攻撃種類(0=単/1=範)' }, { offset: 28, name: '攻撃発生(時間)' }, { offset: 32, name: 'キャラ出現y軸範囲(上)*' },
+    { offset: 36, name: 'キャラ出現y軸範囲(下)*' }, { offset: 40, name: '対浮' }, { offset: 44, name: '対黒' }, { offset: 48, name: '対メ' },
+    { offset: 52, name: '対白' }, { offset: 56, name: '対天' }, { offset: 60, name: '対エ' }, { offset: 64, name: '対ゾ' },
+    { offset: 68, name: 'めっぽう強い' }, { offset: 72, name: 'ふっとばす(確率)' }, { offset: 76, name: '動きを止める(確率)' },
+    { offset: 80, name: '動きを止める(時間)' }, { offset: 84, name: '動きを遅くする(確率)' }, { offset: 88, name: '動きを遅くする(時間)' },
+    { offset: 92, name: '打たれ強い' }, { offset: 96, name: '超ダメージ' }, { offset: 100, name: 'クリティカル(確率)' },
+    { offset: 104, name: '攻撃ターゲット限定' }, { offset: 108, name: '撃破時お金アップ' }, { offset: 112, name: '城破壊が得意' },
+    { offset: 116, name: '波動(確率)' }, { offset: 120, name: '波動(レベル)' }, { offset: 124, name: '攻撃力ダウン(確率)' },
+    { offset: 128, name: '攻撃力ダウン(時間)' }, { offset: 132, name: '攻撃力ダウン(何%にするか)' }, { offset: 136, name: '攻撃力アップ(発動する残り体力の割合)' },
+    { offset: 140, name: '攻撃力アップ(倍率) 100(χ-1)' }, { offset: 144, name: '生き残る(確率)' }, { offset: 148, name: 'メタル' },
+    { offset: 152, name: '攻撃射程(遠方&前方)[4x]*' }, { offset: 156, name: '攻撃射程(遠方&後方)[4x]*' }, { offset: 160, name: '波動無効' },
+    { offset: 164, name: '波動ストッパー' }, { offset: 168, name: 'ふっとばし無効' }, { offset: 172, name: '動きを止める無効' },
+    { offset: 176, name: '動きを遅くする無効' }, { offset: 180, name: '攻撃力ダウン無効' }, { offset: 184, name: 'ゾンビキラー' },
+    { offset: 188, name: '魔女キラー' }, { offset: 196, name: '※攻撃回数へ' }, { offset: 200, name: '※攻撃回数へ' },
+    { offset: 204, name: '※攻撃回数へ' }, { offset: 208, name: '※攻撃回数へ' }, { offset: 212, name: '二撃目威力' },
+    { offset: 216, name: '三撃目威力' }, { offset: 220, name: '二撃目発生f' }, { offset: 224, name: '三撃目発生f' },
+    { offset: 228, name: '特性付与(一撃目)' }, { offset: 232, name: '特性付与(二撃目)' }, { offset: 236, name: '特性付与(三撃目)' },
+    { offset: 240, name: '生産演出*' }, { offset: 244, name: '魂エフェクトの種類*' }, { offset: 256, name: 'バリアブレイカー(確率)' },
+    { offset: 260, name: 'ワープ(確率)' }, { offset: 264, name: 'ワープ(時間)' }, { offset: 268, name: 'ワープ範囲(前方)[4x]*' },
+    { offset: 272, name: 'ワープ範囲(後方)[4x]*' }, { offset: 276, name: 'ワープ無効' }, { offset: 284, name: '使徒キラー' },
+    { offset: 288, name: '対古' }, { offset: 292, name: '古代の呪い無効' }, { offset: 296, name: '超打たれ強い' },
+    { offset: 300, name: '極ダメージ' }, { offset: 304, 'name': '渾身の一撃(確率)' }, { offset: 308, 'name': '渾身の一撃(倍率) 100(χ-1)' },
+    { offset: 312, name: '攻撃無効(確率)' }, { offset: 316, name: '攻撃無効(時間)[25x]' }, { offset: 320, name: '烈波(確率)' },
+    { offset: 324, name: '烈波発生範囲(前方)[4x]*' }, { offset: 328, name: '烈波発生範囲(後方)[4x]*' }, { offset: 332, name: '烈波(レベル)' },
+    { offset: 336, name: '毒撃無効' }, { offset: 340, name: '烈波無効' }, { offset: 344, name: '呪い(確率)' }, { offset: 348, name: '呪い(時間)' },
+    { offset: 352, name: '小波動化(波動onの時のみ有効)' }, { offset: 356, name: 'シールドブレイカー(確率)' }, { offset: 360, name: '対悪' },
+    { offset: 364, name: '超生命体特攻' }, { offset: 368, name: '魂攻撃' }, { offset: 392, name: '超獣特攻' }, { offset: 408, name: '烈波カウンター' },
+    { offset: 412, name: '召喚*' }, { offset: 420, name: '超賢者特攻' }, { offset: 424, name: 'メタルキラー' },
+    { offset: 428, name: '爆破(確率)' }, { offset: 432, name: '爆破発生範囲(前方)[4x]*' }, { offset: 436, name: '爆破発生範囲(後方)[4x]*' },
+    { offset: 440, name: '爆破無効' },
+].map(item => ({ ...item, checkedGreen: false, checkedRed: false, value: '' })); // 各項目にチェック状態と値を初期化
+
+// DOMContentLoadedイベントリスナー: HTMLドキュメントの読み込みが完了した後に実行されます
+document.addEventListener('DOMContentLoaded', () => {
+    const d = document; // documentオブジェクトへの参照を短縮
+    const getEl = (id) => d.getElementById(id); // IDから要素を取得するヘルパー関数
+    
+    // 必要なDOM要素の参照を取得
+    const genBtn = getEl('gen-btn'); // コード生成ボタン
+    const resultCodeEl = getEl('result-code'); // 生成されたコードを表示する要素
+    const copyBtn = getEl('copy-btn'); // コードコピーボタン
+    const resultArea = getEl('result-area'); // 生成コード表示エリア
+
+    // 追加: Luaファイルダウンロード関連の要素
+    const downloadLuaSection = getEl('download-lua-section'); // Luaダウンロードセクション
+    const downloadLuaBtn = getEl('download-lua-btn'); // Luaダウンロードボタン
+
+    // コード生成ボタンのクリックイベントリスナー
+    genBtn.addEventListener('click', () => {
+        // コード生成の確認ダイアログを表示
+        const confirmed = confirm("本当にコードを生成しますか？");
+
+        if (confirmed) {
+            // OK を押した場合の処理
+            alert("コードを生成します！");
+            try { 
+                genCode(); // コード生成関数を呼び出し
+            } catch (e) { 
+                alert(e.message); // エラーが発生した場合はアラート表示
+            }
+        } else {
+            // キャンセルを押した場合の処理
+            alert("キャンセルされました");
+        }
+    });
+
+    const revCalcCheck = getEl('rev-calc-check'); // 逆算モードチェックボックス
+    const revResultArea = getEl('rev-result-area'); // 逆算結果表示エリア
+    const revResultList = getEl('rev-result-list'); // 逆算結果リスト
+    const searchBox = getEl('search-box'); // 検索ボックス
+    const searchResultsWrapper = getEl('search-results-wrapper'); // 検索結果表示エリア
+    const menuTabs = d.querySelector('.menu-tabs'); // カテゴリタブメニュー
+    const dwordIn = getEl('dword-in'); // 検索パターン入力フィールド
+    const refineIn = getEl('refine-in'); // リファイン値入力フィールド
+    const reverseBtn = getEl('reverse-btn'); // 逆算実行ボタン
+
+    // --- ユーティリティ関数 ---
+    // 全角数字・英字を半角に変換
+    const toHalf = (s) => s ? s.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)) : '';
+    // 数値文字列からカンマやアルファベットを除去
+    const cleanNumStr = (s) => s.replace(/,/g, '').replace(/[a-zA-Z]/g, '').trim();
+    // ひらがなをカタカナに変換
+    const hiraToKana = (s) => s.replace(/[\u3041-\u3096]/g, m => String.fromCharCode(m.charCodeAt(0) + 0x60));
+    // カタカナをひらがなに変換
+    const kanaToHira = (s) => s.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+    
+    // テキストをクリップボードにコピーする非同期関数
+    const copyToClip = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text); // Clipboard APIを使用してコピー
+            copyBtn.textContent = 'コピー完了！'; // ボタンのテキストを更新
+        } catch (err) {
+            // Clipboard APIが使えない場合のフォールバック（textareaを使用）
+            try {
+                const ta = d.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed'; // 画面外に配置
+                ta.style.left = '-9999px';
+                d.body.appendChild(ta);
+                ta.select(); // テキストを選択
+                d.execCommand('copy'); // コピーコマンドを実行
+                d.body.removeChild(ta); // textareaを削除
+                copyBtn.textContent = 'コピー完了！';
+            } catch (copyErr) {
+                copyBtn.textContent = 'コピー失敗';
+                alert('コピーに失敗しました。');
+            }
+        } finally {
+            // 2秒後にボタンのテキストを元に戻す
+            setTimeout(() => { copyBtn.textContent = 'コピー'; }, 2000);
+        }
+    };
+
+    // ステータス項目HTMLを生成する関数
+    const createItemHTML = (item) => `
+        <div class="status-item" data-offset="${item.offset}">
+            <div class="checks">
+                <input type="checkbox" class="green" data-check-type="green" data-offset="${item.offset}" ${item.checkedGreen ? 'checked' : ''}>
+                <input type="checkbox" class="red" data-check-type="red" data-offset="${item.offset}" ${item.checkedRed ? 'checked' : ''}>
+            </div>
+            <span class="offset">${item.offset}:</span>
+            <label for="check-${item.offset}">${item.name}</label>
+            <input type="number" data-offset="${item.offset}" value="${item.value}" placeholder="1" step="1">
+        </div>`;
+    
+    // 一括操作コントロールHTMLを生成する関数
+    const createBatchControlsHTML = (targetId) => `
+        <div class="batch-controls" data-controls-id="${targetId}">
+            <label><input type="checkbox" class="batch-check" data-check-type="green"> <span style="color:var(--secondary-color)">■</span>一括選択</label>
+            <label><input type="checkbox" class="batch-check" data-check-type="red"> <span style="color:var(--red-check)">■</span>一括変更選択</label>
+            <input type="number" class="batch-value" placeholder="一括入力 (赤チェック対象)">
+        </div>`;
+
+    // 指定されたコンテナに項目をレンダリングする関数
+    const renderItems = (container, items) => {
+        container.innerHTML = createBatchControlsHTML(container.id) + `<div class="status-grid">${items.map(createItemHTML).join('')}</div>`;
+    };
+
+    // UI初期化関数: statusDataをカテゴリ分けしてレンダリングします
+    const init = () => {
+        const categories = { basic: [], basic2: [], perf: [], prob: [], invalid: [], other: [] };
+        // 基本部に含めるオフセット
+        const basicMainOffsets = new Set([-24, -20, -16, -12, -8, -4, 0, 4]);
+        // 性能部に含めるキーワード
+        const perfKeywords = new Set(['魔女キラー', 'ゾンビキラー', 'メタルキラー', '超賢者特攻', '烈波カウンター', '超獣特攻', '魂攻撃', '攻撃ターゲット限定', '撃破時お金アップ', '超打たれ強い', '極ダメージ', '召喚', '使徒キラー', '城破壊が得意', '超ダメージ', 'めっぽう強い', '波動ストッパー']);
+        const probKeywords = new Set();
+        const probOffsets = new Set();
+
+        // 確率関連のキーワードとオフセットを収集
+        statusData.forEach(item => {
+            if (item.name.includes('確率')) {
+                probOffsets.add(item.offset);
+                const match = item.name.match(/(.+)\(確率\)/);
+                if (match) probKeywords.add(match[1]);
+            }
+        });
+
+        // statusDataを各カテゴリに分類
+        statusData.forEach(item => {
+            if (item.name.includes('無効')) { categories.invalid.push(item); return; }
+            if (basicMainOffsets.has(item.offset)) { categories.basic.push(item); return; }
+            
+            let isProbRelated = probOffsets.has(item.offset) || probOffsets.has(item.offset - 4) || probOffsets.has(item.offset - 8) || item.name.includes('レベル') || item.name.includes('攻撃力アップ');
+            if (!isProbRelated) {
+                for(const keyword of probKeywords) {
+                    if (item.name.includes(keyword) && (item.name.includes('%') || item.name.includes('％') || item.name.includes('割合'))) {
+                         isProbRelated = true; break;
+                    }
+                }
+            }
+            if (isProbRelated) { categories.prob.push(item); return; }
+            
+            if (perfKeywords.has(item.name) || item.name.startsWith('対')) { categories.perf.push(item); return; }
+            
+            // basic2は特定のオフセット範囲に該当するか、あるいは他に分類されない場合に含める
+            if (item.offset >= -24 && item.offset <= 64 || item.offset === 440) { categories.basic2.push(item); return; }
+
+            categories.other.push(item); // どのカテゴリにも属さない場合はその他に
+        });
+
+        // 各カテゴリのアイテムをレンダリング
+        for (const catId in categories) {
+            renderItems(getEl(`cat-${catId}`), categories[catId]);
+        }
+    };
+    
+    // 逆算モード実行関数
+    const executeReverseCalculation = () => {
+        resultArea.style.display = 'none'; // コード生成結果エリアを非表示に
+        downloadLuaSection.style.display = 'none'; // Luaダウンロードセクションも非表示に
+        const refineValue = parseInt(cleanNumStr(refineIn.value), 10); // リファイン値を取得
+        if (isNaN(refineValue)) return alert('有効なリファイン値がありません。');
+
+        const rawValues = dwordIn.value.split(';'); // 検索パターンをセミコロンで分割
+        let valuesWithOffsets = []; // オフセットが指定された値
+        const unprocessed = []; // オフセットが指定されていない値
+
+        // 検索パターンからオフセット指定を解析
+        rawValues.forEach(valStr => {
+            const match = valStr.trim().match(/(\d+)\s*\((\-?\d+)\)/); // 例: 3(-20)
+            if (match) {
+                valuesWithOffsets.push({ value: parseInt(match[1]), offset: parseInt(match[2]) });
+            } else {
+                unprocessed.push(valStr);
+            }
+        });
+
+        // リファイン値が未加工の値リストのどこにあるかを見つける
+        const refineIndex = unprocessed.map(v => parseInt(cleanNumStr(v), 10)).indexOf(refineValue);
+        if (refineIndex === -1) return alert(`検索パターン内に基準値 ${refineValue} が見つかりません。`);
+
+        // オフセットが指定されていない値に対して、リファイン値を基準にオフセットを計算
+        unprocessed.forEach((valStr, index) => {
+            const offset = (index - refineIndex) * 4; // DWORDなので4バイトずつ
+            // 既にオフセットが指定されている場合は重複しないようにする
+            if (!valuesWithOffsets.some(v => v.offset === offset)) {
+                 valuesWithOffsets.push({ value: parseInt(cleanNumStr(valStr), 10), offset: offset });
+            }
+        });
+        
+        revResultList.innerHTML = ''; // 以前の結果をクリア
+        // オフセット順にソートして結果を表示
+        valuesWithOffsets.sort((a, b) => a.offset - b.offset).forEach(({value, offset}) => {
+            const item = statusData.find(it => it.offset === offset); // 対応するステータス項目を検索
+            const li = d.createElement('li');
+            li.innerHTML = `オフセット <b>${offset}</b>: 値 <b>${value}</b> → <b>${item ? item.name : '(該当なし)'}</b>`;
+            revResultList.appendChild(li);
+        });
+        revResultArea.style.display = 'block'; // 逆算結果エリアを表示
+    };
+
+    // Luaコード生成関数
+    const genCode = () => {
+        revResultArea.style.display = 'none'; // 逆算結果エリアを非表示に
+        d.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid')); // エラー表示をリセット
+        
+        const refineVal = parseInt(cleanNumStr(refineIn.value), 10); // リファイン値を取得
+        if (isNaN(refineVal)) {
+            alert('有効なリファイン値がありません。');
+            return refineIn.classList.add('is-invalid'); // エラー表示
+        }
+
+        // 検索パターンを解析し、DWORD値の配列を作成
+        const dwordVals = dwordIn.value.split(';').map(s => parseInt(cleanNumStr(s), 10)).filter(n => !isNaN(n));
+        if (dwordVals.length === 0) {
+            alert('有効なDWORD値がありません。');
+            return dwordIn.classList.add('is-invalid'); // エラー表示
+        }
+
+        // 検索パターン（HEX形式）を生成
+        const hexPattern = "h " + dwordVals.map(num => {
+            const buf = new ArrayBuffer(4); // 4バイトのArrayBuffer
+            new DataView(buf).setInt32(0, num, true); // リトルエンディアンで32ビット整数を書き込み
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(' '); // 16進数文字列に変換
+        }).join(' ');
+
+        const edits = []; // 変更するオフセットと値のリスト
+        // 緑チェックが入っている項目を処理
+        statusData.filter(item => item.checkedGreen).forEach(item => {
+            const valStr = item.value;
+            const value = (valStr.trim() === '') ? 1 : parseInt(valStr, 10); // 値が空の場合はデフォルトで1
+            // 無効な数値入力チェック
+            if (valStr.includes('.') || isNaN(value)) {
+                d.querySelectorAll(`[data-offset="${item.offset}"]`).forEach(el => el.classList.add('is-invalid'));
+                throw new Error(`無効な数値です: 「${item.name}」`);
+            }
+            edits.push(`{offset = ${item.offset}, value = ${value}}`); // 編集リストに追加
+        });
+        
+        // 検索範囲の設定
+        const rangeParts = [];
+        if (getEl('range-cb').checked) rangeParts.push('gg.REGION_CODE_APP');
+        if (getEl('range-other').checked) rangeParts.push('gg.REGION_OTHER');
+        const rangeSetting = rangeParts.length > 0 ? rangeParts.join(' | ') : 'gg.REGION_OTHER'; // どちらもチェックがない場合はOTHERをデフォルトに
+
+        let prefixCode = ''; // Luaコードの先頭に挿入する条件分岐
+        const selectedPrefix = d.querySelector('input[name="lua-prefix"]:checked');
+        if (selectedPrefix && selectedPrefix.value !== 'none') {
+            const type = selectedPrefix.value;
+            if (type === 'elseif_ax_val') prefixCode = `elseif Ax == ${getEl('lua-prefix-val').value || '2'} then\n\n`;
+            else if (type === 'if_ax_nil') prefixCode = `if Ax == nil then return end\n\n`;
+            else if (type === 'if_ax_1') prefixCode = `if Ax == 1 then\n\n`;
+            else if (type === 'if_ax_val') prefixCode = `if Ax == ${getEl('lua-prefix-val2').value || '2'} then\n\n`;
+        }
+
+        const editStr = edits.length > 0 ? '    ' + edits.join(',\n    ') : ''; // 編集設定を整形
+        // 最終的なLuaスクリプト
+        const luaScript = `${prefixCode}gg.clearResults()
+gg.setRanges(${rangeSetting})
+local hexPattern = "${hexPattern}"
+gg.searchNumber(hexPattern, gg.TYPE_HEX)
+local hexResults = gg.getResults(99999)
+if #hexResults == 0 then gg.alert("HEXパターンが見つかりませんでした") return end
+gg.toast("見つかったアドレス数: " .. #hexResults)
+local dwordList = {}
+for _, v in ipairs(hexResults) do table.insert(dwordList, { address = v.address, flags = gg.TYPE_DWORD }) end
+dwordList = gg.getValues(dwordList)
+local refinedList = {}
+for _, v in ipairs(dwordList) do if v.value == ${refineVal} then table.insert(refinedList, v) end end
+if #refinedList == 0 then gg.toast("${refineVal}は見つかりませんでした") return end
+local editSettings = {
+${editStr}
+}
+if #editSettings > 0 then
+  for _, setting in ipairs(editSettings) do
+    local editList = {}
+    for _, v in ipairs(refinedList) do
+      table.insert(editList, { address = v.address + setting.offset, flags = gg.TYPE_DWORD, value = setting.value })
+    end
+    gg.setValues(editList)
+  end
+  gg.toast("複数オフセットの値を書き換えました")
+else
+  gg.toast("変更項目が未選択のため、書き込みませんでした。")
+end
+gg.clearResults()`;
+
+        resultCodeEl.textContent = luaScript.trim(); // 生成されたコードをtextareaに表示
+        resultArea.style.display = 'block'; // 結果表示エリアを表示
+        downloadLuaSection.style.display = 'block'; // Luaダウンロードセクションも表示
+    };
+
+    // UI要素の状態をstatusDataと同期させる関数
+    const syncUI = (offset) => {
+        const data = statusData.find(i => i.offset == offset);
+        if (!data) return;
+        d.querySelectorAll(`.status-item[data-offset="${offset}"]`).forEach(itemEl => {
+            const chkGreen = itemEl.querySelector('.green');
+            const chkRed = itemEl.querySelector('.red');
+            const val = itemEl.querySelector('input[type="number"]');
+            if (chkGreen.checked !== data.checkedGreen) chkGreen.checked = data.checkedGreen;
+            if (chkRed.checked !== data.checkedRed) chkRed.checked = data.checkedRed;
+            if (val.value !== data.value) val.value = data.value;
+        });
+    };
+
+    let rafId; // requestAnimationFrame ID
+    // 検索ボックスに入力があったときに実行される関数
+    const performSearch = () => {
+        cancelAnimationFrame(rafId); // 以前の検索処理をキャンセル
+        rafId = requestAnimationFrame(() => { // アニメーションフレームで検索を実行
+            const query = searchBox.value.trim().toLowerCase(); // 検索クエリを小文字に変換
+            if (!query) {
+                searchResultsWrapper.innerHTML = ''; 
+                searchResultsWrapper.classList.remove('active'); // 検索結果を非表示
+                return;
+            }
+            const queryHira = kanaToHira(query); // ひらがなクエリも生成
+            // statusDataから検索クエリに一致する項目をフィルタリング
+            const results = statusData.filter(item => {
+                const nameLower = item.name.toLowerCase();
+                const nameHira = kanaToHira(nameLower);
+                return nameLower.includes(query) || nameHira.includes(queryHira);
+            });
+            
+            // 検索結果の表示
+            if (results.length > 0) {
+                searchResultsWrapper.innerHTML = createBatchControlsHTML('search-results-wrapper') + `<div class="status-grid">${results.map(createItemHTML).join('')}</div>`;
+            } else {
+                searchResultsWrapper.innerHTML = '<p>該当する項目はありません。</p>';
+            }
+            searchResultsWrapper.classList.add('active'); // 検索結果を表示
+        });
+    };
+
+    // ファイル名に含める現在日時をフォーマットする関数 (YYYYMMDD_HHmmss)
+    const getFormattedDateTime = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    };
+
+    // 生成されたLuaファイルをダウンロードする関数
+    const downloadGeneratedLuaFile = () => {
+        const codeContent = resultCodeEl.textContent;
+        if (!codeContent) {
+            alert("ダウンロードするコードがありません。まずコードを生成してください。");
+            return;
+        }
+
+        const formattedDateTime = getFormattedDateTime();
+        const filename = `Aにゃんこ_${formattedDateTime}.lua`; // ファイル名を生成
+        
+        const blob = new Blob([codeContent], { type: 'text/plain;charset=utf-8' }); // Blobオブジェクトを作成
+        const url = URL.createObjectURL(blob); // BlobのURLを作成
+        
+        const a = d.createElement('a'); // 一時的なアンカー要素を作成
+        a.href = url; // ダウンロードURLを設定
+        a.download = filename; // ダウンロードファイル名を設定
+        d.body.appendChild(a); // bodyに追加（一部ブラウザで必要）
+        a.click(); // クリックイベントをトリガーしてダウンロードを開始
+        d.body.removeChild(a); // アンカー要素を削除
+        URL.revokeObjectURL(url); // オブジェクトURLを解放してメモリをクリーンアップ
+
+        alert(`'${filename}' をダウンロードしました！`);
+    };
+
+    // イベントリスナーの設定
+    reverseBtn.addEventListener('click', executeReverseCalculation); // 逆算実行ボタン
+    copyBtn.addEventListener('click', () => copyToClip(resultCodeEl.textContent)); // コピーボタン
+    downloadLuaBtn.addEventListener('click', downloadGeneratedLuaFile); // Luaダウンロードボタン
+
+    // 逆算モードチェックボックスの変更イベント
+    revCalcCheck.addEventListener('change', (e) => {
+        const isReverse = e.target.checked;
+        genBtn.style.display = isReverse ? 'none' : 'block'; // 逆算モードONでコード生成ボタン非表示
+        reverseBtn.style.display = isReverse ? 'block' : 'none'; // 逆算モードONで逆算実行ボタン表示
+        
+        // モード切り替え時に結果表示とダウンロードセクションを非表示にする
+        resultArea.style.display = 'none';
+        downloadLuaSection.style.display = 'none';
+    });
+
+    // 検索パターン入力フィールドの変更イベント
+    dwordIn.addEventListener('input', () => {
+        // 検索パターンから5000以上の最大値をリファイン値として自動設定
+        const values = dwordIn.value.split(';').map(s => parseInt(cleanNumStr(s), 10)).filter(n => !isNaN(n) && n >= 5000);
+        if (values.length > 0) {
+            refineIn.value = Math.max(...values);
+        }
+    });
+    
+    // カテゴリタブのクリックイベント（イベント委譲）
+    menuTabs.addEventListener('click', (e) => {
+        if (e.target.classList.contains('tab-btn')) {
+            d.querySelector('.tab-btn.active').classList.remove('active'); // 現在アクティブなタブを非アクティブに
+            d.querySelector('.category-content.active').classList.remove('active'); // 現在アクティブなコンテンツを非表示に
+            e.target.classList.add('active'); // クリックされたタブをアクティブに
+            getEl(e.target.dataset.target).classList.add('active'); // 対応するコンテンツを表示
+        }
+    });
+    
+    searchBox.addEventListener('input', performSearch); // 検索ボックス入力イベント
+
+    // body要素全体にイベントリスナーを設定し、子要素からのイベントを処理（イベント委譲）
+    d.body.addEventListener('input', (e) => {
+        const target = e.target;
+        const controls = target.closest('.batch-controls'); // 一括操作コントロールかどうかを判定
+        if (controls) {
+            const container = getEl(controls.dataset.controlsId) || controls.parentElement; // コントロールの親コンテナ
+            const items = Array.from(container.querySelectorAll('.status-item')); // そのコンテナ内の全ステータス項目
+            const checkType = target.dataset.checkType;
+
+            if (checkType) { // 一括チェックボックスの場合
+                const isChecked = target.checked;
+                const prop = checkType === 'green' ? 'checkedGreen' : 'checkedRed'; // どちらのチェックボックスか
+                items.forEach(item => {
+                    const offset = item.dataset.offset;
+                    const data = statusData.find(i => i.offset == offset);
+                    if (data) data[prop] = isChecked; // statusDataを更新
+                    syncUI(offset); // UIを同期
+                });
+            }
+            if (target.matches('.batch-value')) { // 一括入力フィールドの場合
+                const value = target.value;
+                if (value.trim() === '') return;
+                items.forEach(item => {
+                    const offset = item.dataset.offset;
+                    const data = statusData.find(i => i.offset == offset);
+                    if (data && data.checkedRed) { // 赤チェックが入っている項目のみ対象
+                        data.value = value;
+                        if(!data.checkedGreen) data.checkedGreen = true; // 値が入力されたら緑チェックも入れる
+                        syncUI(offset);
+                    }
+                });
+            }
+            return;
+        }
+
+        const itemDiv = target.closest('.status-item'); // 個別のステータス項目かどうかを判定
+        if (itemDiv) {
+            const offset = itemDiv.dataset.offset;
+            const data = statusData.find(i => i.offset == offset);
+            if (!data) return;
+
+            if (target.matches('input[type="checkbox"]')) { // 個別のチェックボックスの場合
+                const prop = target.dataset.checkType === 'green' ? 'checkedGreen' : 'checkedRed';
+                data[prop] = target.checked; // statusDataを更新
+            }
+            if (target.matches('input[type="number"]')) { // 個別の数値入力フィールドの場合
+                data.value = target.value; // statusDataを更新
+                if (target.value.trim() !== '' && !data.checkedGreen) {
+                    data.checkedGreen = true; // 値が入力されたら緑チェックも入れる
+                }
+            }
+            syncUI(offset); // UIを同期
+        }
+    });
+
+    init(); // ページ読み込み時にUIを初期化
+});
+</script>
+
+</body>
+</html>

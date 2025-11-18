@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <title>ログインページ</title>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --primary-color: #98FB98; 
+            --secondary-color: #3CB371; 
+            --bg-color: #F0FFF0;
+            --widget-bg: #fff; 
+            --text-color: #333; 
+            --error-color: #d32f2f; 
+            --red-check: #ff6b6b;
+            --radius: 12px; 
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* secondary-colorを使いたい場合 */
+        .secondary-bg {
+            background-color: var(--secondary-color);
+            color: white; /* 文字色も変更 */
+            padding: 10px;
+            border-radius: var(--radius);
+        }
+
+
+
+
+
+        .top-nav {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start; /* 左寄せでも中央寄せでもOK */
+    align-items: center;          /* 縦中央揃え */
+    flex-wrap: wrap;              /* 横に並ばなければ折り返す */
+    margin-bottom: 30px;
+}
+
+.nav-btn {
+    display: inline-flex;        /* 横並び確保 */
+    align-items: center;          /* 高さ中央揃え */
+    justify-content: center;
+    min-width: 150px;             /* 横幅指定 */
+    height: 40px;                 /* 高さ指定で縦長防止 */
+    background-color: #808080;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 8px;
+    padding: 0 20px;              /* 横の余白 */
+    transition: background-color 0.3s;
+}
+
+.nav-btn:hover {
+    background-color: #666;
+}
+
+
+        
+
+
+    </style>
+</head>
+<body>
+
+
+    <main id="main-content">
+    <section class="widget">
+        <div class="header-with-nav">
+            <h1 style="color:#3CB371;">開発者について</h1>
+<div style="height:2px; background-color:#4076c6; width:100%; margin:20px 0;"></div>
+
+            <div class="top-nav">
+                <a href="index.html" class="nav-btn" style="background-color:#99ac2c; color:white;">ホーム</a>
+                <a href="ログイン.html" class="nav-btn" style="background-color:#99ac2c; color:white;">ステータス編集</a>
+                <a href="開発者について.html" class="nav-btn" style="background-color:#99ac2c; color:white;">開発者について</a>
+                <a href="Lua_editor.html" class="nav-btn" style="background-color:#99ac2c; color:white;">Lua editor</a>
+
+            </div>
+        </div>
+
+
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <section class="secondary-bg">
+        <h2><b>開発者┃くらむぼん<br><br>ADHD診断済み。インチュニブ服用。</b></h2>
+    </section>
+
+<div style="height:2px; background-color:#7849c9; width:100%; margin:20px 0;"></div>
+
+
+
+    <section class="secondary-bg" style="display: flex; align-items: center; gap: 20px;">
+    <img src="チャンネルアイコン.jpg" 
+         alt="チャンネルアイコン"
+         style="width:100px; height:100px; border-radius:50%; object-fit: cover;">
+    <div>
+        <h2><b>YouTubeチャンネル</b></h2>
+        <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA?si=SZ7U0PjuVURPrfOl"
+           target="_blank"
+           class="nav-btn"
+           style="background-color:#99ac2c; color:white;">
+            ここをクリック
+        </a>
+    </div>
+</section>
+
+
+
+
+
+</body>
+</html>
