@@ -45,12 +45,23 @@
         .top-nav { display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap; }
         .nav-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 150px; height: 40px; background-color: var(--secondary-color); color: white; font-weight: bold; text-decoration: none; border-radius: 8px; padding: 0 20px; transition: background-color 0.3s, transform 0.2s; }
         .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
-        
-        /* ▼▼▼ 追加したスタイル ▼▼▼ */
         .notice-text { font-size: 0.9em; color: #888; line-height: 1.5; margin-bottom: 20px; text-align: center; }
         .footer-links { text-align: center; margin-top: 15px; font-size: 0.9em; }
         .footer-links a { color: var(--secondary-color); text-decoration: none; margin: 0 10px; }
         .footer-links a:hover { text-decoration: underline; }
+
+        /* ▼▼▼ パスワード表示ボタン用のスタイルを追加 ▼▼▼ */
+        .password-container { position: relative; }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            user-select: none; /* テキスト選択を無効化 */
+            font-size: 20px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -64,7 +75,6 @@
             </nav>
         </section>
 
-        <!-- ▼▼▼ 修正点1: 説明文を追加して、ブラウザとユーザーに目的を伝える ▼▼▼ -->
         <section id="login-widget" class="widget">
             <h2>ログイン</h2>
             <p class="notice-text">
@@ -78,7 +88,11 @@
                 </div>
                 <div class="input-area">
                     <label for="login-password">パスワード</label>
-                    <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+                    <!-- ▼▼▼ パスワード表示ボタンを配置 ▼▼▼ -->
+                    <div class="password-container">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+                        <span class="toggle-password" id="toggle-login-password">👁️</span>
+                    </div>
                 </div>
                 <button type="submit" id="login-btn" class="action-btn">ログイン</button>
                 <p id="login-message" class="message-area error-message"></p>
@@ -86,7 +100,6 @@
             <div class="form-toggle">
                 アカウントをお持ちでないですか？ <span id="show-register" class="toggle-link">新規登録</span>
             </div>
-            <!-- ▼▼▼ 修正点2: プライバシーポリシー等へのリンクを追加 ▼▼▼ -->
             <div class="footer-links">
                 <a href="privacy-policy.html" target="_blank">プライバシーポリシー</a>
                 <a href="terms-of-service.html" target="_blank">利用規約</a>
@@ -95,7 +108,6 @@
 
         <section id="register-widget" class="widget">
             <h2>新規登録</h2>
-            <!-- ▼▼▼ 修正点1: こちらにも説明文を追加 ▼▼▼ -->
             <p class="notice-text">
                 このサイト専用のアカウントを新規作成します。<br>
                 ここで登録した情報が、他のサービスで使用されることはありません。
@@ -107,7 +119,11 @@
                 </div>
                 <div class="input-area">
                     <label for="register-password">パスワード (8～32文字)</label>
-                    <input type="password" id="register-password" name="new-password" autocomplete="new-password" required minlength="8" maxlength="32">
+                     <!-- ▼▼▼ パスワード表示ボタンを配置 ▼▼▼ -->
+                    <div class="password-container">
+                        <input type="password" id="register-password" name="new-password" autocomplete="new-password" required minlength="8" maxlength="32">
+                        <span class="toggle-password" id="toggle-register-password">👁️</span>
+                    </div>
                 </div>
                 <button type="submit" id="register-btn" class="action-btn">登録する</button>
                 <p id="register-message" class="message-area"></p>
@@ -115,7 +131,6 @@
             <div class="form-toggle">
                 すでにアカウントをお持ちですか？ <span id="show-login" class="toggle-link">ログイン</span>
             </div>
-            <!-- ▼▼▼ 修正点2: こちらにもリンクを追加 ▼▼▼ -->
             <div class="footer-links">
                 <a href="privacy-policy.html" target="_blank">プライバシーポリシー</a>
                 <a href="terms-of-service.html" target="_blank">利用規約</a>
@@ -123,8 +138,7 @@
         </section>
     </main>
     <script>
-        // (JavaScriptは変更なし)
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyTxY2D7hbssRtOsI1RdrtGHDk8EbB6NRJ5KKc7Hs8KDTCG_wYjQq2L5ysrRb9B6hTZ/exec';
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbynZWcG9kstvsTTSuMjQ_F17xEhkM4yPHF_8Yl93fBe9UrKAAzDYl24SyP6sfkjleqV/exec';
         const LOGGED_IN_PAGE = 'にゃんこ大戦争.html';
         const loginWidget = document.getElementById('login-widget');
         const registerWidget = document.getElementById('register-widget');
@@ -139,6 +153,25 @@
         loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const btn = document.getElementById('login-btn'); const msgArea = document.getElementById('login-message'); const username = document.getElementById('login-username').value.trim(); const password = document.getElementById('login-password').value.trim(); if (!username || !password) { msgArea.textContent = '全項目を入力してください。'; return; } btn.disabled = true; btn.textContent = '認証中...'; msgArea.textContent = ''; try { const res = await fetch(GAS_WEB_APP_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'login', username, password }) }); const result = await res.json(); if (result.status === 'success') { setCookie('session_token', result.token, 7); window.location.href = LOGGED_IN_PAGE; } else { msgArea.textContent = result.message || 'ログインに失敗しました。'; } } catch (err) { msgArea.textContent = '通信エラーが発生しました。'; console.error("Login Error:", err); } finally { btn.disabled = false; btn.textContent = 'ログイン'; } });
         const registerForm = document.getElementById('register-form');
         registerForm.addEventListener('submit', async (e) => { e.preventDefault(); const btn = document.getElementById('register-btn'); const msgArea = document.getElementById('register-message'); const username = document.getElementById('register-username').value.trim(); const password = document.getElementById('register-password').value.trim(); if (username.length < 4 || username.length > 32 || password.length < 8 || password.length > 32) { msgArea.className = 'message-area error-message'; msgArea.textContent = '文字数を確認してください。'; return; } btn.disabled = true; btn.textContent = '登録中...'; msgArea.textContent = ''; try { const res = await fetch(GAS_WEB_APP_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'register', username, password }) }); const result = await res.json(); if (result.status === 'success') { setCookie('session_token', result.token, 7); window.location.href = LOGGED_IN_PAGE; } else { msgArea.className = 'message-area error-message'; msgArea.textContent = result.message || '登録に失敗しました。'; } } catch (err) { msgArea.className = 'message-area error-message'; msgArea.textContent = '通信エラーが発生しました。'; console.error("Registration Error:", err); } finally { btn.disabled = false; btn.textContent = '登録する'; } });
+        
+        /* ▼▼▼ パスワード表示切り替え用のJavaScriptを追加 ▼▼▼ */
+        function setupPasswordToggle(toggleId, inputId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+            if (toggle && input) {
+                toggle.addEventListener('click', () => {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        toggle.textContent = '🙈'; // アイコンを変更
+                    } else {
+                        input.type = 'password';
+                        toggle.textContent = '👁️'; // アイコンを元に戻す
+                    }
+                });
+            }
+        }
+        setupPasswordToggle('toggle-login-password', 'login-password');
+        setupPasswordToggle('toggle-register-password', 'register-password');
     </script>
 </body>
 </html>
