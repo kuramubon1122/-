@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja" prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ▼▼▼ 記事のタイトルに合わせて変更 ▼▼▼ -->
+    <title>ここに記事のタイトルを入力｜くらむぼん公式サイト</title>
+    <meta name="description" content="ここに記事の簡単な説明（ディスクリプション）を入力します。">
+    <!-- ▲▲▲ 記事のタイトルに合わせて変更 ▲▲▲ -->
+    
+    <meta name="keywords" content="キーワード1, キーワード2, くらむぼん">
+    <link rel="canonical" href="https://nyankohack.tokyo/article1.html"> <!-- ← ファイル名に合わせて変更 -->
+    
+    <!-- ▼▼▼ アイコン設定 ▼▼▼ -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <!-- ▲▲▲ アイコン設定 ▲▲▲ -->
+
+    <!-- OGP (SNS共有) タグ -->
+    <meta property="og:url" content="https://nyankohack.tokyo/article1.html"> <!-- ← ファイル名に合わせて変更 -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="ここに記事のタイトルを入力｜くらむぼん公式サイト">
+    <meta property="og:description" content="ここに記事の簡単な説明（ディスクリプション）を入力します。">
+    <meta property="og:site_name" content="くらむぼん公式サイト">
+    <meta property="og:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+
+    <!-- Twitterカード タグ -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="ここに記事のタイトルを入力｜くらむぼん公式サイト">
+    <meta name="twitter:description" content="ここに記事の簡単な説明（ディスクリプション）を入力します。">
+    <meta name="twitter:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+
+    <style>
+        :root {
+            --primary-color: #98FB98; --secondary-color: #2E8B57; --bg-color: #F0FFF0;
+            --widget-bg: #FFFFFF; --text-color: #333333; --border-color: #E0E0E0;
+            --shadow-color: rgba(0,0,0,0.1); --radius: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #2E8B57; --secondary-color: #98FB98; --bg-color: #121212;
+                --widget-bg: #1E1E1E; --text-color: #E0E0E0; --border-color: #444444;
+                --shadow-color: rgba(0,0,0,0.4);
+            }
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        #page-container { width: 100%; max-width: 800px; }
+        .site-header, .site-footer { width: 100%; padding: 20px 0; }
+        .site-footer { text-align: center; font-size: 0.9em; color: #888; margin-top: 20px; }
+        .widget { background-color: var(--widget-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px var(--shadow-color); border-left: 5px solid var(--secondary-color); }
+        h1, h2, h3 { color: var(--secondary-color); margin-top: 0; }
+        h1 { text-align: center; font-size: 2.5em; }
+        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; font-size: 1.8em; margin-top: 1.5em;}
+        h3 { font-size: 1.5em; border-bottom: none; }
+        .post-meta { text-align: center; margin-bottom: 20px; color: #888; }
+        .post-content p { line-height: 1.8; margin-bottom: 1em; }
+        .post-content a { color: var(--secondary-color); text-decoration: underline; }
+        .post-content a:hover { color: var(--primary-color); }
+        .post-content code { background-color: var(--border-color); color: var(--secondary-color); padding: 3px 6px; border-radius: 4px; font-weight: bold; font-family: 'Courier New', Courier, monospace;}
+        .post-content pre { background-color: var(--border-color); padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .nav-btn { display: inline-block; padding: 15px; background-color: var(--secondary-color); color: white; text-decoration: none; text-align: center; font-weight: bold; border-radius: var(--radius); transition: background-color 0.3s, transform 0.2s; }
+        .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; } h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <div id="page-container">
+        <main>
+            <article class="widget">
+                <header class="site-header">
+                     <!-- ▼▼▼ 記事のタイトル ▼▼▼ -->
+                    <h1>解析防止方法について</h1>
+                    <div class="post-meta">
+                        公開日: <time datetime="2025-11-21">2025年11月21日</time>
+                    </div>
+                </header>
+                
+                <section class="post-content">
+                    <!-- ▼▼▼ ここから記事の本文 ▼▼▼ -->
+                    <h2>完全な解析防止はない！</h2>
+                    <p>
+                     解析を難しくすることは可能だがLuaは専用のスクリプトやツールを使えば<codee>簡単に</codee>復号化し解析防止コードを捨てれてしまう。<br>
+                     ではどうすれば解析防止を有効に使えるだろうか？
+
+                    </p>
+
+                    <h2>解析防止の正しい使い方</h2>
+                    <p>
+                    解析防止コードは復号化後のコードに含めると危険ということがわかった。だから解析防止コードは<code>Github</code>などから読み込むのが安全であろう。
+                    </p>
+                    <p>Githubのファイルの中身の記述を<code>raw</code>で取得するとLuaで実行できる。</p>
+                    
+                    <h3>Githubからの実行方法</h3>
+                    <p>
+                    以下のコードで実行するとGithubから取得したコードを実行できる。
+                    </p>
+                    <pre><code>
+local url = "https://raw.githubusercontent.com/ (自身のURLを入力)"
+
+-- URL取得・読み込み
+local response = gg.makeRequest(url)
+if not response or not response.content then
+    logLua("print('コード取得失敗')")
+    gg.alert("コード取得失敗")
+    return
+end
+
+-- 取得コードを安全に load
+local fn, err = load(response.content, "remote_chunk", "bt", _G)
+if not fn then
+    logLua("print('コード読み込み失敗: "..tostring(err).."')")
+    gg.alert("コード読み込み失敗: "..tostring(err))
+    return
+end
+
+-- 実行
+local status, e = pcall(fn)
+if not status then
+    logLua("print('実行エラー: "..tostring(e).."')")
+    gg.alert("実行エラー: "..tostring(e))
+else
+    logLua("print('コード実行完了')")
+end
+                    </code></pre>
+
+                    <!-- ▲▲▲ ここまで記事の本文 ▲▲▲ -->
+                </section>
+            </article>
+
+            <nav style="text-align: center;">
+                <a href="blog.html" class="nav-btn">ブログ一覧に戻る</a>
+            </nav>
+        </main>
+
+        <footer class="site-footer">
+            <p>&copy; 2025 くらむぼん</p>
+        </footer>
+    </div>
+</body>
+</html>
