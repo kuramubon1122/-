@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>くらむぼん公式サイト｜YouTube活動とLINE BOT開発</title>
-    <meta name="description" content="くらむぼんの公式サイト。YouTubeチャンネルでの活動報告や、開発したLINE「文章暗号化BOT」の情報を発信しています。">
+    <title>くらむぼん公式サイト｜YouTube活動とLINE BOT「文章暗号化BOT」開発</title>
+    <meta name="description" content="くらむぼんの公式サイト。YouTubeでのブロスタ動画投稿や、自作のLINE「文章暗号化BOT」の開発情報を発信。プロフィールや開発の裏側、お知らせなどを掲載しています。">
+    <meta name="keywords" content="くらむぼん, YouTube, ブロスタ, LINE BOT, プログラミング, 暗号化, ゲーム実況">
     <link rel="canonical" href="https://nyankohack.tokyo/">
     
-    <!-- ファイル名はご指定の通り変更していません -->
     <link rel="icon" type="image/png" href="チャンネルアイコン.jpg">
     <link rel="apple-touch-icon" sizes="180x180" href="チャンネルアイコン.jpg">
 
@@ -15,7 +15,7 @@
     <meta property="og:url" content="https://nyankohack.tokyo/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="くらむぼん公式サイト｜YouTubeとLINE BOT開発">
-    <meta property="og:description" content="YouTubeチャンネルや開発したLINE BOTの情報を発信しています。">
+    <meta property="og:description" content="YouTubeチャンネルでの活動や、開発したLINE BOTの情報を発信しています。">
     <meta property="og:site_name" content="くらむぼん公式サイト">
     <meta property="og:image" content="https://nyankohack.tokyo/チャンネルアイコン.jpg">
 
@@ -27,14 +27,52 @@
 
     <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
 
-    <!-- 構造化データ -->
+    <!-- 構造化データ (JSON-LD) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "くらむぼん",
-      "url": "https://nyankohack.tokyo/",
-      "sameAs": ["https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA"]
+      "@graph": [
+        {
+          "@type": "Person",
+          "name": "くらむぼん",
+          "url": "https://nyankohack.tokyo/",
+          "sameAs": [
+            "https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA"
+          ],
+          "knowsAbout": ["Brawl Stars", "Game", "Programming", "LINE BOT Development"],
+          "image": "https://nyankohack.tokyo/チャンネルアイコン.jpg"
+        },
+        {
+          "@type": "WebSite",
+          "name": "くらむぼん公式サイト",
+          "url": "https://nyankohack.tokyo/",
+          "creator": {
+            "@type": "Person",
+            "name": "くらむぼん"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "「文章暗号化BOT」は本当に安全ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい。このBOTはユーザーが設定した「鍵」に基づいて暗号化と復号を行います。同じ「鍵」を知らない限り、第三者が内容を解読することは非常に困難です。また、BOTサーバーが会話ログや鍵の情報を保存することはありません。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "鍵を忘れた場合はどうなりますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "鍵を忘れてしまうと、その鍵で暗号化された文章を復号することはできなくなります。大切な情報の場合は、鍵を安全な場所に保管してください。新しい鍵を設定すれば、それ以降のメッセージは新しい鍵で暗号化できます。"
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
     <style>
@@ -58,17 +96,24 @@
         .widget { background-color: var(--widget-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px var(--shadow-color); border-left: 5px solid var(--secondary-color); }
         h1, h2, h3 { color: var(--secondary-color); margin-top: 0; }
         h1 { text-align: center; font-size: 2.5em; }
-        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
+        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; font-size: 1.8em; }
         h3 { font-size: 1.5em; border-bottom: none; }
-        nav { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-        .nav-btn { padding: 15px; background-color: var(--secondary-color); color: white; text-decoration: none; text-align: center; font-weight: bold; border-radius: var(--radius); transition: background-color 0.3s, transform 0.2s; }
+        nav { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
+        .nav-btn { flex: 1 1 200px; padding: 15px; background-color: var(--secondary-color); color: white; text-decoration: none; text-align: center; font-weight: bold; border-radius: var(--radius); transition: background-color 0.3s, transform 0.2s; }
         .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
         .divider { height: 2px; background-color: var(--border-color); width: 100%; margin: 25px 0; }
-        .profile-container { display: flex; align-items: center; gap: 20px; margin-top: 25px; }
-        .profile-link img { width: 200px; height: 200px; object-fit: cover; border-radius: var(--radius); display: block; }
+        .profile-container { display: flex; align-items: flex-start; gap: 25px; margin-top: 25px; }
+        .profile-link img { width: 200px; height: 200px; object-fit: cover; border-radius: var(--radius); display: block; flex-shrink: 0; }
         .profile-link:hover img { opacity: 0.85; }
-        .explain p { margin: 0; line-height: 1.6; }
-        .explain code { background-color: var(--border-color); padding: 2px 5px; border-radius: 4px; }
+        .explain { flex-grow: 1; }
+        .explain p, .explain ul { margin: 0 0 1em 0; line-height: 1.7; }
+        .explain ul { padding-left: 20px; }
+        .explain code { background-color: var(--border-color); color: var(--secondary-color); padding: 3px 6px; border-radius: 4px; font-weight: bold; }
+        .news-item { border-bottom: 1px solid var(--border-color); padding: 15px 0; }
+        .news-item:last-child { border-bottom: none; }
+        .news-date { font-size: 0.9em; color: #888; margin-right: 10px; }
+        .contact-list { list-style: none; padding: 0; }
+        .contact-list li { margin-bottom: 10px; }
         #loading-indicator { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 10px; }
         .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--secondary-color); animation: spin 1s ease infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -85,8 +130,14 @@
         .slider-nav:hover { background-color: rgba(0, 0, 0, 0.8); }
         #prev-btn { left: -20px; }
         #next-btn { right: -20px; }
+        details { margin-top: 10px; border: 1px solid var(--border-color); border-radius: 8px; }
+        summary { cursor: pointer; padding: 15px; font-weight: bold; color: var(--secondary-color); }
+        .faq-answer { padding: 0 15px 15px; }
         @media (max-width: 600px) {
-            .profile-container { flex-direction: column; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+            .profile-container { flex-direction: column; align-items: center; }
+            .profile-link img { width: 150px; height: 150px; }
             .video-item { flex: 0 0 50%; }
             #prev-btn { left: 5px; }
             #next-btn { right: 5px; }
@@ -95,7 +146,10 @@
 </head>
 <body>
     <div id="page-container">
-        <header class="site-header"><h1>くらむぼん公式サイト</h1></header>
+        <header class="site-header">
+            <h1>くらむぼん公式サイト</h1>
+        </header>
+
         <main id="main-content">
             <section class="widget" aria-labelledby="profile-title">
                 <h2 id="profile-title">プロフィール &amp; 活動</h2>
@@ -106,13 +160,16 @@
                 </nav>
                 <div class="profile-container">
                     <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA" target="_blank" rel="noopener noreferrer" class="profile-link">
-                        <img src="チャンネルアイコン.jpg" alt="YouTubeチャンネルアイコン" width="200" height="200" fetchpriority="high">
+                        <img src="チャンネルアイコン.jpg" alt="くらむぼんのYouTubeチャンネルアイコン" width="200" height="200" fetchpriority="high">
                     </a>
                     <div class="explain">
-                        <p>2023年チャンネル開設。</p>
+                        <p>はじめまして、<strong>くらむぼん</strong>です。<br>ゲーム（特にブロスタ）とプログラミングが好きで、その二つを軸に活動しています。</p>
+                        <p>YouTubeでは、主にブロスタのプレイ動画や攻略情報を発信。そして、趣味で開発した便利なツールもこのサイトで公開しています。</p>
                         <div class="divider"></div>
-                        <h3>ブロスタのプロフ</h3>
-                        <p>総トロ74000以上。<br>最高マスター1</p>
+                        <h3>YouTube活動 (2023年〜)</h3>
+                        <p>チャンネルでは、楽しみながら上達できるような動画作りを心がけています。ハイレベルなプレイから、ちょっと笑える企画まで、幅広く投稿中です。</p>
+                        <h3>ブロスタのプロフィール</h3>
+                        <p>総トロフィーは74000以上、パワーリーグの最高ランクはマスターⅠです。皆さんと一緒にブロスタを楽しみたいです！</p>
                     </div>
                 </div>
                 <div class="divider"></div>
@@ -126,25 +183,75 @@
                     </div>
                 </div>
             </section>
-            <section class="widget" aria-labelledby="bot-title">
+            
+            <section class="widget" id="bot-section" aria-labelledby="bot-title">
                 <h2 id="bot-title">文章暗号化BOT</h2>
                 <div class="profile-container">
                     <a href="https://line.me/R/ti/p/@630pniaf" target="_blank" rel="noopener noreferrer" class="profile-link">
-                        <img src="暗号化BOTアイコン.jpg" alt="文章暗号化BOTのアイコン" width="200" height="200" fetchpriority="high">
+                        <img src="暗号化BOTアイコン.jpg" alt="LINE 文章暗号化BOTのアイコン" width="200" height="200" fetchpriority="high">
                     </a>
                     <div class="explain">
-                        <p>LINEで使える暗号化BOTです。</p>
-                        <div class="divider"></div>
-                        <h3>使い方</h3>
-                        <p><code>1:</code> で暗号化モード<br><code>2:</code> で復号化モード<br><code>3:"ここに鍵を入力"</code> で鍵を設定</p>
+                        <h3>プライベートな会話を守る</h3>
+                        <p>友人との秘密の会話や、他人に見られたくないメモを、簡単な操作で暗号化・復号できるLINE BOTです。「プログラミングで日常を少し便利にしたい」という思いから開発しました。</p>
+                        <h3>主な利用シーン</h3>
+                        <ul>
+                            <li>グループLINEでの内緒話に</li>
+                            <li>パスワードや個人情報を一時的にメモするときに</li>
+                            <li>ちょっとした遊び心で友達を驚かせたいときに</li>
+                        </ul>
                     </div>
                 </div>
+                <div class="divider"></div>
+                <h3>使い方</h3>
+                <p>BOTを友だち追加して、トーク画面で以下のコマンドを送るだけ！</p>
+                <p><code>1:</code> を送信 → <strong>暗号化モード</strong>に切り替え<br>
+                   <code>2:</code> を送信 → <strong>復号（元に戻す）モード</strong>に切り替え<br>
+                   <code>3:"ここに好きな鍵を入力"</code> を送信 → <strong>暗号化・復号に使う「鍵」</strong>を設定</p>
+                <p><strong>重要:</strong> 暗号化と復号は同じ「鍵」を使って行われます。鍵を忘れると元に戻せなくなるのでご注意ください。</p>
+                
+                <h3>よくある質問 (FAQ)</h3>
+                <details>
+                    <summary>「文章暗号化BOT」は本当に安全ですか？</summary>
+                    <div class="faq-answer">
+                        <p>はい。このBOTはユーザーが設定した「鍵」に基づいて暗号化と復号を行います。同じ「鍵」を知らない限り、第三者が内容を解読することは非常に困難です。また、BOTサーバーが会話ログや鍵の情報を保存することはありません。</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>鍵を忘れた場合はどうなりますか？</summary>
+                    <div class="faq-answer">
+                        <p>鍵を忘れてしまうと、その鍵で暗号化された文章を復号することはできなくなります。大切な情報の場合は、鍵を安全な場所に保管してください。新しい鍵を設定すれば、それ以降のメッセージは新しい鍵で暗号化できます。</p>
+                    </div>
+                </details>
             </section>
+
+            <section class="widget" id="news" aria-labelledby="news-title">
+                <h2 id="news-title">お知らせ</h2>
+                <article class="news-item">
+                    <p><time datetime="2025-11-20" class="news-date">2025/11/20</time>公式サイトをリニューアルしました！</p>
+                </article>
+                
+                </article>
+                 <article class="news-item">
+                    <p><time datetime="2025-11-01" class="news-date">2025/11/01</time>LINE「文章暗号化BOT」の軽微な不具合を修正しました。</p>
+                </article>
+            </section>
+            
+            <section class="widget" id="contact" aria-labelledby="contact-title">
+                <h2 id="contact-title">お問い合わせ</h2>
+                <p>ご意見、ご感想、コラボレーションのご依頼などは、下記よりご連絡ください。</p>
+                <ul class="contact-list">
+                    <li><strong>YouTube:</strong> <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA" target="_blank" rel="noopener noreferrer">チャンネルのコメント欄</a></li>
+                    <li><strong>X (旧Twitter):</strong> <a href="#" target="_blank" rel="noopener noreferrer">@YourTwitterHandle</a> (準備中)</li>
+                </ul>
+            </section>
+
         </main>
-        <footer class="site-footer"><p>&copy; 2024 くらむぼん. All Rights Reserved.</p></footer>
+        <footer class="site-footer">
+            <p>&copy; <span id="current-year">2024</span> くらむぼん. All Rights Reserved.</p>
+        </footer>
     </div>
     <script>
-        // (JavaScriptは変更なし)
+        // YouTube動画取得・スライダー制御
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxy6KEmjZxwgLDygZ-Eom3qbsaE0k5iZ3XBLRN0tRHzdN-KVk7kecZVhPSzQofssrTd/exec';
         const CACHE_KEY = 'youtube_video_cache';
         const sliderRoot = document.getElementById('slider-root');
@@ -162,7 +269,14 @@
         function resetAutoScroll() { stopAutoScroll(); startAutoScroll(); }
         function setupSlider(videoData) { videos = videoData; if (videos.length === 0) { loadingIndicator.innerHTML = '<p>表示する動画がありません。</p>'; return; } loadingIndicator.style.display = 'none'; popularVideosTitle.style.display = 'block'; sliderRoot.style.display = 'block'; visibleItems = window.innerWidth <= 600 ? 2 : 3; const clonesEnd = videos.slice(0, visibleItems); const clonesStart = videos.slice(-visibleItems); const allItems = [...clonesStart, ...videos, ...clonesEnd]; slider.innerHTML = allItems.map(video => `<div class="video-item"><a href="${video.url}" target="_blank" rel="noopener noreferrer"><img src="${video.thumbnail}" alt="${video.title}" loading="lazy" width="480" height="360"><p class="video-title">${video.title}</p></a></div>`).join(''); itemWidth = slider.querySelector('.video-item').getBoundingClientRect().width; moveSlider(visibleItems, false); slider.addEventListener('transitionend', () => { isTransitioning = false; if (currentIndex >= videos.length + visibleItems) { moveSlider(visibleItems, false); } if (currentIndex <= visibleItems - 1) { moveSlider(videos.length + visibleItems - 1, false); } }); nextBtn.addEventListener('click', () => { nextSlide(); resetAutoScroll(); }); prevBtn.addEventListener('click', () => { prevSlide(); resetAutoScroll(); }); sliderRoot.addEventListener('mouseenter', stopAutoScroll); sliderRoot.addEventListener('mouseleave', startAutoScroll); if (videos.length > visibleItems) { startAutoScroll(); nextBtn.style.display = 'flex'; prevBtn.style.display = 'flex'; } else { nextBtn.style.display = 'none'; prevBtn.style.display = 'none'; } }
         async function fetchVideos() { try { const cachedData = sessionStorage.getItem(CACHE_KEY); if (cachedData) { setupSlider(JSON.parse(cachedData)); return; } const response = await fetch(GAS_WEB_APP_URL); if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); const videoData = await response.json(); sessionStorage.setItem(CACHE_KEY, JSON.stringify(videoData)); setupSlider(videoData); } catch (error) { console.error('動画の読み込みエラー:', error); loadingIndicator.innerHTML = '<p>動画の読み込みに失敗しました。時間をおいて再読み込みしてください。</p>'; } }
-        document.addEventListener('DOMContentLoaded', fetchVideos);
+        
+        // DOM読み込み完了時のイベントリスナー
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchVideos();
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        });
+
+        // ウィンドウリサイズ時のイベントリスナー
         window.addEventListener('resize', () => { if (videos.length > 0) { stopAutoScroll(); setupSlider(videos); } });
     </script>
 </body>
