@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>くらむぼん公式サイト｜YouTube活動とLINE BOT「文章暗号化BOT」開発</title>
-    <meta name="description" content="くらむぼんの公式サイト。YouTubeでのブロスタ動画投稿や、自作のLINE「文章暗号化BOT」の開発情報を発信。プロフィールや開発の裏側、お知らせなどを掲載しています。">
-    <meta name="keywords" content="くらむぼん, YouTube, ブロスタ, LINE BOT, プログラミング, 暗号化, ゲーム実況">
+    <title>くらむぼん公式サイト｜ブロスタ・にゃんこ大戦争のスクリプト配布とLINE BOT開発</title>
+    <meta name="description" content="くらむぼんの公式サイト。趣味で開発したブロスタやにゃんこ大戦争で使えるスクリプトの配布、LINE「文章暗号化BOT」の情報を発信。YouTubeでのゲーム実況も。">
+    <meta name="keywords" content="くらむぼん, YouTube, ブロスタ, にゃんこ大戦争, LINE BOT, スクリプト, 配布, プログラミング, Lua, ゲームツール">
     <link rel="canonical" href="https://nyankohack.tokyo/">
     
     <link rel="icon" type="image/png" href="チャンネルアイコン.jpg">
@@ -14,15 +14,15 @@
     <!-- OGP (SNS共有) タグ -->
     <meta property="og:url" content="https://nyankohack.tokyo/">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="くらむぼん公式サイト｜YouTubeとLINE BOT開発">
-    <meta property="og:description" content="YouTubeチャンネルでの活動や、開発したLINE BOTの情報を発信しています。">
+    <meta property="og:title" content="くらむぼん公式サイト｜ゲーム用スクリプト配布とツール開発">
+    <meta property="og:description" content="ブロスタやにゃんこ大戦争で使える自作スクリプトを配布中！LINE BOT開発やYouTube活動も行っています。">
     <meta property="og:site_name" content="くらむぼん公式サイト">
     <meta property="og:image" content="https://nyankohack.tokyo/チャンネルアイコン.jpg">
 
     <!-- Twitterカード タグ -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="くらむぼん公式サイト">
-    <meta name="twitter:description" content="YouTubeやLINE BOT開発の情報を発信中！">
+    <meta name="twitter:description" content="ブロスタ・にゃんこ大戦争のスクリプト配布やLINE BOT開発情報を発信中！">
     <meta name="twitter:image" content="https://nyankohack.tokyo/チャンネルアイコン.jpg">
 
     <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
@@ -39,7 +39,7 @@
           "sameAs": [
             "https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA"
           ],
-          "knowsAbout": ["Brawl Stars", "Game", "Programming", "LINE BOT Development"],
+          "knowsAbout": ["Brawl Stars", "The Battle Cats", "Game", "Programming", "LINE BOT Development", "Scripting", "Lua"],
           "image": "https://nyankohack.tokyo/チャンネルアイコン.jpg"
         },
         {
@@ -56,18 +56,18 @@
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "「文章暗号化BOT」は本当に安全ですか？",
+              "name": "配布されているスクリプトは安全ですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "はい。このBOTはユーザーが設定した「鍵」に基づいて暗号化と復号を行います。同じ「鍵」を知らない限り、第三者が内容を解読することは非常に困難です。また、BOTサーバーが会話ログや鍵の情報を保存することはありません。"
+                "text": "はい。ここで配布しているスクリプトはすべて自作したものであり、安全性を確認しています。ただし、ご利用は自己責任でお願いいたします。不明な点があれば、お問い合わせください。"
               }
             },
             {
               "@type": "Question",
-              "name": "鍵を忘れた場合はどうなりますか？",
+              "name": "「文章暗号化BOT」は本当に安全ですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "鍵を忘れてしまうと、その鍵で暗号化された文章を復号することはできなくなります。大切な情報の場合は、鍵を安全な場所に保管してください。新しい鍵を設定すれば、それ以降のメッセージは新しい鍵で暗号化できます。"
+                "text": "はい。このBOTはユーザーが設定した「鍵」に基づいて暗号化と復号を行います。同じ「鍵」を知らない限り、第三者が内容を解読することは非常に困難です。また、BOTサーバーが会話ログや鍵の情報を保存することはありません。"
               }
             }
           ]
@@ -109,11 +109,6 @@
         .explain p, .explain ul { margin: 0 0 1em 0; line-height: 1.7; }
         .explain ul { padding-left: 20px; }
         .explain code { background-color: var(--border-color); color: var(--secondary-color); padding: 3px 6px; border-radius: 4px; font-weight: bold; }
-        .news-item { border-bottom: 1px solid var(--border-color); padding: 15px 0; }
-        .news-item:last-child { border-bottom: none; }
-        .news-date { font-size: 0.9em; color: #888; margin-right: 10px; }
-        .contact-list { list-style: none; padding: 0; }
-        .contact-list li { margin-bottom: 10px; }
         #loading-indicator { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 10px; }
         .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--secondary-color); animation: spin 1s ease infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -134,8 +129,7 @@
         summary { cursor: pointer; padding: 15px; font-weight: bold; color: var(--secondary-color); }
         .faq-answer { padding: 0 15px 15px; }
         @media (max-width: 600px) {
-            h1 { font-size: 2em; }
-            h2 { font-size: 1.5em; }
+            h1 { font-size: 2em; } h2 { font-size: 1.5em; }
             .profile-container { flex-direction: column; align-items: center; }
             .profile-link img { width: 150px; height: 150px; }
             .video-item { flex: 0 0 50%; }
@@ -146,9 +140,7 @@
 </head>
 <body>
     <div id="page-container">
-        <header class="site-header">
-            <h1>くらむぼん公式サイト</h1>
-        </header>
+        <header class="site-header"><h1>くらむぼん公式サイト</h1></header>
 
         <main id="main-content">
             <section class="widget" aria-labelledby="profile-title">
@@ -163,11 +155,11 @@
                         <img src="チャンネルアイコン.jpg" alt="くらむぼんのYouTubeチャンネルアイコン" width="200" height="200" fetchpriority="high">
                     </a>
                     <div class="explain">
-                        <p>はじめまして、<strong>くらむぼん</strong>です。<br>ゲーム（特にブロスタ）とプログラミングが好きで、その二つを軸に活動しています。</p>
-                        <p>YouTubeでは、主にブロスタのプレイ動画や攻略情報を発信。そして、趣味で開発した便利なツールもこのサイトで公開しています。</p>
+                        <p>はじめまして、<strong>くらむぼん</strong>です。<br>ゲーム（特にブロスタやにゃんこ大戦争）とプログラミングが好きで、その二つを軸に活動しています。</p>
+                        <p>YouTubeではゲーム実況を、そしてこのサイトでは趣味で開発した便利なツールやスクリプトを配布しています。</p>
                         <div class="divider"></div>
                         <h3>YouTube活動 (2023年〜)</h3>
-                        <p>チャンネルでは、楽しみながら上達できるような動画作りを心がけています。ハイレベルなプレイから、ちょっと笑える企画まで、幅広く投稿中です。</p>
+                        <p>主にブロスタのプレイ動画や攻略情報を発信。ハイレベルなプレイから、面白い企画まで幅広く投稿中です。</p>
                         <h3>ブロスタのプロフィール</h3>
                         <p>総トロフィーは74000以上、パワーリーグの最高ランクはマスターⅠです。皆さんと一緒にブロスタを楽しみたいです！</p>
                     </div>
@@ -184,6 +176,20 @@
                 </div>
             </section>
             
+            <section class="widget" id="scripts-section" aria-labelledby="scripts-title">
+                <h2 id="scripts-title">自作ツール &amp; スクリプト配布</h2>
+                <p>ここでは、私が趣味で作成したゲーム用の便利ツールやLuaスクリプトを配布しています。<strong>ブロスタ</strong>の戦績管理ツールや、<strong>にゃんこ大戦争</strong>のデータ整理に役立つスクリプトなどを不定期で更新予定です。</p>
+                <p>プログラミングの知識を活かして、ゲームプレイがもっと楽しく、効率的になるようなものを目指しています。</p>
+                <h3>スクリプトの利用について</h3>
+                <p>配布しているスクリプトは、<a href="Lua_editor.html">Lua editor</a>などの実行環境でご利用いただけます。各スクリプトの使い方は、配布ページにて詳しく説明します。</p>
+                <details>
+                    <summary>配布されているスクリプトは安全ですか？</summary>
+                    <div class="faq-answer">
+                        <p>はい。ここで配布しているスクリプトはすべて自作したものであり、悪意のあるコードが含まれていないことを確認しています。ただし、ゲームの利用規約を遵守し、自己責任でのご利用をお願いいたします。</p>
+                    </div>
+                </details>
+            </section>
+
             <section class="widget" id="bot-section" aria-labelledby="bot-title">
                 <h2 id="bot-title">文章暗号化BOT</h2>
                 <div class="profile-container">
@@ -193,21 +199,14 @@
                     <div class="explain">
                         <h3>プライベートな会話を守る</h3>
                         <p>友人との秘密の会話や、他人に見られたくないメモを、簡単な操作で暗号化・復号できるLINE BOTです。「プログラミングで日常を少し便利にしたい」という思いから開発しました。</p>
-                        <h3>主な利用シーン</h3>
-                        <ul>
-                            <li>グループLINEでの内緒話に</li>
-                            <li>パスワードや個人情報を一時的にメモするときに</li>
-                            <li>ちょっとした遊び心で友達を驚かせたいときに</li>
-                        </ul>
                     </div>
                 </div>
                 <div class="divider"></div>
                 <h3>使い方</h3>
                 <p>BOTを友だち追加して、トーク画面で以下のコマンドを送るだけ！</p>
-                <p><code>1:</code> を送信 → <strong>暗号化モード</strong>に切り替え<br>
-                   <code>2:</code> を送信 → <strong>復号（元に戻す）モード</strong>に切り替え<br>
-                   <code>3:"ここに好きな鍵を入力"</code> を送信 → <strong>暗号化・復号に使う「鍵」</strong>を設定</p>
-                <p><strong>重要:</strong> 暗号化と復号は同じ「鍵」を使って行われます。鍵を忘れると元に戻せなくなるのでご注意ください。</p>
+                <p><code>1:</code> を送信 → <strong>暗号化モード</strong><br>
+                   <code>2:</code> を送信 → <strong>復号モード</strong><br>
+                   <code>3:"ここに好きな鍵を入力"</code> を送信 → <strong>鍵</strong>を設定</p>
                 
                 <h3>よくある質問 (FAQ)</h3>
                 <details>
@@ -216,35 +215,7 @@
                         <p>はい。このBOTはユーザーが設定した「鍵」に基づいて暗号化と復号を行います。同じ「鍵」を知らない限り、第三者が内容を解読することは非常に困難です。また、BOTサーバーが会話ログや鍵の情報を保存することはありません。</p>
                     </div>
                 </details>
-                <details>
-                    <summary>鍵を忘れた場合はどうなりますか？</summary>
-                    <div class="faq-answer">
-                        <p>鍵を忘れてしまうと、その鍵で暗号化された文章を復号することはできなくなります。大切な情報の場合は、鍵を安全な場所に保管してください。新しい鍵を設定すれば、それ以降のメッセージは新しい鍵で暗号化できます。</p>
-                    </div>
-                </details>
             </section>
-
-            <section class="widget" id="news" aria-labelledby="news-title">
-                <h2 id="news-title">お知らせ</h2>
-                <article class="news-item">
-                    <p><time datetime="2025-11-20" class="news-date">2025/11/20</time>公式サイトをリニューアルしました！</p>
-                </article>
-                
-                </article>
-                 <article class="news-item">
-                    <p><time datetime="2025-11-01" class="news-date">2025/11/01</time>LINE「文章暗号化BOT」の軽微な不具合を修正しました。</p>
-                </article>
-            </section>
-            
-            <section class="widget" id="contact" aria-labelledby="contact-title">
-                <h2 id="contact-title">お問い合わせ</h2>
-                <p>ご意見、ご感想、コラボレーションのご依頼などは、下記よりご連絡ください。</p>
-                <ul class="contact-list">
-                    <li><strong>YouTube:</strong> <a href="https://youtube.com/channel/UCTvT5704yfXyBjzFoWSg0CA" target="_blank" rel="noopener noreferrer">チャンネルのコメント欄</a></li>
-                    <li><strong>X (旧Twitter):</strong> <a href="#" target="_blank" rel="noopener noreferrer">@YourTwitterHandle</a> (準備中)</li>
-                </ul>
-            </section>
-
         </main>
         <footer class="site-footer">
             <p>&copy; <span id="current-year">2024</span> くらむぼん. All Rights Reserved.</p>
