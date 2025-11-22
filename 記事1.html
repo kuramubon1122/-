@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja" prefix="og: http://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
@@ -7,67 +8,67 @@
     <title>Lua解析防止方法｜くらむぼん公式サイト</title>
     <meta name="description" content="Lua解析防止方法">
     <!-- ▲▲▲ 記事のタイトルに合わせて変更 ▲▲▲ -->
-    
-    <meta name="keywords" content="キーワード1, キーワード2, くらむぼん">
-    <link rel="canonical" href="https://nyankohack.tokyo/記事1.html"> <!-- ← ファイル名に合わせて変更 -->
-    
-    <!-- ▼▼▼ アイコン設定 ▼▼▼ -->
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-     <link rel="icon" href="profile-icon.jpg">
 
-    <!-- ▲▲▲ アイコン設定 ▲▲▲ -->
+<meta name="keywords" content="キーワード1, キーワード2, くらむぼん, Lua, 解析防止, GameGuardian, チート対策, セキュリティ, 難読化">
+<link rel="canonical" href="https://nyankohack.tokyo/記事1.html"> <!-- ← ファイル名に合わせて変更 -->
 
-    <!-- OGP (SNS共有) タグ -->
-    <meta property="og:url" content="https://nyankohack.tokyo/記事1.html"> <!-- ← ファイル名に合わせて変更 -->
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Lua解析防止方法｜くらむぼん公式サイト">
-    <meta property="og:description" content="Lua解析防止方法">
-    <meta property="og:site_name" content="くらむぼん公式サイト">
-    <meta property="og:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+<!-- ▼▼▼ アイコン設定 ▼▼▼ -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+ <link rel="icon" href="profile-icon.jpg">
 
-    <!-- Twitterカード タグ -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Lua解析防止方法｜くらむぼん公式サイト">
-    <meta name="twitter:description" content="Lua解析防止方法">
-    <meta name="twitter:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+<!-- ▲▲▲ アイコン設定 ▲▲▲ -->
 
-    <style>
+<!-- OGP (SNS共有) タグ -->
+<meta property="og:url" content="https://nyankohack.tokyo/記事1.html"> <!-- ← ファイル名に合わせて変更 -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lua解析防止方法｜くらむぼん公式サイト">
+<meta property="og:description" content="Lua解析防止方法">
+<meta property="og:site_name" content="くらむぼん公式サイト">
+<meta property="og:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+
+<!-- Twitterカード タグ -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lua解析防止方法｜くらむぼん公式サイト">
+<meta name="twitter:description" content="Lua解析防止方法">
+<meta name="twitter:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+
+<style>
+    :root {
+        --primary-color: #98FB98; --secondary-color: #2E8B57; --bg-color: #F0FFF0;
+        --widget-bg: #FFFFFF; --text-color: #333333; --border-color: #E0E0E0;
+        --shadow-color: rgba(0,0,0,0.1); --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
         :root {
-            --primary-color: #98FB98; --secondary-color: #2E8B57; --bg-color: #F0FFF0;
-            --widget-bg: #FFFFFF; --text-color: #333333; --border-color: #E0E0E0;
-            --shadow-color: rgba(0,0,0,0.1); --radius: 12px;
+            --primary-color: #2E8B57; --secondary-color: #98FB98; --bg-color: #121212;
+            --widget-bg: #1E1E1E; --text-color: #E0E0E0; --border-color: #444444;
+            --shadow-color: rgba(0,0,0,0.4);
         }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --primary-color: #2E8B57; --secondary-color: #98FB98; --bg-color: #121212;
-                --widget-bg: #1E1E1E; --text-color: #E0E0E0; --border-color: #444444;
-                --shadow-color: rgba(0,0,0,0.4);
-            }
-        }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        #page-container { width: 100%; max-width: 800px; }
-        .site-header, .site-footer { width: 100%; padding: 20px 0; }
-        .site-footer { text-align: center; font-size: 0.9em; color: #888; margin-top: 20px; }
-        .widget { background-color: var(--widget-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px var(--shadow-color); border-left: 5px solid var(--secondary-color); }
-        h1, h2, h3 { color: var(--secondary-color); margin-top: 0; }
-        h1 { text-align: center; font-size: 2.5em; }
-        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; font-size: 1.8em; margin-top: 1.5em;}
-        h3 { font-size: 1.5em; border-bottom: none; }
-        .post-meta { text-align: center; margin-bottom: 20px; color: #888; }
-        .post-content p { line-height: 1.8; margin-bottom: 1em; }
-        .post-content a { color: var(--secondary-color); text-decoration: underline; }
-        .post-content a:hover { color: var(--primary-color); }
-        .post-content code { background-color: var(--border-color); color: var(--secondary-color); padding: 3px 6px; border-radius: 4px; font-weight: bold; font-family: 'Courier New', Courier, monospace;}
-        .post-content pre { background-color: var(--border-color); padding: 15px; border-radius: 8px; overflow-x: auto; }
-        .nav-btn { display: inline-block; padding: 15px; background-color: var(--secondary-color); color: white; text-decoration: none; text-align: center; font-weight: bold; border-radius: var(--radius); transition: background-color 0.3s, transform 0.2s; }
-        .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
-        @media (max-width: 600px) {
-            h1 { font-size: 2em; } h2 { font-size: 1.5em; }
-        }
-    </style>
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    #page-container { width: 100%; max-width: 800px; }
+    .site-header, .site-footer { width: 100%; padding: 20px 0; }
+    .site-footer { text-align: center; font-size: 0.9em; color: #888; margin-top: 20px; }
+    .widget { background-color: var(--widget-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px var(--shadow-color); border-left: 5px solid var(--secondary-color); }
+    h1, h2, h3 { color: var(--secondary-color); margin-top: 0; }
+    h1 { text-align: center; font-size: 2.5em; }
+    h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; font-size: 1.8em; margin-top: 1.5em;}
+    h3 { font-size: 1.5em; border-bottom: none; }
+    .post-meta { text-align: center; margin-bottom: 20px; color: #888; }
+    .post-content p { line-height: 1.8; margin-bottom: 1em; }
+    .post-content a { color: var(--secondary-color); text-decoration: underline; }
+    .post-content a:hover { color: var(--primary-color); }
+    .post-content code { background-color: var(--border-color); color: var(--secondary-color); padding: 3px 6px; border-radius: 4px; font-weight: bold; font-family: 'Courier New', Courier, monospace;}
+    .post-content pre { background-color: var(--border-color); padding: 15px; border-radius: 8px; overflow-x: auto; }
+    .nav-btn { display: inline-block; padding: 15px; background-color: var(--secondary-color); color: white; text-decoration: none; text-align: center; font-weight: bold; border-radius: var(--radius); transition: background-color 0.3s, transform 0.2s; }
+    .nav-btn:hover { background-color: #256d45; transform: translateY(-2px); }
+    @media (max-width: 600px) {
+        h1 { font-size: 2em; } h2 { font-size: 1.5em; }
+    }
+</style>
 </head>
 <body>
     <div id="page-container">
@@ -75,32 +76,30 @@
             <article class="widget">
                 <header class="site-header">
                      <!-- ▼▼▼ 記事のタイトル ▼▼▼ -->
-                    <h1>解析防止方法について</h1>
+                    <h1>Lua解析防止方法について</h1>
                     <div class="post-meta">
                         公開日: <time datetime="2025-11-21">2025年11月21日</time>
                     </div>
                 </header>
+
+<section class="post-content">
+                <!-- ▼▼▼ ここから記事の本文 ▼▼▼ -->
+                <h2>完全な解析防止はない！</h2>
+                <p>
+                 解析を難しくすることは可能だが、Luaは専用のスクリプトやツールを使えば簡単に復号化し解析防止コードを捨てられてしまう可能性があることを理解しておくべきです。では、どうすれば解析防止をより有効に使えるでしょうか？
+                </p>
+
+                <h2>解析防止の正しい使い方</h2>
+                <p>
+                解析防止コードは復号化後のコードに含めると危険ということがわかっています。そのため、解析防止コードは直接スクリプト内に記述するのではなく、<code>Github</code>などの外部リソースから読み込むのがより安全な方法の一つです。
+                </p>
+                <p>GitHubのファイルの中身を<code>raw</code>形式で取得することで、Luaで実行できるコードとして利用できます。</p>
                 
-                <section class="post-content">
-                    <!-- ▼▼▼ ここから記事の本文 ▼▼▼ -->
-                    <h2>完全な解析防止はない！</h2>
-                    <p>
-                     解析を難しくすることは可能だがLuaは専用のスクリプトやツールを使えば<codee>簡単に</codee>復号化し解析防止コードを捨てれてしまう。<br>
-                     ではどうすれば解析防止を有効に使えるだろうか？
-
-                    </p>
-
-                    <h2>解析防止の正しい使い方</h2>
-                    <p>
-                    解析防止コードは復号化後のコードに含めると危険ということがわかった。だから解析防止コードは<code>Github</code>などから読み込むのが安全であろう。
-                    </p>
-                    <p>Githubのファイルの中身の記述を<code>raw</code>で取得するとLuaで実行できる。</p>
-                    
-                    <h3>Githubからの実行方法</h3>
-                    <p>
-                    以下のコードで実行するとGithubから取得したコードを実行できる。
-                    </p>
-                    <pre><code>
+                <h3>Githubからの実行方法</h3>
+                <p>
+                以下のコードで実行するとGitHubから取得したコードを実行できます。これは基本的なアプローチですが、セキュリティをさらに強化するためには後述する手法と組み合わせる必要があります。
+                </p>
+                <pre><code>
 local url = "https://raw.githubusercontent.com/ (自身のURLを入力)"
 
 -- URL取得・読み込み
@@ -112,6 +111,7 @@ if not response or not response.content then
 end
 
 -- 取得コードを安全に load
+-- 'bt' はバイナリチャンクでもテキストチャンクでもロードを試みるオプション
 local fn, err = load(response.content, "remote_chunk", "bt", _G)
 if not fn then
     logLua("print('コード読み込み失敗: "..tostring(err).."')")
@@ -127,20 +127,233 @@ if not status then
 else
     logLua("print('コード実行完了')")
 end
-                    </code></pre>
+</code></pre>
 
-                    <!-- ▲▲▲ ここまで記事の本文 ▲▲▲ -->
-                </section>
-            </article>
+                <h2>ハッカーの主な攻撃手段の事例</h2>
+                <p>
+                GameGuardian (GG) のLuaスクリプトを含むクライアントサイドのコードは、様々な方法で攻撃される可能性があります。これらの攻撃手法を理解することが、より効果的な防御策を講じるための第一歩となります。
+                </p>
 
-            <nav style="text-align: center;">
-                <a href="blog.html" class="nav-btn">ブログ一覧に戻る</a>
-            </nav>
-        </main>
+                <h3>コードの逆コンパイル・デコンパイル・デオブfuscation</h3>
+                <p>
+                ハッカーは、配布されたLuaバイトコードや難読化されたソースコードを、専用のツール（デコンパイラやデオブfuscator）や手動での分析によって元の、あるいはより読みやすい形式に復元しようとします。GitHub上に公開された難読化されていないコードは、特に解析が容易になります。Luaスクリプトのデコンパイルは比較的容易であり、難読化されていても専門的なツールで復元を試みることが可能です。
+                </p>
 
-        <footer class="site-footer">
-            <p>&copy; 2025 くらむぼん</p>
-        </footer>
-    </div>
+                <h3>メモリ改ざん</h3>
+                <p>
+                GameGuardian自体が提供する機能を利用して、実行中のアプリケーションのメモリを直接読み書きし、ゲーム内の変数（体力、コイン、クールダウン時間など）やフラグ（無敵フラグ、スキル使用可能フラグなど）を不正に変更する手法です。Luaスクリプトがゲームのメモリを操作している場合、その操作自体を傍受・改ざんされるリスクがあります。
+                </p>
+
+                <h3>APIフックとサンドボックス回避</h3>
+                <p>
+                Luaの標準関数や<code>gg</code>オブジェクトが提供するAPIをフック（横取り）し、その挙動を改変したり、本来スクリプトからアクセスできない情報にアクセスしたりすることが可能です。また、Luaスクリプトが隔離されたサンドボックス環境で実行されている場合でも、そのサンドボックスの脆弱性を突いて脱出（エスケープ）し、より広範なシステム操作を試みる可能性があります。
+                </p>
+
+                <h3>ネットワーク通信の傍受と改ざん</h3>
+                <p>
+                クライアント（Luaスクリプトが動作しているデバイス）とサーバー間のネットワーク通信を傍受し、送受信されるデータを読み取ったり、改ざんして不正なリクエストをサーバーに送信したりする「Man-in-the-Middle (MITM)」攻撃が行われることがあります。これにより、ゲーム内アイテムの不正取得や、認証情報の漏洩などが引き起こされる可能性があります。
+                </p>
+
+                <h3>環境検出の回避</h3>
+                <p>
+                多くのチート対策は、GameGuardianのようなチートツールやデバッガー、あるいはルート化された環境などを検出するロジックを含んでいます。しかし、ハッカーはこれらの検出ロジックを解析し、それを回避するための偽装（スプーフィング）やバイパス手法を開発・利用します。
+                </p>
+
+                <h2>Lua解析防止のための具体的なコードと安全な実装方法</h2>
+                <p>
+                上記の攻撃手段を踏まえ、Luaスクリプトの解析をより困難にし、安全性を高めるための具体的な手法を以下に示します。完全な防止は不可能ですが、これらの対策を組み合わせることで攻撃コストを大幅に引き上げることができます。
+                </p>
+
+                <h3>難読化の強化</h3>
+                <p>
+                コードを読み解きにくくするために、様々な難読化手法を組み合わせることが重要です。難読化は攻撃者がコードの意図を理解するのを遅らせることを目的とします。
+                </p>
+                <ul>
+                    <li><strong>文字列難読化:</strong>
+                        文字列リテラルを直接記述せず、ASCIIコードの配列として格納したり、逆順にしたり、複数の小さな文字列に分割して実行時に結合したりするなど、複雑な方法でエンコード・デコードを行います。これにより、スクリプト内の意味のある情報（URL、APIキーなど）を直接読み取られることを防ぎます。
+                    </li>
+                    <li><strong>変数名・関数名難読化:</strong>
+                        意味のある変数名や関数名を、<code>a</code>, <code>b</code>, <code>_1</code>, <code>__temp</code>のような短く無意味な名前や、ランダムな文字列に自動的に変更します。これにより、コードの機能や目的を推測することを困難にします。
+                    </li>
+                    <li><strong>制御フロー難読化:</strong>
+                        コードの実行順序を意図的に複雑にし、条件分岐（<code>if</code>文）やループ（<code>for</code>, <code>while</code>文）の構造を入れ子にしたり、常に真となる条件や偽となる条件を追加したり、計算結果によってジャンプするなどの手法で、実行パスを視覚的に追いにくくします。
+                    </li>
+                    <li><strong>定数難読化:</strong>
+                        数値や真偽値などの定数を、直接記述せず、複雑な算術演算（例: <code>5</code>を<code>(10 + 20 - 25) * 2 - 5</code>とする）や、配列・テーブルのインデックス参照（例: <code>local t = {nil, true}; local my_bool = t[2]</code>）を使って表現します。
+                    </li>
+                    <li><strong>ジャンクコードの挿入:</strong>
+                        実行には影響しない無意味なコードや、デバッグを混乱させるためのコードを挿入します。
+                    </li>
+                    <li><strong><code>load</code>関数の多重利用と動的コード生成:</strong>
+                        メインのスクリプトを複数の小さな難読化されたチャンクに分割し、それぞれを動的に<code>load</code>関数で読み込み・実行します。コードの一部をサーバーから取得し、クライアント側でさらに難読化を施してから実行するなどの動的な手法も有効です。
+                    </li>
+                </ul>
+                <p>難読化ツールとしては、<a href="https://luraph.com/" target="_blank" rel="noopener noreferrer">Luraph</a>のような商用サービスも存在します。</p>
+
+                <h3>環境・整合性チェック</h3>
+                <p>
+                スクリプトが実行されている環境が不正でないか、またスクリプト自体が改ざんされていないかをチェックする仕組みを導入します。
+                </p>
+                <ul>
+                    <li><strong>コードの整合性チェック:</strong>
+                        スクリプトの重要な部分（特に機密性の高いロジックや変数を操作する箇所）に対して、起動時にハッシュ値（例: MD5, SHA-256）を計算し、事前に埋め込まれた正しいハッシュ値と比較します。不一致があれば、コードが改ざんされていると判断し、スクリプトの実行を停止したり、警告を発したりします。ただし、ハッシュ値自体が改ざんされるリスクも考慮し、ハッシュ値の格納方法も保護する必要があります。
+                    </li>
+                    <li><strong>チートツール検出の試み:</strong>
+                        GameGuardianのようなチートツールは、特定のプロセス名、ファイルパス、メモリパターンなどを持つことがあります。これらの兆候をLuaスクリプト内で検出するロジックを組み込み、検出した場合はスクリプトの実行を停止します。ただし、これはハッカーとの「猫と鼠のゲーム」であり、常に最新のツールに対応するために更新が必要です。
+                        <pre><code>
+-- 例: 特定のファイルパスの存在チェック (GGツールが作成する可能性のあるファイル)
+local gg_indicators = {
+    "/data/data/org.(':')[gameguardian/files/", -- GGのデータパスの一部 (環境により異なる)
+    -- 他のチートツールやモッディングツールの特徴的なファイルパスを追加
+}
+
+for i, path in ipairs(gg_indicators) do
+    local f = io.open(path, "r")
+    if f then
+        io.close(f)
+        gg.alert("不正なツールが検出されました！")
+        os.exit() -- スクリプトを強制終了
+    end
+end
+
+-- より高度な検出には、プロセスの列挙やメモリパターン検索などが必要ですが、
+-- Luaの標準機能だけでは困難な場合が多いです。
+                        </code></pre>
+                    </li>
+                    <li><strong>デバイスロック / バンシステム:</strong>
+                        スクリプトを特定のデバイスIDに紐付け、初回実行時にデバイスIDを記録します。以降の実行時にはそのIDを検証し、異なるデバイスからの実行や、規定回数以上の不正な試行があった場合にスクリプトの使用を永久に禁止（バン）する仕組みです。これはオフラインで実装することも可能ですが、より強固にするにはサーバーとの連携が推奨されます。
+                        <pre><code>
+-- GameGuardianのフォーラムで紹介されているデバイスロックの概念例
+-- これはコンセプトコードであり、実際の環境に合わせて調整が必要です
+local DEVICE_ID_FILE = "/sdcard/.gg_device_lock.txt"
+local BAN_FILE = "/sdcard/.gg_device_banned.txt"
+local MAX_ATTEMPTS = 3
+
+local function generate_device_id()
+    -- 実際のデバイス固有の情報を元に、より複雑なIDを生成すべき
+    return string.format("%016x", os.time() + math.random(1, 100000))
+end
+
+local function get_device_id()
+    local f = io.open(DEVICE_ID_FILE, "r")
+    if f then
+        local id = f:read("*a")
+        io.close(f)
+        return id
+    end
+    return nil
+end
+
+local function set_device_id(id)
+    local f = io.open(DEVICE_ID_FILE, "w")
+    if f then
+        f:write(id)
+        io.close(f)
+        return true
+    end
+    return false
+end
+
+local function is_banned()
+    local f = io.open(BAN_FILE, "r")
+    if f then
+        io.close(f)
+        return true
+    end
+    return false
+end
+
+local function ban_device()
+    local f = io.open(BAN_FILE, "w")
+    if f then
+        f:write("BANNED")
+        io.close(f)
+        return true
+    end
+    return false
+end
+
+if is_banned() then
+    gg.alert("このデバイスはスクリプトの使用を禁止されています。")
+    os.exit()
+end
+
+local stored_id = get_device_id()
+if not stored_id then
+    local new_id = generate_device_id()
+    if set_device_id(new_id) then
+        gg.alert("スクリプトがこのデバイスにロックされました。あなたのID: "..new_id.."\nこのIDを安全な場所に保管してください。")
+        gg.copyText(new_id) -- IDをクリップボードにコピー
+        stored_id = new_id
+    else
+        gg.alert("デバイスIDの保存に失敗しました。")
+        os.exit()
+    end
+end
+
+local attempts = 0
+while attempts < MAX_ATTEMPTS do
+    local input_id = gg.prompt("デバイスIDを入力してください:", "", "text")
+    if input_id == stored_id then
+        gg.alert("認証成功！")
+        break
+    else
+        attempts = attempts + 1
+        gg.alert("不正なIDです！残り ".. (MAX_ATTEMPTS - attempts) .. " 回の試行。")
+        if attempts == MAX_ATTEMPTS then
+            gg.alert("試行回数が上限に達しました。このデバイスは禁止されます。")
+            ban_device()
+            os.exit()
+        end
+    end
+end
+                        </code></pre>
+                    </li>
+                </ul>
+
+                <h3>安全なコード取得と実行の強化</h3>
+                <p>
+                外部からコードを読み込む際には、その経路と内容の信頼性を確保するための対策が必要です。
+                </p>
+                <ul>
+                    <li><strong>HTTPSと証明書ピンニング:</strong>
+                        GitHubのような信頼できるサービスを利用する場合でも、<code>https://</code>を必ず使用し、可能であれば証明書ピンニング（Certificate Pinning）を実装して、中間者攻撃による偽のサーバーからのコード取得を防ぎます。<code>gg.makeRequest</code>が直接証明書ピンニングをサポートしていない場合、C側の拡張機能や、証明書検証を行うプロキシを介して通信を行うなどの工夫が必要です。
+                        <pre><code>
+-- gg.makeRequestで直接証明書ピンニングを行うための組み込み関数は提供されていない場合が多いです。
+-- したがって、よりセキュアな通信には、カスタムのC/C++モジュールを介したり、
+-- サーバーサイドで署名と検証を行うなどの工夫が必要になります。
+-- 参考として、証明書検証の重要性を示すコメント：
+-- gg.makeRequest(url, {ssl_verify_peer=true, ssl_trusted_certificate="path/to/my_ca.pem"})
+-- 上記のようなオプションがgg.makeRequestで利用できればベストですが、通常は限定的です。
+                        </code></pre>
+                    </li>
+                    <li><strong>コードの署名と検証:</strong>
+                        GitHubから取得するコードや、カスタムサーバーから取得するコードに対して、サーバー側でデジタル署名を行い、クライアント側のLuaスクリプトでその署名を検証する仕組みを導入します。これにより、コードが改ざんされていないことと、信頼できるソースから提供されたものであることを確認できます。署名には公開鍵暗号方式を利用します。
+                    </li>
+                    <li><strong>動的コード生成と分割:</strong>
+                        スクリプト全体を一度に公開・提供するのではなく、必要なロジックを複数の小さな部分に分割し、それぞれを異なるタイミングで動的に取得・生成・実行します。これにより、攻撃者が一度に全コードを解析することを困難にします。また、コードの一部を難読化されたデータとして渡し、実行時に復号化して<code>load</code>するなどの手法も考えられます。
+                    </li>
+                </ul>
+
+                <h3>最終的な防御策：サーバーサイドでの検証</h3>
+                <p>
+                クライアントサイドの保護は、どれほど強固にしても限界があります。最も安全で確実な防御策は、ゲームの核心となるロジック（例: スコア計算、アイテム付与、通貨の増減など）や、プレイヤーの状態に関する重要な情報の管理を、信頼できるサーバーサイドで行うことです。
+                </p>
+                <p>
+                クライアントからの入力やアクションはすべてサーバーで検証し、不正な操作や矛盾するデータは拒否するように設計します。これにより、クライアントサイドのLuaスクリプトが改ざんされたとしても、ゲーム全体の公平性やセキュリティが損なわれるのを防ぐことができます。
+                </p>
+                <!-- ▲▲▲ ここまで記事の本文 ▲▲▲ -->
+            </section>
+        </article>
+
+        <nav style="text-align: center;">
+            <a href="blog.html" class="nav-btn">ブログ一覧に戻る</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 くらむぼん</p>
+    </footer>
+</div>
 </body>
 </html>
