@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja" prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ▼▼▼ SEO対策：タイトルとディスクリプション ▼▼▼ -->
+    <title>GameGuardianのLuaスクリプト解析・復号化方法！暗号化されたコードを読む手順【初心者向け】</title>
+    <meta name="description" content="GameGuardian(GG)で使用されるLuaスクリプトの解析方法、暗号化されたスクリプトの復号化手順、デコンパイルの基礎知識を解説。load関数のフックを利用したコード取得方法も紹介します。">
+    <!-- ▲▲▲ SEO対策 ▲▲▲ -->
+
+    <meta name="keywords" content="GameGuardian, Lua, スクリプト, 解析, 復号化, 暗号化, デコンパイル, unluac, GGスクリプト">
+    <link rel="canonical" href="https://nyankohack.tokyo/Lua記事2.html">
+
+    <!-- ▼▼▼ アイコン設定 ▼▼▼ -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="profile-icon.jpg">
+    <!-- ▲▲▲ アイコン設定 ▲▲▲ -->
+
+    <!-- OGP (SNS共有) タグ -->
+    <meta property="og:url" content="https://nyankohack.tokyo/Lua記事2.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="GameGuardianのLuaスクリプト解析・復号化方法">
+    <meta property="og:description" content="GGスクリプトの中身を知りたい方へ。解析・復号化の基礎テクニックを公開。">
+    <meta property="og:site_name" content="くらむぼん公式サイト">
+    <meta property="og:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+
+    <!-- Twitterカード タグ -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="GameGuardianのLuaスクリプト解析・復号化方法">
+    <meta name="twitter:description" content="GGスクリプトの中身を知りたい方へ。解析・復号化の基礎テクニックを公開。">
+    <meta name="twitter:image" content="https://nyankohack.tokyo/profile-icon.jpg">
+
+    <style>
+        /* Basic theme variables (継承) */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6610f2;
+            --bg-color: #f8f9fa;
+            --widget-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0,0,0,0.1);
+            --link-hover-color: #0056b3;
+            --swl-radius--8: 12px;
+            --swl-radius--2: 4px;
+            --code-bg: #282c34;
+            --code-text: #abb2bf;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #6a00ff;
+                --secondary-color: #00bcd4;
+                --bg-color: #1a1a1a;
+                --widget-bg: #2d2d2d;
+                --text-color: #e0e0e0;
+                --border-color: #4a4a4a;
+                --shadow-color: rgba(0,0,0,0.4);
+                --link-hover-color: #00e5ff;
+                --code-bg: #1e1e1e;
+            }
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        #page-container { width: 100%; max-width: 800px; }
+        .site-header, .site-footer { width: 100%; padding: 20px 0; }
+        .site-footer { text-align: center; font-size: 0.9em; color: #888; margin-top: 20px; }
+        .widget { background-color: var(--widget-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--swl-radius--8); box-shadow: 0 4px 12px var(--shadow-color); border-left: 6px solid var(--primary-color); }
+        
+        .c-secTitle { color: var(--primary-color); font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.05); font-size: 24px; margin-bottom: 1em; }
+        .post-content h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-top: 1.8em; color: var(--primary-color); font-size: 1.8em; font-weight: 700; }
+        .post-content h3 { color: var(--secondary-color); font-size: 1.4em; font-weight: 600; margin-top: 1.2em; border-left: 4px solid var(--secondary-color); padding-left: 10px; }
+        .post-content p { line-height: 1.9; margin-bottom: 1.2em; font-size: 1.05em; }
+        .post-content a { color: var(--secondary-color); text-decoration: underline; font-weight: 700; }
+        .post-content a:hover { color: var(--link-hover-color); text-decoration: none; }
+        .post-content ul { margin-bottom: 1.5em; line-height: 1.8; }
+        .post-content li { margin-bottom: 0.5em; }
+        
+        /* Code Block Styles */
+        .code-container {
+            position: relative;
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #ddd;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .copy-btn {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #ddd;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        pre {
+            margin: 0;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: var(--code-text);
+            font-size: 0.95em;
+        }
+
+        .highlight-box { background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .alert-box { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .c-secTitle { font-size: 20px; }
+            .post-content h2 { font-size: 1.5em; }
+            body { padding: 10px; }
+            .widget { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="page-container">
+        <main>
+            <article class="widget">
+                <header class="site-header">
+                    <h1 class="c-secTitle">GameGuardianのLuaスクリプト解析・復号化方法！仕組みを理解しよう</h1>
+                    <div class="p-articleMetas -top">
+                        <span class="post-meta">更新日: <time datetime="2025-11-22">2025年11月22日</time></span>
+                        <br>
+                        <!-- アイコン画像を使用 -->
+                        <div style="text-align:center; margin-top:10px;">
+                            <img src="profile-icon.jpg" alt="Lua解析イメージ" style="width:120px; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                        </div>
+                    </div>
+                </header>
+
+                <div class="post-content">
+                    <p>GameGuardian（以下GG）ユーザーなら、ネット上で配布されている「暗号化されたLuaスクリプト」を見たことがあるはずです。</p>
+                    <p><strong>「このスクリプトの中身はどうなっているの？」「勉強のためにコードを読みたい」</strong></p>
+                    <p>そう思ったことはありませんか？本記事では、GGで使用されるLuaスクリプトの基本的な仕組みと、教育目的での解析・復号化のアプローチ（Hooking）について技術的に解説します。</p>
+
+                    <div class="alert-box">
+                        <strong>⚠ 注意</strong>
+                        <p>本記事は技術的な仕組みを理解するための学習用コンテンツです。著作権を侵害する行為や、有料スクリプトのクラッキング、悪用を推奨するものではありません。解析は自己責任で行ってください。</p>
+                    </div>
+
+                    <h2>Luaスクリプトの「暗号化」の正体とは？</h2>
+                    <p>一般的に「暗号化」と呼ばれているものの多くは、実は以下の2つのパターンのどちらか（あるいは組み合わせ）です。</p>
+
+                    <h3>1. バイトコード化 (Pre-compiled)</h3>
+                    <p>Luaはソースコードをそのまま実行するのではなく、一度「バイトコード」という機械が読みやすい形式に変換します。拡張子が <code>.lua</code> でも、中身を開くと <code>LuaQ</code> や <code>LuaR</code> で始まる文字化けしたようなファイルになっている場合がこれです。</p>
+
+                    <h3>2. 難読化・ローダーの使用</h3>
+                    <p>スクリプト全体を複雑な文字列に変換し、それを実行時に <code>load()</code> 関数などで読み込ませる方法です。実際の処理コードは見えませんが、実行時には必ず元のコードに戻っています。</p>
+
+                    <h2>解析方法：load関数のフック (Hook)</h2>
+                    <p>最も汎用性が高いのが、Luaの実行関数を「フック（横取り）」する方法です。</p>
+                    <p>Luaには文字列をコードとして読み込む <code>load</code> や <code>loadstring</code> という関数があります。暗号化されたスクリプトも、最終的にはこの関数を通して実行されます。</p>
+                    <p>つまり、<strong>「実行される直前に中身を表示させる」</strong>という処理を割り込ませれば、平文のソースコードを取得できます。</p>
+
+                    <h3>解析用スクリプトのコード</h3>
+                    <p>以下は、<code>load</code> 関数をフックして、読み込まれるコードの中身をファイルに保存（またはログ出力）するための基本的なコードです。</p>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>Lua Hook Script</span>
+                            <button class="copy-btn" onclick="copyToClipboard('code1')">コピー</button>
+                        </div>
+                        <pre><code id="code1">-- 元のload関数を保存
+local old_load = load
+
+-- load関数を上書き（フック）
+load = function(chunk, chunkname, mode, env)
+    -- 読み込まれたコード(chunk)が存在する場合
+    if chunk then
+        -- ここでコードの中身を出力または保存
+        print("\n=== DECRYPTED CODE START ===\n")
+        print(chunk) 
+        print("\n=== DECRYPTED CODE END ===\n")
+        
+        -- 必要であればファイルに保存する処理をここに追加
+        -- local file = io.open("/sdcard/dump.lua", "a")
+        -- file:write(chunk .. "\n")
+        -- file:close()
+    end
+    
+    -- 元のload関数を実行して、通常の動作に戻す
+    return old_load(chunk, chunkname, mode, env)
+end
+
+-- この後に解析したいスクリプトをrequireまたはdofileで読み込む
+print("Hook installed. Now execute the target script.")</code></pre>
+                    </div>
+
+                    <h3>使い方の手順</h3>
+                    <ol>
+                        <li>GameGuardianのスクリプト実行画面を開く。</li>
+                        <li>上記のコードをコピーし、新しいLuaファイル（例：<code>hook.lua</code>）として保存する。</li>
+                        <li>解析したいスクリプトの実行前に、この <code>hook.lua</code> を実行する（あるいは、解析したいスクリプトの先頭に貼り付ける）。</li>
+                        <li>暗号化されたスクリプトが実行されると、GGのログ画面等に復号された中身が表示される。</li>
+                    </ol>
+
+                    <h2>バイトコードのデコンパイルについて</h2>
+                    <p>上記の方法で取得したコードが、まだ文字化けしている（バイトコードのまま）場合は、デコンパイラが必要です。</p>
+                    <p>PCツールを使用するのが一般的です。</p>
+                    <ul>
+                        <li><strong>unluac</strong>: Java製の有名なデコンパイラ。Lua 5.1系に強い。</li>
+                        <li><strong>luadec</strong>: 別の強力なデコンパイラ。</li>
+                    </ul>
+                    <p>GameGuardianは標準でLua 5.3ベース（一部独自仕様）を使用していることが多いですが、スクリプトによっては5.1やJIT互換の場合もあります。</p>
+
+                    <div class="highlight-box">
+                        <strong>ポイント</strong><br>
+                        完全に元のソースコード（変数名やコメント）に戻るわけではありません。変数名が <code>L0_1</code> のような機械的な名前になることが多いですが、処理の流れ（ロジック）は理解できるようになります。
+                    </div>
+
+                    <h2>まとめ</h2>
+                    <p>Luaスクリプトの解析は、プログラミングの学習において非常に勉強になります。他者が書いたコードのロジックを知ることで、自分のスクリプト作成能力も向上します。</p>
+                    <p>ただし、<strong>作成者が意図して隠しているロジックを暴く行為</strong>には倫理的な問題も伴います。あくまで個人の学習範囲内で留め、悪用しないようにしましょう。</p>
+
+                    <p>より詳しいLuaの仕様については、公式ドキュメントを参照することをおすすめします。</p>
+                </div>
+            </article>
+        </main>
+
+        <nav style="text-align: center;">
+            <a href="Luaブログ.html" class="nav-btn">ブログ一覧に戻る</a>
+        </nav>
+
+        <footer class="site-footer">
+            <p>&copy; 2025 くらむぼん公式サイト. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <!-- ▼▼▼ コピー機能用スクリプト ▼▼▼ -->
+    <script>
+        function copyToClipboard(elementId) {
+            const codeText = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(codeText).then(function() {
+                // コピー成功時のフィードバック（ボタンのテキスト変更など）
+                const btn = document.querySelector(`button[onclick="copyToClipboard('${elementId}')"]`);
+                const originalText = btn.innerText;
+                btn.innerText = "完了！";
+                btn.style.backgroundColor = "#28a745"; // 緑色に変更
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = "transparent";
+                }, 2000);
+            }, function(err) {
+                console.error('コピーに失敗しました: ', err);
+                alert('コピーに失敗しました。手動でコピーしてください。');
+            });
+        }
+    </script>
+</body>
+</html>
