@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl DB Search</title>
+    <style>
+        body { background-color: #121212; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; margin: 0; }
+        h1 { color: #ffc107; text-shadow: 0 0 10px rgba(255,193,7,0.5); margin-bottom: 5px; }
+        .subtitle { color: #888; font-size: 0.8rem; margin-bottom: 30px; }
+        
+        .search-container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 15px; }
+        
+        /* ラジオボタンのスタイル */
+        .radio-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .radio-group label { cursor: pointer; color: #aaa; font-size: 0.9rem; }
+        .radio-group input:checked + span { color: #ffc107; font-weight: bold; text-decoration: underline; }
+        
+        .search-box { display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333; font-size: 16px; background: #2c2c2c; color: #fff; outline: none; }
+        button { padding: 12px 25px; border-radius: 8px; border: none; background: #ffc107; color: #000; font-weight: bold; cursor: pointer; }
+        button:hover { background: #e0a800; }
+        
+        table { width: 100%; max-width: 800px; margin: 30px auto; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #252525; color: #aaa; font-size: 0.9em; }
+        tr:hover { background: #2a2a2a; }
+        
+        /* リンクのスタイル */
+        a.detail-link { 
+            color: #fff; background: #ff5252; padding: 5px 10px; 
+            text-decoration: none; border-radius: 4px; font-size: 0.8em; font-weight: bold;
+        }
+        a.detail-link:hover { background: #ff1744; }
+        
+        .tag { font-family: monospace; color: #ffc107; }
+        #loading { display: none; margin-top: 20px; color: #888; }
+        .error { color: #ff5252; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>⚡ BRAWL ULTIMATE DB</h1>
+    <p class="subtitle">Powered by Hugging Face API</p>
+
+    <div class="search-container">
+        <div class="radio-group">
+            <label><input type="radio" name="mode" value="tag" hidden><span>🆔 ID検索</span></label>
+            <label><input type="radio" name="mode" value="exact" hidden><span>🎯 名前(完全)</span></label>
+            <label><input type="radio" name="mode" value="partial" checked hidden><span>🔍 名前(部分)</span></label>
+        </div>
+        <div class="search-box">
+            <input type="text" id="q" placeholder="検索ワードを入力...">
+            <button onclick="search()">検索</button>
+        </div>
+    </div>
+
+    <div id="loading">データベース照会中...</div>
+    <p id="error" class="error"></p>
+
+    <table id="result-table" style="display:none;">
+        <thead><tr><th>TAG</th><th>NAME</th><th>INFO</th></tr></thead>
+        <tbody id="list"></tbody>
+    </table>
+
+    <script>
+        // ★重要: あなたのHugging FaceのURLに書き換えてください
+        const API_BASE = "https://katodeth-brawldatabase.hf.space";
+
+        async function search() {
+            const q = document.getElementById('q').value.trim();
+            if (!q) return;
+
+            // 選択されているモードを取得
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result-table').style.display = 'none';
+            document.getElementById('error').innerText = '';
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+
+            try {
+                // APIにモードと一緒にリクエスト
+                const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
+                if (!res.ok) throw new Error("API Error");
+                
+                const data = await res.json();
+
+                if (data.length === 0) {
+                    document.getElementById('error').innerText = "見つかりませんでした。";
+                } else {
+                    data.forEach(p => {
+                        // BrawlInsightへのリンクを生成
+                        const link = `https://brawlinsight.com/?tag=${p.tag}`;
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="tag">#${p.tag}</td>
+                            <td>${p.name}</td>
+                            <td><a href="${link}" target="_blank" class="detail-link">BrawlInsight ↗</a></td>
+                        `;
+                        list.appendChild(tr);
+                    });
+                    document.getElementById('result-table').style.display = 'table';
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('error').innerText = "通信エラー: サーバーが起動中か確認してください。";
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        document.getElementById('q').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') search();
+        });
+    </script>
+</body>
+</html>
