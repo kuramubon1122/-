@@ -25,7 +25,6 @@
         th { background: #252525; color: #aaa; font-size: 0.9em; }
         tr:hover { background: #2a2a2a; }
         
-        /* リンクボタンのデザイン */
         a.detail-link { 
             color: #fff; background: #29b6f6; padding: 6px 12px; 
             text-decoration: none; border-radius: 4px; font-size: 0.85em; font-weight: bold;
@@ -39,8 +38,8 @@
     </style>
 </head>
 <body>
-    <h1>⚡ ブロスタデータベース</h1>
-    <p class="subtitle">Brawl Ultimate Database</p>
+    <h1>⚡ BRAWL ULTIMATE DB</h1>
+    <p class="subtitle">Powered by Hugging Face API (v2)</p>
 
     <div class="search-container">
         <div class="radio-group">
@@ -63,9 +62,8 @@
     </table>
 
     <script>
-        // ★重要: ここをあなたのHugging FaceのURLに書き換えてください！
-        // 例: "https://katodeth-brawldatabase.hf.space"
-        const API_BASE = "https://katodeth-brawldatabase.hf.space";
+        // ★新しいAPIのURLに変更済み★
+        const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
 
         async function search() {
             const q = document.getElementById('q').value.trim();
@@ -80,6 +78,7 @@
 
             try {
                 const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
+                
                 if (!res.ok) throw new Error(`Server Error: ${res.status}`);
                 
                 const data = await res.json();
@@ -88,7 +87,6 @@
                     document.getElementById('error').innerText = "見つかりませんでした。";
                 } else {
                     data.forEach(p => {
-                        // ★修正: BrawlInsightsの正しいURL形式に変更
                         const link = `https://brawlinsights.com/ja/player/profile/${p.tag}`;
                         
                         const tr = document.createElement('tr');
@@ -103,7 +101,7 @@
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('error').innerHTML = "通信エラー: サーバーの状態を確認してください。<br>(Hugging Faceが起動中かチェック)";
+                document.getElementById('error').innerHTML = "通信エラー: サーバー起動中(Building)の可能性があります。<br>数分待って再試行してください。";
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
