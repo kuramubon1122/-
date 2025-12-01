@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ブロスタデータベース検索 | Brawl Ultimate DB</title>
-    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索ツール。1300万人以上のデータを収録。名前やIDから詳細情報を瞬時に検索可能。">
+    
+    <!-- 🔥 SEO対策: 重要なキーワードを前方に配置 -->
+    <title>ブロスタ名前検索・戦績分析データベース | Brawl Ultimate DB</title>
+    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー名前検索、戦績分析、トロフィー統計ができる世界最大級のデータベース。IDや名前から詳細データを分析。">
+    <meta name="keywords" content="ブロスタ, 名前検索, データベース, 分析, 統計, Brawl Stars, トロフィー, ランキング, 戦績, 検索">
+    
+    <!-- OGP設定 (SNSでシェアされた用) -->
+    <meta property="og:title" content="ブロスタ名前検索・分析DB">
+    <meta property="og:description" content="1000万人以上のプレイヤーデータを検索・分析できるツール">
+    <meta property="og:type" content="website">
+    
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; margin: 0; }
         
         h1 { 
-            font-size: 2.5rem; margin-bottom: 5px; color: #ffc107;
+            font-size: 2.2rem; margin-bottom: 5px; color: #ffc107;
             text-shadow: 0 0 10px #ffc107, 0 0 20px #ff9800;
             animation: glow 2s infinite alternate;
         }
         @keyframes glow { from { text-shadow: 0 0 10px #ffc107; } to { text-shadow: 0 0 25px #ffeb3b, 0 0 10px #ff9800; } }
 
-        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; }
-        .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.3em; font-family: monospace; }
+        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 0.5px; }
+        .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.2em; font-family: monospace; }
 
         .search-container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         
@@ -28,9 +37,9 @@
         input[type="text"] { flex: 1; padding: 15px; border-radius: 30px; border: 2px solid #333; font-size: 16px; background: #252525; color: #fff; outline: none; transition: 0.3s; }
         input[type="text"]:focus { border-color: #ffc107; }
         button { padding: 15px 30px; border-radius: 30px; border: none; background: linear-gradient(45deg, #ffc107, #ff9800); color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { transform: scale(1.05); }
+        button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 193, 7, 0.4); }
         
-        table { width: 100%; max-width: 800px; margin: 30px auto; border-collapse: collapse; background: #1e1e1e; border-radius: 12px; overflow: hidden; }
+        table { width: 100%; max-width: 800px; margin: 30px auto; border-collapse: collapse; background: #1e1e1e; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
         th { background: #252525; color: #aaa; font-size: 0.85em; }
         tr:hover { background: #2a2a2a; }
@@ -41,26 +50,31 @@
         a.detail-link { 
             display: inline-block; background: #29b6f6; color: #fff; padding: 6px 15px; 
             text-decoration: none; border-radius: 20px; font-size: 0.8em; font-weight: bold;
+            box-shadow: 0 2px 5px rgba(41, 182, 246, 0.3);
         }
         a.detail-link:hover { background: #039be5; transform: translateY(-2px); }
         
         #loading { display: none; margin-top: 20px; color: #888; }
         .error { color: #ff5252; margin-top: 20px; }
-        .seo-text { margin-top: 50px; color: #444; font-size: 0.7rem; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.5; text-align: justify; }
+        
+        /* SEO対策テキストエリア */
+        .seo-content { margin-top: 60px; color: #555; font-size: 0.8rem; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto; text-align: justify; }
+        .seo-content h2 { color: #888; font-size: 1rem; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 10px; }
+        .seo-content strong { color: #aaa; }
     </style>
 </head>
 <body>
     <h1>⚡ BRAWL ULTIMATE DB</h1>
     <p class="subtitle">
-        Data Analyzing: <span id="count" class="db-count">0</span> Players<br>
-        世界最大級の非公式ブロスタデータベース
+        分析対象: <span id="count" class="db-count">0</span> プレイヤー<br>
+        ブロスタ(Brawl Stars) 名前検索＆戦績分析データベース
     </p>
 
     <div class="search-container">
         <div class="radio-group">
             <label><input type="radio" name="mode" value="tag" hidden><span>🆔 ID検索</span></label>
             <label><input type="radio" name="mode" value="exact" hidden><span>🎯 完全一致</span></label>
-            <label><input type="radio" name="mode" value="partial" checked hidden><span>🔍 部分一致</span></label>
+            <label><input type="radio" name="mode" value="partial" checked hidden><span>🔍 名前検索(部分)</span></label>
         </div>
         <div class="search-box">
             <input type="text" id="q" placeholder="プレイヤー名 または タグ(#...)">
@@ -68,33 +82,42 @@
         </div>
     </div>
 
-    <div id="loading">検索中...</div>
+    <div id="loading">データベース照会中...</div>
     <p id="error" class="error"></p>
+
     <table id="result-table" style="display:none;">
         <thead><tr><th>ICON / NAME</th><th>TAG</th><th>ACTION</th></tr></thead>
         <tbody id="list"></tbody>
     </table>
-    <div class="seo-text"><p>Brawl Stars（ブロスタ）のプレイヤー検索ツール。世界中のプレイヤーデータを網羅し、名前やタグから詳細な戦績を確認できます。</p></div>
+
+    <!-- SEO対策用コンテンツ (検索エンジン向け) -->
+    <div class="seo-content">
+        <h2>ブロスタ データベース検索について</h2>
+        <p>
+            本サイトは、人気ゲーム<strong>ブロスタ (Brawl Stars)</strong> の非公式データベース検索ツールです。
+            世界中の1000万人以上のプレイヤーデータを独自に収集・データベース化し、<strong>名前検索</strong>や<strong>タグ検索</strong>から、
+            トロフィー数や戦績などの<strong>統計データ</strong>を瞬時に分析・確認することができます。
+            クラン勧誘時の実績確認や、ライバルの調査、自分の戦績の振り返りに最適です。
+        </p>
+    </div>
 
     <script>
-        // ★ URL更新済み
         const API_BASE = "https://katodeth-brawl-database-v4.hf.space";
         const countEl = document.getElementById('count');
 
-        // --- ① ページを開いた瞬間にダミーのスロット演出開始 (体感速度UP) ---
+        // --- スロット演出 ---
         let dummyCount = 0;
         const spinInterval = setInterval(() => {
-            // ランダムな数字を表示して動いてる感を出す
             dummyCount = Math.floor(Math.random() * 10000000) + 5000000;
             countEl.innerText = dummyCount.toLocaleString();
         }, 50);
 
-        // --- ② サーバーから本当の数字を取得 ---
+        // --- サーバーから総数を取得 ---
         fetch(`${API_BASE}/api/stats`)
             .then(res => res.json())
             .then(data => {
-                clearInterval(spinInterval); // ダミー停止
-                animateValue(countEl, 0, data.count, 800); // 0から本番の数字へアニメーション
+                clearInterval(spinInterval);
+                animateValue(countEl, 0, data.count, 800);
             })
             .catch(() => {
                 clearInterval(spinInterval);
@@ -135,25 +158,27 @@
                 } else {
                     data.forEach(p => {
                         const tr = document.createElement('tr');
-                        // ★修正: DBから取得した icon_id を直接使う (APIリクエスト不要！)
-                        const iconUrl = p.icon_id ? \`https://cdn.brawlify.com/profile-icons/\${p.icon_id}.png\` : 'https://cdn.brawlify.com/profile-icons/28000000.png';
                         
-                        tr.innerHTML = \`
+                        // DBから取得したicon_idを使用 (ない場合はデフォルト)
+                        const iconUrl = p.icon_id ? `https://cdn.brawlify.com/profile-icons/${p.icon_id}.png` : 'https://cdn.brawlify.com/profile-icons/28000000.png';
+                        
+                        tr.innerHTML = `
                             <td>
                                 <div style="display:flex;align-items:center;">
-                                    <img src="\${iconUrl}" class="player-icon" onerror="this.src='https://cdn.brawlify.com/profile-icons/28000000.png'">
-                                    <span>\${p.name}</span>
+                                    <img src="${iconUrl}" class="player-icon" onerror="this.src='https://cdn.brawlify.com/profile-icons/28000000.png'">
+                                    <span>${p.name}</span>
                                 </div>
                             </td>
-                            <td class="tag">#\${p.tag}</td>
-                            <td><a href="https://brawlinsights.com/ja/player/profile/\${p.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>
-                        \`;
+                            <td class="tag">#${p.tag}</td>
+                            <td><a href="https://brawlinsight.com/?tag=${p.tag}" target="_blank" class="detail-link">詳細分析 ↗</a></td>
+                        `;
                         list.appendChild(tr);
                     });
                     document.getElementById('result-table').style.display = 'table';
                 }
             } catch (e) {
-                document.getElementById('error').innerText = "通信エラー: サーバー起動中の可能性があります";
+                console.error(e);
+                document.getElementById('error').innerText = "通信エラー: サーバーを確認してください";
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
