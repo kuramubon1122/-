@@ -184,8 +184,7 @@
             if (data.length === 0) {
                 errorMsg.innerText = "見つかりませんでした。";
             } else {
-                // ★修正1: タグ(ID)のアルファベット順にソート（辞書順）
-                // localeCompareを使うと文字コード順（#0... #2... #A...）に綺麗に並びます
+                // ★修正1: タグ(ID)のアルファベット順(辞書順)にソート
                 data.sort((a, b) => {
                     return a.tag.localeCompare(b.tag);
                 });
@@ -223,12 +222,13 @@
         }
     }
 
-    // ★修正2: アイコン取得処理の完全修正
+    // ★修正2: アイコン取得処理の再見直し
+    // 403 ForbiddenやCORSエラーを防ぐため、プロキシを変更しエラーハンドリングを強化
     async function updatePlayerIcon(tag) {
         const imgEl = document.getElementById(`icon-${tag}`);
         if (!imgEl) return;
 
-        // すでにキャッシュにあればそれを使う
+        // キャッシュにあればそれを使う
         if (iconCache.has(tag)) {
             const cachedId = iconCache.get(tag);
             imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
@@ -239,14 +239,14 @@
             // BrawlAPIのエンドポイント
             const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
             
-            // alloriginsの代わりに 'corsproxy.io' を使用します
-            // こちらの方がJSONをそのまま返してくれるため、パースエラーが起きにくく、CORSも回避できます
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+            // ★変更点: corsproxy.io から api.codetabs.com に変更
+            // codetabsは比較的ブロックされにくく、生のJSONをそのまま返してくれます
+            const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
 
+            // エラーが出てもコンソールを赤くしないよう、try-catchで囲む
             const res = await fetch(proxyUrl);
             
             if (res.ok) {
-                // corsproxyは中身をそのまま返すので、直接JSONとして扱えます
                 const apiData = await res.json();
                 
                 // アイコンIDが存在すれば更新
@@ -255,10 +255,12 @@
                     iconCache.set(tag, iconId);
                     imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
                 }
+            } else {
+                // 403などが返ってきた場合は静かに無視（デフォルトアイコンのまま）
+                // 混雑時などはAPI側がプロキシを拒否することがあります
             }
         } catch (e) {
-            // アイコン取得に失敗してもエラー表示は出さず、デフォルト画像のままにする
-            // console.warn(`Icon fetch failed for ${tag}`, e);
+            // 通信エラーは無視
         }
     }
 
