@@ -4,17 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ★修正点1: CSPを緩和し、'unsafe-inline' を追加してデザイン崩れを防止 -->
+    <!-- CSP設定 -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
 
-    <!-- SEO対策 -->
     <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
-    <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。IDや名前からユーザーを検索し、正しいプロフィールアイコンと共に詳細を確認できます。">
+    <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。">
     
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; margin: 0; }
         
-        /* タイトル装飾: ネオン風 */
         h1 { 
             color: #ffc107; 
             margin-bottom: 5px; 
@@ -30,7 +28,6 @@
 
         .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 30px; font-weight: bold; }
         
-        /* スロット風カウンターのスタイル */
         .record-count { 
             color: #29b6f6; 
             font-family: 'Courier New', Courier, monospace;
@@ -59,7 +56,6 @@
         th { background: #252525; color: #aaa; font-size: 0.85em; letter-spacing: 1px; }
         tr:hover { background: #2a2a2a; }
         
-        /* プロフィールアイコン画像 */
         .profile-icon { 
             width: 44px; height: 44px; 
             border-radius: 6px; 
@@ -83,7 +79,6 @@
         #loading { display: none; margin-top: 20px; color: #888; font-style: italic; }
         .error { color: #ff5252; margin-top: 20px; font-weight: bold; }
 
-        /* SEOフッター */
         .seo-footer {
             margin-top: 50px;
             padding-top: 20px;
@@ -99,7 +94,6 @@
 </head>
 <body>
     <h1>⚡ BRAWL ULTIMATE DB</h1>
-    <!-- スロットカウンターエリア -->
     <p class="subtitle">DATABASE RECORDS: <span id="db-count" class="record-count">0</span></p>
 
     <div class="search-container">
@@ -121,7 +115,7 @@
         <thead>
             <tr>
                 <th>ICON</th>
-                <th>TAG</th>
+                <th>TAG (A-Z)</th>
                 <th>NAME</th>
                 <th>INFO</th>
             </tr>
@@ -132,8 +126,6 @@
     <div class="seo-footer">
         <p>
             BRAWL ULTIMATE DBへようこそ。ここは世界最大級の<strong>ブロスタ(Brawl Stars)</strong>プレイヤーデータベースです。
-            3000万件以上の記録から、正確な<strong>名前検索</strong>、<strong>統計データ</strong>、そしてリアルタイムのプロフィールアイコン取得機能を提供します。
-            プロプレイヤーの分析やフレンドの戦績確認に最適化されており、ID検索や部分一致検索もサポートしています。
         </p>
     </div>
 
@@ -142,7 +134,6 @@
         const TOTAL_RECORDS = 30525403; 
         const iconCache = new Map();
 
-        // ページ読み込み時
         window.onload = function() {
             animateCounter("db-count", 0, TOTAL_RECORDS, 800);
         };
@@ -187,11 +178,19 @@
                 
                 if (!res.ok) throw new Error(`Server Error: ${res.status}`);
                 
-                const data = await res.json();
+                let data = await res.json();
 
                 if (data.length === 0) {
                     errorMsg.innerText = "見つかりませんでした。";
                 } else {
+                    // ★追加箇所: データをタグ（ID）順にソートする処理
+                    data.sort((a, b) => {
+                        // ハッシュタグを除去して比較
+                        const tagA = a.tag.replace('#', '');
+                        const tagB = b.tag.replace('#', '');
+                        return tagA.localeCompare(tagB);
+                    });
+
                     data.forEach(p => {
                         const cleanTag = p.tag.replace('#', '');
                         const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
@@ -235,10 +234,8 @@
 
             try {
                 const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
-                
-                // ★修正点2: allorigins.win のエンドポイントを '/raw' から '/get' に変更
-                // これにより、CORSヘッダー付きのJSONオブジェクトが返ってくるため、
-                // ブラウザによるCORSブロックを確実に回避できます。
+                // CORSエラー対策として allorigins を使用していますが、
+                // プレイヤーが存在しない場合は404エラーとなり、コンソールに赤文字が出ることがあります。
                 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
                 const res = await fetch(proxyUrl);
@@ -246,8 +243,6 @@
                 if (res.ok) {
                     const jsonWrapper = await res.json();
                     
-                    // 中身のJSON文字列をパースする
-                    // allorigins.win/get は { "contents": "ここに実際のデータ" } を返します
                     if (jsonWrapper.contents) {
                         try {
                             const apiData = JSON.parse(jsonWrapper.contents);
@@ -258,12 +253,12 @@
                                 imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
                             }
                         } catch (parseError) {
-                            // contentsがJSONでない場合（403エラー画面のHTMLなど）は無視
+                            // JSONパースエラーは無視
                         }
                     }
                 }
             } catch (e) {
-                // 通信エラー時も静かに無視（コンソールを赤くしない）
+                // ネットワークエラー発生時も、デフォルトアイコンのままにするため何もしない
             }
         }
 
