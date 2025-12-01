@@ -61,8 +61,13 @@
             background: #000; 
             border: 2px solid #555;
             transition: transform 0.2s;
+            opacity: 0.6; /* ロード前は少し暗く */
         }
-        .profile-icon:hover { transform: scale(1.1); border-color: #ffc107; }
+        .profile-icon.loaded {
+            opacity: 1;
+            border-color: #ffc107;
+        }
+
         .icon-cell { width: 60px; text-align: center; }
 
         a.detail-link { 
@@ -76,6 +81,7 @@
         .tag { font-family: monospace; color: #ffc107; font-weight: bold; }
         #loading { display: none; margin-top: 20px; color: #888; font-style: italic; }
         .error { color: #ff5252; margin-top: 20px; font-weight: bold; }
+        .status-msg { font-size: 0.8rem; color: #666; margin-top: 5px; min-height: 1.2em; }
 
         .seo-footer {
             margin-top: 50px;
@@ -104,6 +110,7 @@
             <input type="text" id="q" placeholder="検索ワードを入力...">
             <button onclick="search()">検索</button>
         </div>
+        <div id="status-msg" class="status-msg"></div>
     </div>
 
     <div id="loading">データベース照会中...</div>
@@ -122,15 +129,14 @@
     </table>
 
     <div class="seo-footer">
-        <p>
-            BRAWL ULTIMATE DBへようこそ。
-        </p>
+        <p>BRAWL ULTIMATE DB - Player Statistics & Analysis Tool</p>
     </div>
 
 <script>
     const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
     const TOTAL_RECORDS = 30525403; 
     const iconCache = new Map();
+    let isFetchingIcons = false; // アイコン取得重複防止フラグ
 
     window.onload = function() {
         animateCounter("db-count", 0, TOTAL_RECORDS, 800);
@@ -160,20 +166,24 @@
         const q = document.getElementById('q').value.trim();
         if (!q) return;
 
+        // 前回のアイコン取得処理があれば中断したいが、簡単のためフラグ管理
+        isFetchingIcons = false; 
+
         const mode = document.querySelector('input[name="mode"]:checked').value;
         const loading = document.getElementById('loading');
         const resultTable = document.getElementById('result-table');
         const errorMsg = document.getElementById('error');
         const list = document.getElementById('list');
+        const statusMsg = document.getElementById('status-msg');
 
         loading.style.display = 'block';
         resultTable.style.display = 'none';
         errorMsg.innerText = '';
         list.innerHTML = '';
+        statusMsg.innerText = '';
 
         try {
             const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
-            
             if (!res.ok) throw new Error(`Server Error: ${res.status}`);
             
             let data = await res.json();
@@ -181,11 +191,10 @@
             if (data.length === 0) {
                 errorMsg.innerText = "見つかりませんでした。";
             } else {
-                // ID(タグ)の辞書順にソート
-                data.sort((a, b) => {
-                    return a.tag.localeCompare(b.tag);
-                });
+                // ★修正: タグ(ID)の辞書順(アルファベット順)にソート
+                data.sort((a, b) => a.tag.localeCompare(b.tag));
 
+                // リスト描画
                 data.forEach(p => {
                     const cleanTag = p.tag.replace('#', '');
                     const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
@@ -204,20 +213,45 @@
                         <td><a href="${detailLink}" target="_blank" class="detail-link">詳細・分析 ↗</a></td>
                     `;
                     list.appendChild(tr);
-
-                    updatePlayerIcon(cleanTag);
                 });
                 resultTable.style.display = 'table';
+                
+                // ★修正: アイコンを「1つずつ順番に」取得する関数を呼び出す
+                // これにより一斉アクセスによるCORS/429エラーを防ぐ
+                fetchIconsSequentially(data);
             }
         } catch (e) {
             console.error(e);
-            errorMsg.innerHTML = "通信エラー: サーバー応答なし、または混雑しています。<br>時間をおいて再試行してください。";
+            errorMsg.innerHTML = "通信エラー: サーバー応答なし、または混雑しています。";
         } finally {
             loading.style.display = 'none';
         }
     }
 
-    // ★修正: alloriginsのrawモードを使い、URL生成を慎重に行う
+    // ★新機能: アイコンを順番に取得する処理
+    async function fetchIconsSequentially(players) {
+        isFetchingIcons = true;
+        const statusMsg = document.getElementById('status-msg');
+        
+        for (let i = 0; i < players.length; i++) {
+            if (!isFetchingIcons) break; // 新しい検索が始まったら中断
+
+            const p = players[i];
+            const cleanTag = p.tag.replace('#', '');
+            
+            // 状況表示（任意）
+            // statusMsg.innerText = `アイコン読み込み中... ${i + 1}/${players.length}`;
+
+            await updatePlayerIcon(cleanTag);
+            
+            // サーバー負荷軽減のため、次のリクエストまで少し待つ (500ms)
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        statusMsg.innerText = "";
+    }
+
+    // ★修正: アイコン取得 (alloriginsの /get モードを使用)
+    // /get はJSONでラップされた応答を返すため、HTTPステータスエラーが起きてもCORS違反になりにくい
     async function updatePlayerIcon(tag) {
         const imgEl = document.getElementById(`icon-${tag}`);
         if (!imgEl) return;
@@ -225,33 +259,39 @@
         if (iconCache.has(tag)) {
             const cachedId = iconCache.get(tag);
             imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
+            imgEl.classList.add('loaded');
             return;
         }
 
         try {
-            // BrawlAPIに渡すタグは '#' をURLエンコードした '%23' である必要があります
-            // alloriginsを経由する場合、さらに全体をエンコードする必要があります
-            const brawlApiUrl = `https://api.brawlapi.com/v1/players/${encodeURIComponent('#' + tag)}`;
+            // BrawlAPIのエンドポイント
+            // # を %23 にエンコードして渡す必要がある
+            const brawlApiUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
             
-            // allorigins.win/raw を使用 (CORS回避 + JSON直取得)
-            // キャッシュによる404を防ぐため、timestampを追加
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(brawlApiUrl)}&t=${Date.now()}`;
+            // allorigins.win/get を使用。これは { "contents": "..." } というJSONを返す。
+            // ブラウザ側では常に正常なJSON取得として扱われるため、コンソールの赤エラーが消える。
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(brawlApiUrl)}`;
 
             const res = await fetch(proxyUrl);
-            
             if (res.ok) {
-                const apiData = await res.json();
-                if (apiData.icon && apiData.icon.id) {
-                    const iconId = apiData.icon.id;
-                    iconCache.set(tag, iconId);
-                    imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+                const wrapper = await res.json();
+                // wrapper.contents に実際のAPIレスポンス(文字列)が入っている
+                if (wrapper.contents) {
+                    try {
+                        const apiData = JSON.parse(wrapper.contents);
+                        if (apiData.icon && apiData.icon.id) {
+                            const iconId = apiData.icon.id;
+                            iconCache.set(tag, iconId);
+                            imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+                            imgEl.classList.add('loaded');
+                        }
+                    } catch (parseError) {
+                        // JSONパースエラーは無視 (404ページHTMLなどが返ってきた場合など)
+                    }
                 }
-            } else {
-                // 404や403が返ってきても、コンソールに赤文字を出さないためここで処理終了
-                // (デフォルトアイコンのままになります)
             }
         } catch (e) {
-            // 通信エラー時も何もしない（デフォルトアイコン維持）
+            // 通信エラーは無視
         }
     }
 
