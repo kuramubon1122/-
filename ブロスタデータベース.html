@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- ★ご要望のCSPタグ: 動作を阻害しないよう、httpsへの接続を許可する設定にしています -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
+
     <!-- SEO対策 -->
     <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
     <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。IDや名前からユーザーを検索し、正しいプロフィールアイコンと共に詳細を確認できます。">
@@ -235,26 +238,31 @@
             }
 
             try {
-                // ★修正点: CORSプロキシ(corsproxy.io)を経由させる
-                // BrawlAPIのURLをエンコードしてプロキシに渡します
+                // ★修正点: corsproxy.io が403でブロックされるため、
+                // 'api.allorigins.win' という別のプロキシに変更しました。
                 const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+                
+                // allorigins.win/raw を使用すると生データ(JSON)が返ってきます
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
                 const res = await fetch(proxyUrl);
                 
                 if (res.ok) {
                     const data = await res.json();
-                    const iconId = data.icon.id;
+                    // データ構造が異なる場合があるため、nullチェックを行う
+                    const iconId = data.icon ? data.icon.id : null;
                     
                     if (iconId) {
                         iconCache.set(tag, iconId);
                         imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
                     }
                 } else {
-                    console.warn(`API returned status ${res.status} for ${tag}`);
+                    // エラーログを出さず静かに無視する（コンソールを汚さない）
+                    // console.warn(`API status ${res.status} for ${tag}`); 
                 }
             } catch (e) {
-                console.warn(`Icon fetch failed for ${tag}:`, e);
+                // 通信エラー時も静かに無視する
+                // console.warn(`Icon fetch error for ${tag}`);
             }
         }
 
