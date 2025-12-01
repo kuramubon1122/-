@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSP設定: 画像や接続先を許可 -->
+    <!-- CSP設定: デザイン崩れ防止のため 'unsafe-inline' を許可 -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
 
     <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
@@ -185,6 +185,7 @@
                 errorMsg.innerText = "見つかりませんでした。";
             } else {
                 // ★修正1: タグ(ID)のアルファベット順にソート（辞書順）
+                // localeCompareを使うと文字コード順（#0... #2... #A...）に綺麗に並びます
                 data.sort((a, b) => {
                     return a.tag.localeCompare(b.tag);
                 });
@@ -222,12 +223,12 @@
         }
     }
 
-    // ★修正2: アイコン取得関数の大幅見直し
+    // ★修正2: アイコン取得処理の完全修正
     async function updatePlayerIcon(tag) {
         const imgEl = document.getElementById(`icon-${tag}`);
         if (!imgEl) return;
 
-        // キャッシュにあればそれを使う
+        // すでにキャッシュにあればそれを使う
         if (iconCache.has(tag)) {
             const cachedId = iconCache.get(tag);
             imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
@@ -238,14 +239,14 @@
             // BrawlAPIのエンドポイント
             const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
             
-            // alloriginsの代わりに 'corsproxy.io' を使用（より単純なプロキシ）
-            // これにより、クロスオリジン(CORS)エラーを回避しつつ生のJSONを取得可能
+            // alloriginsの代わりに 'corsproxy.io' を使用します
+            // こちらの方がJSONをそのまま返してくれるため、パースエラーが起きにくく、CORSも回避できます
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
             const res = await fetch(proxyUrl);
             
             if (res.ok) {
-                // corsproxyは中身をそのまま返すので、直接JSONとしてパース可能
+                // corsproxyは中身をそのまま返すので、直接JSONとして扱えます
                 const apiData = await res.json();
                 
                 // アイコンIDが存在すれば更新
@@ -256,8 +257,8 @@
                 }
             }
         } catch (e) {
-            // エラー時はコンソールには出さず、デフォルトアイコンのままにする
-            // console.warn(`Icon fetch failed for ${tag}:`, e); 
+            // アイコン取得に失敗してもエラー表示は出さず、デフォルト画像のままにする
+            // console.warn(`Icon fetch failed for ${tag}`, e);
         }
     }
 
