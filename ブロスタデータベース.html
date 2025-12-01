@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロスタデータベース検索 | Brawl Ultimate DB</title>
     <!-- SEO -->
-    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索ツール。1000万人以上のデータを収録。名前やIDから詳細情報を瞬時に検索可能。">
+    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索ツール。1300万人以上のデータを収録。名前やIDから詳細情報を瞬時に検索可能。">
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; margin: 0; }
         h1 { 
@@ -63,7 +63,6 @@
     <div class="seo-text"><p>Brawl Stars（ブロスタ）のプレイヤー検索ツール。1300万人以上のデータベースから名前やタグで詳細な戦績を確認できます。</p></div>
 
     <script>
-        // ★Hugging FaceのURL (v4)
         const API_BASE = "https://katodeth-brawl-database-v4.hf.space";
         const countEl = document.getElementById('count');
 
@@ -111,10 +110,13 @@
                     data.forEach(p => {
                         const tr = document.createElement('tr');
                         const imgId = `img-${p.tag}`;
-                        let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png"; // デフォルト
+                        let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png"; 
                         if(p.icon_id && p.icon_id > 0) {
                             iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id}.png`;
                         }
+
+                        // ★修正: BrawlInsightsへのリンク形式を変更
+                        const link = `https://brawlinsights.com/ja/player/profile/${p.tag}`;
 
                         tr.innerHTML = `
                             <td>
@@ -125,10 +127,9 @@
                                 </div>
                             </td>
                             <td class="tag">#${p.tag}</td>
-                            <td><a href="https://brawlinsight.com/?tag=${p.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>
+                            <td><a href="${link}" target="_blank" class="detail-link">詳細 ↗</a></td>
                         `;
                         list.appendChild(tr);
-                        // ★自分のHugging Faceサーバー経由で最新アイコンを取得 (CORS回避)
                         fetchLiveIcon(p.tag, imgId);
                     });
                     document.getElementById('result-table').style.display = 'table';
@@ -142,7 +143,6 @@
 
         async function fetchLiveIcon(tag, imgId) {
             try {
-                // 直接BrawlAPIを叩かず、自分のサーバーの中継地点(/api/live_icon)を叩く
                 const res = await fetch(`${API_BASE}/api/live_icon/${tag}`);
                 if (res.ok) {
                     const data = await res.json();
