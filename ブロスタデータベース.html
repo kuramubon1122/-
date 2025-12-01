@@ -3,301 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- CSP設定 -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
-
-    <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
+    
+    <!-- SEO対策 -->
+    <title>ブロスタ データベース | プレイヤー検索＆統計ツール</title>
+    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー名やタグから、トロフィー数や戦績を検索できる世界最大級の非公式データベース。1000万人以上のデータを収録。">
+    <meta name="keywords" content="ブロスタ, Brawl Stars, データベース, 検索, ランキング, トロフィー, 名前検索">
+    
     <style>
-        body { background-color: #121212; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; margin: 0; }
+        body { background-color: #121212; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; margin: 0; }
         
+        /* 光るタイトル */
         h1 { 
-            color: #ffc107; 
-            margin-bottom: 5px; 
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(255,193,7,0.7), 0 0 20px rgba(255,193,7,0.5);
+            font-size: 2.5rem; margin-bottom: 5px; color: #ffc107;
+            text-shadow: 0 0 10px #ffc107, 0 0 20px #ff9800;
             animation: glow 2s infinite alternate;
         }
+        @keyframes glow { from { text-shadow: 0 0 10px #ffc107; } to { text-shadow: 0 0 25px #ffeb3b, 0 0 10px #ff9800; } }
 
-        @keyframes glow {
-            from { text-shadow: 0 0 10px rgba(255,193,7,0.7), 0 0 20px rgba(255,193,7,0.5); }
-            to { text-shadow: 0 0 20px rgba(255, 235, 59, 1), 0 0 30px rgba(255, 193, 7, 0.8); }
-        }
+        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 1px; }
+        .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.2em; font-family: monospace; }
 
-        .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 30px; font-weight: bold; }
-        
-        .record-count { 
-            color: #29b6f6; 
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.5em; 
-            font-weight: bold;
-            display: inline-block;
-            min-width: 150px;
-        }
-
-        .search-container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .search-container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         
         .radio-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
-        .radio-group label { cursor: pointer; color: #aaa; font-size: 0.9rem; transition: 0.2s; }
-        .radio-group label:hover { color: #fff; }
-        .radio-group input:checked + span { color: #ffc107; font-weight: bold; text-decoration: underline; }
+        .radio-group label { cursor: pointer; color: #888; font-size: 0.9rem; transition: 0.3s; }
+        .radio-group input:checked + span { color: #ffc107; font-weight: bold; border-bottom: 2px solid #ffc107; }
         
         .search-box { display: flex; gap: 10px; }
-        input[type="text"] { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333; font-size: 16px; background: #2c2c2c; color: #fff; outline: none; transition: 0.3s; }
-        input[type="text"]:focus { border-color: #ffc107; background: #333; }
+        input[type="text"] { flex: 1; padding: 15px; border-radius: 30px; border: 2px solid #333; font-size: 16px; background: #252525; color: #fff; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { border-color: #ffc107; }
+        button { padding: 15px 30px; border-radius: 30px; border: none; background: linear-gradient(45deg, #ffc107, #ff9800); color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 193, 7, 0.4); }
         
-        button { padding: 12px 25px; border-radius: 8px; border: none; background: #ffc107; color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #ffca28; transform: scale(1.05); }
-        
-        table { width: 100%; max-width: 800px; margin: 30px auto; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        table { width: 100%; max-width: 800px; margin: 30px auto; border-collapse: collapse; background: #1e1e1e; border-radius: 12px; overflow: hidden; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
-        th { background: #252525; color: #aaa; font-size: 0.85em; letter-spacing: 1px; }
+        th { background: #252525; color: #aaa; font-size: 0.85em; }
         tr:hover { background: #2a2a2a; }
         
-        .profile-icon { 
-            width: 44px; height: 44px; 
-            border-radius: 6px; 
-            object-fit: cover; 
-            background: #000; 
-            border: 2px solid #555;
-            transition: transform 0.2s;
-            opacity: 0.6; /* ロード前は少し暗く */
-        }
-        .profile-icon.loaded {
-            opacity: 1;
-            border-color: #ffc107;
-        }
-
-        .icon-cell { width: 60px; text-align: center; }
-
-        a.detail-link { 
-            display: inline-block;
-            color: #fff; background: #29b6f6; padding: 6px 12px; 
-            text-decoration: none; border-radius: 4px; font-size: 0.85em; font-weight: bold;
-            transition: background 0.2s, transform 0.1s;
-        }
-        a.detail-link:hover { background: #0288d1; transform: translateY(-2px); }
+        .player-icon { width: 35px; height: 35px; border-radius: 50%; background: #333; object-fit: cover; vertical-align: middle; margin-right: 10px; border: 2px solid #444; }
+        .tag { font-family: monospace; color: #ffc107; font-size: 0.9em; }
         
-        .tag { font-family: monospace; color: #ffc107; font-weight: bold; }
-        #loading { display: none; margin-top: 20px; color: #888; font-style: italic; }
-        .error { color: #ff5252; margin-top: 20px; font-weight: bold; }
-        .status-msg { font-size: 0.8rem; color: #666; margin-top: 5px; min-height: 1.2em; }
-
-        .seo-footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
-            color: #444;
-            font-size: 0.75rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
+        a.detail-link { 
+            display: inline-block; background: #29b6f6; color: #fff; padding: 6px 15px; 
+            text-decoration: none; border-radius: 20px; font-size: 0.8em; font-weight: bold;
         }
+        a.detail-link:hover { background: #039be5; transform: translateY(-2px); }
+        
+        #loading { display: none; margin-top: 20px; color: #888; }
+        .error { color: #ff5252; margin-top: 20px; }
+        .seo-text { margin-top: 50px; color: #444; font-size: 0.7rem; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.5; text-align: justify; }
     </style>
 </head>
 <body>
     <h1>⚡ BRAWL ULTIMATE DB</h1>
-    <p class="subtitle">DATABASE RECORDS: <span id="db-count" class="record-count">0</span></p>
+    <p class="subtitle">
+        現在 <span id="count" class="db-count">---</span> 人のプレイヤーデータを分析中<br>
+        国内最大級の非公式ブロスタデータベース
+    </p>
 
     <div class="search-container">
         <div class="radio-group">
-            <label><input type="radio" name="mode" value="tag"><span>🆔 ID検索</span></label>
-            <label><input type="radio" name="mode" value="exact"><span>🎯 名前(完全)</span></label>
-            <label><input type="radio" name="mode" value="partial" checked><span>🔍 名前(部分)</span></label>
+            <label><input type="radio" name="mode" value="tag" hidden><span>🆔 ID検索</span></label>
+            <label><input type="radio" name="mode" value="exact" hidden><span>🎯 完全一致</span></label>
+            <label><input type="radio" name="mode" value="partial" checked hidden><span>🔍 部分一致</span></label>
         </div>
         <div class="search-box">
-            <input type="text" id="q" placeholder="検索ワードを入力...">
+            <input type="text" id="q" placeholder="プレイヤー名 または タグ(#...)">
             <button onclick="search()">検索</button>
         </div>
-        <div id="status-msg" class="status-msg"></div>
     </div>
 
     <div id="loading">データベース照会中...</div>
     <p id="error" class="error"></p>
 
     <table id="result-table" style="display:none;">
-        <thead>
-            <tr>
-                <th>ICON</th>
-                <th>TAG (A-Z)</th>
-                <th>NAME</th>
-                <th>INFO</th>
-            </tr>
-        </thead>
+        <thead><tr><th>ICON / NAME</th><th>TAG</th><th>ACTION</th></tr></thead>
         <tbody id="list"></tbody>
     </table>
 
-    <div class="seo-footer">
-        <p>BRAWL ULTIMATE DB - Player Statistics & Analysis Tool</p>
+    <div class="seo-text">
+        <p>Brawl Stars（ブロスタ）のプレイヤー検索ツールです。名前検索、タグ検索に対応。世界中のプレイヤーの統計データ、トロフィー数、勝利数などの分析情報をデータベース化しています。自分の戦績確認や、ライバルの調査、クラブメンバーの管理に役立つ非公式ツールです。</p>
     </div>
 
-<script>
-    const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
-    const TOTAL_RECORDS = 30525403; 
-    const iconCache = new Map();
-    let isFetchingIcons = false; // アイコン取得重複防止フラグ
+    <script>
+        // ★新しいスペースのURL (v4)
+        const API_BASE = "https://katodeth-brawl-database-v4.hf.space";
 
-    window.onload = function() {
-        animateCounter("db-count", 0, TOTAL_RECORDS, 800);
-    };
-
-    function animateCounter(id, start, end, duration) {
-        const obj = document.getElementById(id);
-        const range = end - start;
-        let startTime = null;
-        function step(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const progress = timestamp - startTime;
-            const percent = Math.min(progress / duration, 1);
-            const ease = percent * (2 - percent);
-            const current = Math.floor(start + (range * ease));
-            obj.innerHTML = current.toLocaleString();
-            if (progress < duration) {
-                window.requestAnimationFrame(step);
-            } else {
-                obj.innerHTML = end.toLocaleString();
-            }
-        }
-        window.requestAnimationFrame(step);
-    }
-
-    async function search() {
-        const q = document.getElementById('q').value.trim();
-        if (!q) return;
-
-        // 前回のアイコン取得処理があれば中断したいが、簡単のためフラグ管理
-        isFetchingIcons = false; 
-
-        const mode = document.querySelector('input[name="mode"]:checked').value;
-        const loading = document.getElementById('loading');
-        const resultTable = document.getElementById('result-table');
-        const errorMsg = document.getElementById('error');
-        const list = document.getElementById('list');
-        const statusMsg = document.getElementById('status-msg');
-
-        loading.style.display = 'block';
-        resultTable.style.display = 'none';
-        errorMsg.innerText = '';
-        list.innerHTML = '';
-        statusMsg.innerText = '';
-
-        try {
-            const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
-            if (!res.ok) throw new Error(`Server Error: ${res.status}`);
-            
-            let data = await res.json();
-
-            if (data.length === 0) {
-                errorMsg.innerText = "見つかりませんでした。";
-            } else {
-                // ★修正: タグ(ID)の辞書順(アルファベット順)にソート
-                data.sort((a, b) => a.tag.localeCompare(b.tag));
-
-                // リスト描画
-                data.forEach(p => {
-                    const cleanTag = p.tag.replace('#', '');
-                    const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
-                    const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="icon-cell">
-                            <img src="${defaultIcon}" 
-                                 id="icon-${cleanTag}" 
-                                 class="profile-icon" 
-                                 alt="Icon">
-                        </td>
-                        <td class="tag">#${cleanTag}</td>
-                        <td>${p.name}</td>
-                        <td><a href="${detailLink}" target="_blank" class="detail-link">詳細・分析 ↗</a></td>
-                    `;
-                    list.appendChild(tr);
-                });
-                resultTable.style.display = 'table';
-                
-                // ★修正: アイコンを「1つずつ順番に」取得する関数を呼び出す
-                // これにより一斉アクセスによるCORS/429エラーを防ぐ
-                fetchIconsSequentially(data);
-            }
-        } catch (e) {
-            console.error(e);
-            errorMsg.innerHTML = "通信エラー: サーバー応答なし、または混雑しています。";
-        } finally {
-            loading.style.display = 'none';
-        }
-    }
-
-    // ★新機能: アイコンを順番に取得する処理
-    async function fetchIconsSequentially(players) {
-        isFetchingIcons = true;
-        const statusMsg = document.getElementById('status-msg');
-        
-        for (let i = 0; i < players.length; i++) {
-            if (!isFetchingIcons) break; // 新しい検索が始まったら中断
-
-            const p = players[i];
-            const cleanTag = p.tag.replace('#', '');
-            
-            // 状況表示（任意）
-            // statusMsg.innerText = `アイコン読み込み中... ${i + 1}/${players.length}`;
-
-            await updatePlayerIcon(cleanTag);
-            
-            // サーバー負荷軽減のため、次のリクエストまで少し待つ (500ms)
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
-        statusMsg.innerText = "";
-    }
-
-    // ★修正: アイコン取得 (alloriginsの /get モードを使用)
-    // /get はJSONでラップされた応答を返すため、HTTPステータスエラーが起きてもCORS違反になりにくい
-    async function updatePlayerIcon(tag) {
-        const imgEl = document.getElementById(`icon-${tag}`);
-        if (!imgEl) return;
-
-        if (iconCache.has(tag)) {
-            const cachedId = iconCache.get(tag);
-            imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
-            imgEl.classList.add('loaded');
-            return;
-        }
-
-        try {
-            // BrawlAPIのエンドポイント
-            // # を %23 にエンコードして渡す必要がある
-            const brawlApiUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
-            
-            // allorigins.win/get を使用。これは { "contents": "..." } というJSONを返す。
-            // ブラウザ側では常に正常なJSON取得として扱われるため、コンソールの赤エラーが消える。
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(brawlApiUrl)}`;
-
-            const res = await fetch(proxyUrl);
-            if (res.ok) {
-                const wrapper = await res.json();
-                // wrapper.contents に実際のAPIレスポンス(文字列)が入っている
-                if (wrapper.contents) {
-                    try {
-                        const apiData = JSON.parse(wrapper.contents);
-                        if (apiData.icon && apiData.icon.id) {
-                            const iconId = apiData.icon.id;
-                            iconCache.set(tag, iconId);
-                            imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
-                            imgEl.classList.add('loaded');
-                        }
-                    } catch (parseError) {
-                        // JSONパースエラーは無視 (404ページHTMLなどが返ってきた場合など)
-                    }
+        // --- スロット風カウンターアニメーション (0.8秒) ---
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // イージング関数 (easeOutExpo) で最後ゆっくりに
+                const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                const value = Math.floor(ease * (end - start) + start);
+                obj.innerHTML = value.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
                 }
-            }
-        } catch (e) {
-            // 通信エラーは無視
+            };
+            window.requestAnimationFrame(step);
         }
-    }
 
-    document.getElementById('q').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') search();
-    });
-</script>
+        // 起動時に総数を取得してアニメーション
+        fetch(`${API_BASE}/api/stats`)
+            .then(res => res.json())
+            .then(data => {
+                const countEl = document.getElementById('count');
+                animateValue(countEl, 0, data.count, 800); // 800ms = 0.8秒
+            })
+            .catch(() => document.getElementById('count').innerText = "---");
+
+        // 検索機能
+        async function search() {
+            const q = document.getElementById('q').value.trim();
+            if (!q) return;
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result-table').style.display = 'none';
+            document.getElementById('error').innerText = '';
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
+                const data = await res.json();
+
+                if (data.length === 0) {
+                    document.getElementById('error').innerText = "見つかりませんでした。";
+                } else {
+                    data.forEach(p => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div style="display:flex;align-items:center;">
+                                    <img src="https://cdn.brawlify.com/profile-icons/28000000.png" class="player-icon" id="icon-${p.tag}">
+                                    <span>${p.name}</span>
+                                </div>
+                            </td>
+                            <td class="tag">#${p.tag}</td>
+                            <td><a href="https://brawlinsight.com/?tag=${p.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>
+                        `;
+                        list.appendChild(tr);
+                        fetchIcon(p.tag); // アイコン後読み
+                    });
+                    document.getElementById('result-table').style.display = 'table';
+                }
+            } catch (e) {
+                document.getElementById('error').innerText = "通信エラー: サーバーを確認してください";
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // アイコン取得
+        async function fetchIcon(tag) {
+            try {
+                const res = await fetch(`https://api.brawlapi.com/v1/player/%23${tag}`);
+                if(res.ok) {
+                    const data = await res.json();
+                    const img = document.getElementById(`icon-${tag}`);
+                    if(img && data.icon && data.icon.id) img.src = `https://cdn.brawlify.com/profile-icons/${data.icon.id}.png`;
+                }
+            } catch(e) {}
+        }
+
+        document.getElementById('q').addEventListener('keypress', e => { if(e.key==='Enter') search() });
+    </script>
 </body>
 </html>
