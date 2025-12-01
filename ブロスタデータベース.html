@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ★ご要望のCSPタグ: 動作を阻害しないよう、httpsへの接続を許可する設定にしています -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
+    <!-- ★修正点1: CSPを緩和し、'unsafe-inline' を追加してデザイン崩れを防止 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
 
     <!-- SEO対策 -->
     <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
@@ -140,11 +140,9 @@
     <script>
         const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
         const TOTAL_RECORDS = 30525403; 
-        
-        // キャッシュシステム
         const iconCache = new Map();
 
-        // ページ読み込み時の処理（カウンターアニメーション）
+        // ページ読み込み時
         window.onload = function() {
             animateCounter("db-count", 0, TOTAL_RECORDS, 800);
         };
@@ -197,8 +195,6 @@
                     data.forEach(p => {
                         const cleanTag = p.tag.replace('#', '');
                         const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
-                        
-                        // デフォルトアイコン（読み込み中）
                         const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
 
                         const tr = document.createElement('tr');
@@ -238,31 +234,36 @@
             }
 
             try {
-                // ★修正点: corsproxy.io が403でブロックされるため、
-                // 'api.allorigins.win' という別のプロキシに変更しました。
                 const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
                 
-                // allorigins.win/raw を使用すると生データ(JSON)が返ってきます
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                // ★修正点2: allorigins.win のエンドポイントを '/raw' から '/get' に変更
+                // これにより、CORSヘッダー付きのJSONオブジェクトが返ってくるため、
+                // ブラウザによるCORSブロックを確実に回避できます。
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
                 const res = await fetch(proxyUrl);
                 
                 if (res.ok) {
-                    const data = await res.json();
-                    // データ構造が異なる場合があるため、nullチェックを行う
-                    const iconId = data.icon ? data.icon.id : null;
+                    const jsonWrapper = await res.json();
                     
-                    if (iconId) {
-                        iconCache.set(tag, iconId);
-                        imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+                    // 中身のJSON文字列をパースする
+                    // allorigins.win/get は { "contents": "ここに実際のデータ" } を返します
+                    if (jsonWrapper.contents) {
+                        try {
+                            const apiData = JSON.parse(jsonWrapper.contents);
+                            const iconId = apiData.icon ? apiData.icon.id : null;
+                            
+                            if (iconId) {
+                                iconCache.set(tag, iconId);
+                                imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+                            }
+                        } catch (parseError) {
+                            // contentsがJSONでない場合（403エラー画面のHTMLなど）は無視
+                        }
                     }
-                } else {
-                    // エラーログを出さず静かに無視する（コンソールを汚さない）
-                    // console.warn(`API status ${res.status} for ${tag}`); 
                 }
             } catch (e) {
-                // 通信エラー時も静かに無視する
-                // console.warn(`Icon fetch error for ${tag}`);
+                // 通信エラー時も静かに無視（コンソールを赤くしない）
             }
         }
 
