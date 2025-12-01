@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO対策: meta descriptionとtitleにキーワードを含める -->
-    <title>ブロスタデータベース検索 | 名前検索・統計・分析ツール</title>
-    <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。IDや名前からユーザーを検索し、プロフィール詳細を確認できます。">
+    <!-- SEO対策 -->
+    <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
+    <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。IDや名前からユーザーを検索し、正しいプロフィールアイコンと共に詳細を確認できます。">
     
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; margin: 0; }
         
-        /* ⚡ BRAWL ULTIMATE DB を光らせるCSS */
+        /* タイトル装飾: ネオン風 */
         h1 { 
             color: #ffc107; 
             margin-bottom: 5px; 
             text-transform: uppercase;
-            /* ネオン風の光沢アニメーション */
             text-shadow: 0 0 10px rgba(255,193,7,0.7), 0 0 20px rgba(255,193,7,0.5);
             animation: glow 2s infinite alternate;
         }
@@ -27,7 +26,16 @@
         }
 
         .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 30px; font-weight: bold; }
-        .record-count { color: #29b6f6; font-family: monospace; font-size: 1.1em; }
+        
+        /* スロット風カウンターのスタイル */
+        .record-count { 
+            color: #29b6f6; 
+            font-family: 'Courier New', Courier, monospace; /* 等幅フォントで数字のブレを防ぐ */
+            font-size: 1.5em; 
+            font-weight: bold;
+            display: inline-block;
+            min-width: 150px;
+        }
 
         .search-container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         
@@ -48,9 +56,17 @@
         th { background: #252525; color: #aaa; font-size: 0.85em; letter-spacing: 1px; }
         tr:hover { background: #2a2a2a; }
         
-        /* プロフィールアイコン用スタイル */
-        .profile-icon { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; background: #333; border: 2px solid #444; }
-        .icon-cell { width: 50px; text-align: center; }
+        /* プロフィールアイコン画像 */
+        .profile-icon { 
+            width: 44px; height: 44px; 
+            border-radius: 6px; 
+            object-fit: cover; 
+            background: #000; 
+            border: 2px solid #555;
+            transition: transform 0.2s;
+        }
+        .profile-icon:hover { transform: scale(1.1); border-color: #ffc107; }
+        .icon-cell { width: 60px; text-align: center; }
 
         a.detail-link { 
             display: inline-block;
@@ -64,7 +80,7 @@
         #loading { display: none; margin-top: 20px; color: #888; font-style: italic; }
         .error { color: #ff5252; margin-top: 20px; font-weight: bold; }
 
-        /* SEO用テキストエリア（フッター風） */
+        /* SEOフッター */
         .seo-footer {
             margin-top: 50px;
             padding-top: 20px;
@@ -80,8 +96,8 @@
 </head>
 <body>
     <h1>⚡ BRAWL ULTIMATE DB</h1>
-    <!-- 総記録数を表示するエリア -->
-    <p class="subtitle">現在のデータベース総記録数: <span id="db-count" class="record-count">集計中...</span></p>
+    <!-- スロットカウンターエリア -->
+    <p class="subtitle">DATABASE RECORDS: <span id="db-count" class="record-count">0</span></p>
 
     <div class="search-container">
         <div class="radio-group">
@@ -90,7 +106,7 @@
             <label><input type="radio" name="mode" value="partial" checked><span>🔍 名前(部分)</span></label>
         </div>
         <div class="search-box">
-            <input type="text" id="q" placeholder="プレイヤー名またはタグを入力...">
+            <input type="text" id="q" placeholder="検索ワードを入力...">
             <button onclick="search()">検索</button>
         </div>
     </div>
@@ -110,35 +126,51 @@
         <tbody id="list"></tbody>
     </table>
 
-    <!-- SEO対策用コンテンツ（ページ下部に配置） -->
     <div class="seo-footer">
         <p>
-            BRAWL ULTIMATE DBは、人気ゲーム「ブロスタ（Brawl Stars）」の非公式データベース検索サイトです。
-            高度な<strong>名前検索</strong>機能により、世界中のプレイヤーの<strong>統計</strong>や<strong>分析</strong>データを素早く参照できます。
-            プレイヤーID検索や部分一致検索を活用して、ライバルやフレンドの情報をチェックしましょう。
-            このデータベースは定期的に更新され、最新のブロスタ統計情報を提供します。
+            BRAWL ULTIMATE DBへようこそ。ここは世界最大級の<strong>ブロスタ(Brawl Stars)</strong>プレイヤーデータベースです。
+            3000万件以上の記録から、正確な<strong>名前検索</strong>、<strong>統計データ</strong>、そしてリアルタイムのプロフィールアイコン取得機能を提供します。
+            プロプレイヤーの分析やフレンドの戦績確認に最適化されており、ID検索や部分一致検索もサポートしています。
         </p>
     </div>
 
     <script>
         const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
+        const TOTAL_RECORDS = 30525403; // 指定された総記録数
         
-        // ページ読み込み時に総記録数を取得する（ダミー関数）
-        // 実際にAPIに/statsエンドポイントがあればそちらに切り替えてください
-        window.onload = async function() {
-            try {
-                // 仮の実装: もしAPIにカウント取得機能があればここを有効化
-                // const res = await fetch(`${API_BASE}/api/stats`);
-                // const data = await res.json();
-                // document.getElementById('db-count').innerText = data.count.toLocaleString();
-                
-                // APIがないため、仮の演出としてランダムな数字を表示するか、"API接続中"とします
-                // ここでは仮に大規模な数字を表示してデータベース感を演出します
-                document.getElementById('db-count').innerText = "30,525,403 件以上";
-            } catch (e) {
-                document.getElementById('db-count').innerText = "不明";
-            }
+        // ★キャッシュシステム: タグとアイコンIDの紐付けを保存するMap
+        const iconCache = new Map();
+
+        // ページ読み込み時の処理
+        window.onload = function() {
+            animateCounter("db-count", 0, TOTAL_RECORDS, 800); // 0.8秒でアニメーション
         };
+
+        // スロット風カウンターアニメーション関数
+        function animateCounter(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            let startTime = null;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = timestamp - startTime;
+                const percent = Math.min(progress / duration, 1);
+                
+                // easeOutQuad (最初は早く、最後はゆっくり止まる)
+                const ease = percent * (2 - percent);
+                
+                const current = Math.floor(start + (range * ease));
+                obj.innerHTML = current.toLocaleString();
+
+                if (progress < duration) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end.toLocaleString(); // 最後に正確な数値をセット
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
 
         async function search() {
             const q = document.getElementById('q').value.trim();
@@ -156,7 +188,7 @@
             list.innerHTML = '';
 
             try {
-                // データベース検索
+                // データベース検索API実行
                 const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
                 
                 if (!res.ok) throw new Error(`Server Error: ${res.status}`);
@@ -164,57 +196,75 @@
                 const data = await res.json();
 
                 if (data.length === 0) {
-                    errorMsg.innerText = "条件に一致するプレイヤーが見つかりませんでした。";
+                    errorMsg.innerText = "見つかりませんでした。";
                 } else {
-                    // 結果の描画
-                    for (const p of data) {
+                    // 結果のリストを作成
+                    data.forEach(p => {
                         const cleanTag = p.tag.replace('#', '');
                         const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
                         
+                        // 初期のアイコン画像（読み込み中用のプレースホルダー）
+                        // Brawl Starsのデフォルトドクロアイコンなどを使用
+                        const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
+
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td class="icon-cell">
-                                <img src="https://cdn.brawlify.com/profile-icons/regular/28000000.png" 
+                                <img src="${defaultIcon}" 
                                      id="icon-${cleanTag}" 
                                      class="profile-icon" 
-                                     alt="Icon">
+                                     alt="Loading...">
                             </td>
                             <td class="tag">#${cleanTag}</td>
                             <td>${p.name}</td>
-                            <td><a href="${detailLink}" target="_blank" class="detail-link">詳細・統計 ↗</a></td>
+                            <td><a href="${detailLink}" target="_blank" class="detail-link">詳細・分析 ↗</a></td>
                         `;
                         list.appendChild(tr);
 
-                        // 非同期でアイコンをフェッチして更新する
-                        fetchPlayerIcon(cleanTag);
-                    }
+                        // 各行に対してアイコン取得処理を実行（非同期）
+                        updatePlayerIcon(cleanTag);
+                    });
                     resultTable.style.display = 'table';
                 }
             } catch (e) {
                 console.error(e);
-                errorMsg.innerHTML = "通信エラー: データベースへの接続に失敗しました。<br>しばらく待ってから再試行してください。";
+                errorMsg.innerHTML = "通信エラー: サーバー応答なし、または混雑しています。<br>時間をおいて再試行してください。";
             } finally {
                 loading.style.display = 'none';
             }
         }
 
-        // 非公式APIを使用してアイコンIDを取得し画像を更新する関数
-        async function fetchPlayerIcon(tag) {
+        // プレイヤーごとのアイコンを更新する関数（キャッシュ対応）
+        async function updatePlayerIcon(tag) {
+            const imgEl = document.getElementById(`icon-${tag}`);
+            if (!imgEl) return;
+
+            // 1. キャッシュを確認
+            if (iconCache.has(tag)) {
+                const cachedId = iconCache.get(tag);
+                imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
+                return;
+            }
+
+            // 2. キャッシュになければAPIを叩く
             try {
-                // BrawlAPI (Unofficial) を使用
+                // BrawlAPI (非公式) を使用してプロフィール情報を取得
                 const res = await fetch(`https://api.brawlapi.com/v1/players/%23${tag}`);
                 if (res.ok) {
                     const data = await res.json();
                     const iconId = data.icon.id;
-                    const imgElement = document.getElementById(`icon-${tag}`);
-                    if (imgElement && iconId) {
-                        // Brawlify CDNから画像を取得
-                        imgElement.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+                    
+                    if (iconId) {
+                        // 3. キャッシュに保存
+                        iconCache.set(tag, iconId);
+                        
+                        // 画像更新
+                        imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
                     }
                 }
             } catch (e) {
-                // エラー時はデフォルトアイコンのままにするため何もしない
-                console.warn(`Could not fetch icon for ${tag}`, e);
+                // エラー時はコンソールのみに出力し、画面上はデフォルトアイコンのままにする
+                console.warn(`Icon fetch failed for ${tag}:`, e);
             }
         }
 
