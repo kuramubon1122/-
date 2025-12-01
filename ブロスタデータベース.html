@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- CSP設定 -->
+
+    <!-- CSP設定: 画像や接続先を許可 -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
 
     <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
     <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。">
-    
+
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; margin: 0; }
         
@@ -126,145 +126,144 @@
     <div class="seo-footer">
         <p>
             BRAWL ULTIMATE DBへようこそ。ここは世界最大級の<strong>ブロスタ(Brawl Stars)</strong>プレイヤーデータベースです。
+            プロプレイヤーの分析やフレンドの戦績確認に最適化されており、ID検索や部分一致検索もサポートしています。
         </p>
     </div>
 
-    <script>
-        const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
-        const TOTAL_RECORDS = 30525403; 
-        const iconCache = new Map();
+<script>
+    const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
+    const TOTAL_RECORDS = 30525403; 
+    const iconCache = new Map();
 
-        window.onload = function() {
-            animateCounter("db-count", 0, TOTAL_RECORDS, 800);
-        };
+    window.onload = function() {
+        animateCounter("db-count", 0, TOTAL_RECORDS, 800);
+    };
 
-        function animateCounter(id, start, end, duration) {
-            const obj = document.getElementById(id);
-            const range = end - start;
-            let startTime = null;
-            function step(timestamp) {
-                if (!startTime) startTime = timestamp;
-                const progress = timestamp - startTime;
-                const percent = Math.min(progress / duration, 1);
-                const ease = percent * (2 - percent);
-                const current = Math.floor(start + (range * ease));
-                obj.innerHTML = current.toLocaleString();
-                if (progress < duration) {
-                    window.requestAnimationFrame(step);
-                } else {
-                    obj.innerHTML = end.toLocaleString();
-                }
-            }
-            window.requestAnimationFrame(step);
-        }
-
-        async function search() {
-            const q = document.getElementById('q').value.trim();
-            if (!q) return;
-
-            const mode = document.querySelector('input[name="mode"]:checked').value;
-            const loading = document.getElementById('loading');
-            const resultTable = document.getElementById('result-table');
-            const errorMsg = document.getElementById('error');
-            const list = document.getElementById('list');
-
-            loading.style.display = 'block';
-            resultTable.style.display = 'none';
-            errorMsg.innerText = '';
-            list.innerHTML = '';
-
-            try {
-                const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
-                
-                if (!res.ok) throw new Error(`Server Error: ${res.status}`);
-                
-                let data = await res.json();
-
-                if (data.length === 0) {
-                    errorMsg.innerText = "見つかりませんでした。";
-                } else {
-                    // ★追加箇所: データをタグ（ID）順にソートする処理
-                    data.sort((a, b) => {
-                        // ハッシュタグを除去して比較
-                        const tagA = a.tag.replace('#', '');
-                        const tagB = b.tag.replace('#', '');
-                        return tagA.localeCompare(tagB);
-                    });
-
-                    data.forEach(p => {
-                        const cleanTag = p.tag.replace('#', '');
-                        const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
-                        const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
-
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="icon-cell">
-                                <img src="${defaultIcon}" 
-                                     id="icon-${cleanTag}" 
-                                     class="profile-icon" 
-                                     alt="Icon">
-                            </td>
-                            <td class="tag">#${cleanTag}</td>
-                            <td>${p.name}</td>
-                            <td><a href="${detailLink}" target="_blank" class="detail-link">詳細・分析 ↗</a></td>
-                        `;
-                        list.appendChild(tr);
-
-                        updatePlayerIcon(cleanTag);
-                    });
-                    resultTable.style.display = 'table';
-                }
-            } catch (e) {
-                console.error(e);
-                errorMsg.innerHTML = "通信エラー: サーバー応答なし、または混雑しています。<br>時間をおいて再試行してください。";
-            } finally {
-                loading.style.display = 'none';
+    function animateCounter(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        const range = end - start;
+        let startTime = null;
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percent = Math.min(progress / duration, 1);
+            const ease = percent * (2 - percent);
+            const current = Math.floor(start + (range * ease));
+            obj.innerHTML = current.toLocaleString();
+            if (progress < duration) {
+                window.requestAnimationFrame(step);
+            } else {
+                obj.innerHTML = end.toLocaleString();
             }
         }
+        window.requestAnimationFrame(step);
+    }
 
-        async function updatePlayerIcon(tag) {
-            const imgEl = document.getElementById(`icon-${tag}`);
-            if (!imgEl) return;
+    async function search() {
+        const q = document.getElementById('q').value.trim();
+        if (!q) return;
 
-            if (iconCache.has(tag)) {
-                const cachedId = iconCache.get(tag);
-                imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
-                return;
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const loading = document.getElementById('loading');
+        const resultTable = document.getElementById('result-table');
+        const errorMsg = document.getElementById('error');
+        const list = document.getElementById('list');
+
+        loading.style.display = 'block';
+        resultTable.style.display = 'none';
+        errorMsg.innerText = '';
+        list.innerHTML = '';
+
+        try {
+            const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
+            
+            if (!res.ok) throw new Error(`Server Error: ${res.status}`);
+            
+            let data = await res.json();
+
+            if (data.length === 0) {
+                errorMsg.innerText = "見つかりませんでした。";
+            } else {
+                // ★修正1: タグ(ID)のアルファベット順にソート（辞書順）
+                data.sort((a, b) => {
+                    return a.tag.localeCompare(b.tag);
+                });
+
+                data.forEach(p => {
+                    const cleanTag = p.tag.replace('#', '');
+                    const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
+                    // デフォルトアイコン（初期状態）
+                    const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="icon-cell">
+                            <img src="${defaultIcon}" 
+                                 id="icon-${cleanTag}" 
+                                 class="profile-icon" 
+                                 alt="Icon">
+                        </td>
+                        <td class="tag">#${cleanTag}</td>
+                        <td>${p.name}</td>
+                        <td><a href="${detailLink}" target="_blank" class="detail-link">詳細・分析 ↗</a></td>
+                    `;
+                    list.appendChild(tr);
+
+                    // 遅延読み込みでアイコン更新
+                    updatePlayerIcon(cleanTag);
+                });
+                resultTable.style.display = 'table';
             }
+        } catch (e) {
+            console.error(e);
+            errorMsg.innerHTML = "通信エラー: サーバー応答なし、または混雑しています。<br>時間をおいて再試行してください。";
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
 
-            try {
-                const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
-                // CORSエラー対策として allorigins を使用していますが、
-                // プレイヤーが存在しない場合は404エラーとなり、コンソールに赤文字が出ることがあります。
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+    // ★修正2: アイコン取得関数の大幅見直し
+    async function updatePlayerIcon(tag) {
+        const imgEl = document.getElementById(`icon-${tag}`);
+        if (!imgEl) return;
 
-                const res = await fetch(proxyUrl);
-                
-                if (res.ok) {
-                    const jsonWrapper = await res.json();
-                    
-                    if (jsonWrapper.contents) {
-                        try {
-                            const apiData = JSON.parse(jsonWrapper.contents);
-                            const iconId = apiData.icon ? apiData.icon.id : null;
-                            
-                            if (iconId) {
-                                iconCache.set(tag, iconId);
-                                imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
-                            }
-                        } catch (parseError) {
-                            // JSONパースエラーは無視
-                        }
-                    }
-                }
-            } catch (e) {
-                // ネットワークエラー発生時も、デフォルトアイコンのままにするため何もしない
-            }
+        // キャッシュにあればそれを使う
+        if (iconCache.has(tag)) {
+            const cachedId = iconCache.get(tag);
+            imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
+            return;
         }
 
-        document.getElementById('q').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') search();
-        });
-    </script>
+        try {
+            // BrawlAPIのエンドポイント
+            const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
+            
+            // alloriginsの代わりに 'corsproxy.io' を使用（より単純なプロキシ）
+            // これにより、クロスオリジン(CORS)エラーを回避しつつ生のJSONを取得可能
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+            const res = await fetch(proxyUrl);
+            
+            if (res.ok) {
+                // corsproxyは中身をそのまま返すので、直接JSONとしてパース可能
+                const apiData = await res.json();
+                
+                // アイコンIDが存在すれば更新
+                if (apiData.icon && apiData.icon.id) {
+                    const iconId = apiData.icon.id;
+                    iconCache.set(tag, iconId);
+                    imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+                }
+            }
+        } catch (e) {
+            // エラー時はコンソールには出さず、デフォルトアイコンのままにする
+            // console.warn(`Icon fetch failed for ${tag}:`, e); 
+        }
+    }
+
+    document.getElementById('q').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') search();
+    });
+</script>
 </body>
 </html>
