@@ -30,7 +30,7 @@
         /* スロット風カウンターのスタイル */
         .record-count { 
             color: #29b6f6; 
-            font-family: 'Courier New', Courier, monospace; /* 等幅フォントで数字のブレを防ぐ */
+            font-family: 'Courier New', Courier, monospace;
             font-size: 1.5em; 
             font-weight: bold;
             display: inline-block;
@@ -136,37 +136,31 @@
 
     <script>
         const API_BASE = "https://katodeth-brawl-database-v2.hf.space";
-        const TOTAL_RECORDS = 30525403; // 指定された総記録数
+        const TOTAL_RECORDS = 30525403; 
         
-        // ★キャッシュシステム: タグとアイコンIDの紐付けを保存するMap
+        // キャッシュシステム
         const iconCache = new Map();
 
-        // ページ読み込み時の処理
+        // ページ読み込み時の処理（カウンターアニメーション）
         window.onload = function() {
-            animateCounter("db-count", 0, TOTAL_RECORDS, 800); // 0.8秒でアニメーション
+            animateCounter("db-count", 0, TOTAL_RECORDS, 800);
         };
 
-        // スロット風カウンターアニメーション関数
         function animateCounter(id, start, end, duration) {
             const obj = document.getElementById(id);
             const range = end - start;
             let startTime = null;
-
             function step(timestamp) {
                 if (!startTime) startTime = timestamp;
                 const progress = timestamp - startTime;
                 const percent = Math.min(progress / duration, 1);
-                
-                // easeOutQuad (最初は早く、最後はゆっくり止まる)
                 const ease = percent * (2 - percent);
-                
                 const current = Math.floor(start + (range * ease));
                 obj.innerHTML = current.toLocaleString();
-
                 if (progress < duration) {
                     window.requestAnimationFrame(step);
                 } else {
-                    obj.innerHTML = end.toLocaleString(); // 最後に正確な数値をセット
+                    obj.innerHTML = end.toLocaleString();
                 }
             }
             window.requestAnimationFrame(step);
@@ -188,7 +182,6 @@
             list.innerHTML = '';
 
             try {
-                // データベース検索API実行
                 const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
                 
                 if (!res.ok) throw new Error(`Server Error: ${res.status}`);
@@ -198,13 +191,11 @@
                 if (data.length === 0) {
                     errorMsg.innerText = "見つかりませんでした。";
                 } else {
-                    // 結果のリストを作成
                     data.forEach(p => {
                         const cleanTag = p.tag.replace('#', '');
                         const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
                         
-                        // 初期のアイコン画像（読み込み中用のプレースホルダー）
-                        // Brawl Starsのデフォルトドクロアイコンなどを使用
+                        // デフォルトアイコン（読み込み中）
                         const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
 
                         const tr = document.createElement('tr');
@@ -213,7 +204,7 @@
                                 <img src="${defaultIcon}" 
                                      id="icon-${cleanTag}" 
                                      class="profile-icon" 
-                                     alt="Loading...">
+                                     alt="Icon">
                             </td>
                             <td class="tag">#${cleanTag}</td>
                             <td>${p.name}</td>
@@ -221,7 +212,6 @@
                         `;
                         list.appendChild(tr);
 
-                        // 各行に対してアイコン取得処理を実行（非同期）
                         updatePlayerIcon(cleanTag);
                     });
                     resultTable.style.display = 'table';
@@ -234,36 +224,36 @@
             }
         }
 
-        // プレイヤーごとのアイコンを更新する関数（キャッシュ対応）
         async function updatePlayerIcon(tag) {
             const imgEl = document.getElementById(`icon-${tag}`);
             if (!imgEl) return;
 
-            // 1. キャッシュを確認
             if (iconCache.has(tag)) {
                 const cachedId = iconCache.get(tag);
                 imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
                 return;
             }
 
-            // 2. キャッシュになければAPIを叩く
             try {
-                // BrawlAPI (非公式) を使用してプロフィール情報を取得
-                const res = await fetch(`https://api.brawlapi.com/v1/players/%23${tag}`);
+                // ★修正点: CORSプロキシ(corsproxy.io)を経由させる
+                // BrawlAPIのURLをエンコードしてプロキシに渡します
+                const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+                const res = await fetch(proxyUrl);
+                
                 if (res.ok) {
                     const data = await res.json();
                     const iconId = data.icon.id;
                     
                     if (iconId) {
-                        // 3. キャッシュに保存
                         iconCache.set(tag, iconId);
-                        
-                        // 画像更新
                         imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
                     }
+                } else {
+                    console.warn(`API returned status ${res.status} for ${tag}`);
                 }
             } catch (e) {
-                // エラー時はコンソールのみに出力し、画面上はデフォルトアイコンのままにする
                 console.warn(`Icon fetch failed for ${tag}:`, e);
             }
         }
