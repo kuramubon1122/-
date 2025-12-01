@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSP設定: デザイン崩れ防止のため 'unsafe-inline' を許可 -->
+    <!-- CSP設定 -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; img-src 'self' https: data:; connect-src 'self' https:;">
 
     <title>ブロスタデータベース検索 | 名前検索・統計・分析・アイコン確認</title>
-    <meta name="description" content="BRAWL ULTIMATE DBは、ブロスタ(Brawl Stars)のプレイヤー名前検索、データベース照会、統計分析を行うためのツールです。">
-
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; margin: 0; }
         
@@ -125,8 +123,7 @@
 
     <div class="seo-footer">
         <p>
-            BRAWL ULTIMATE DBへようこそ。ここは世界最大級の<strong>ブロスタ(Brawl Stars)</strong>プレイヤーデータベースです。
-            プロプレイヤーの分析やフレンドの戦績確認に最適化されており、ID検索や部分一致検索もサポートしています。
+            BRAWL ULTIMATE DBへようこそ。
         </p>
     </div>
 
@@ -184,7 +181,7 @@
             if (data.length === 0) {
                 errorMsg.innerText = "見つかりませんでした。";
             } else {
-                // ★修正1: タグ(ID)のアルファベット順(辞書順)にソート
+                // ID(タグ)の辞書順にソート
                 data.sort((a, b) => {
                     return a.tag.localeCompare(b.tag);
                 });
@@ -192,7 +189,6 @@
                 data.forEach(p => {
                     const cleanTag = p.tag.replace('#', '');
                     const detailLink = `https://brawlinsights.com/ja/player/profile/${cleanTag}`;
-                    // デフォルトアイコン（初期状態）
                     const defaultIcon = "https://cdn.brawlify.com/profile-icons/regular/28000000.png";
 
                     const tr = document.createElement('tr');
@@ -209,7 +205,6 @@
                     `;
                     list.appendChild(tr);
 
-                    // 遅延読み込みでアイコン更新
                     updatePlayerIcon(cleanTag);
                 });
                 resultTable.style.display = 'table';
@@ -222,13 +217,11 @@
         }
     }
 
-    // ★修正2: アイコン取得処理の再見直し
-    // 403 ForbiddenやCORSエラーを防ぐため、プロキシを変更しエラーハンドリングを強化
+    // ★修正: alloriginsのrawモードを使い、URL生成を慎重に行う
     async function updatePlayerIcon(tag) {
         const imgEl = document.getElementById(`icon-${tag}`);
         if (!imgEl) return;
 
-        // キャッシュにあればそれを使う
         if (iconCache.has(tag)) {
             const cachedId = iconCache.get(tag);
             imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${cachedId}.png`;
@@ -236,31 +229,29 @@
         }
 
         try {
-            // BrawlAPIのエンドポイント
-            const targetUrl = `https://api.brawlapi.com/v1/players/%23${tag}`;
+            // BrawlAPIに渡すタグは '#' をURLエンコードした '%23' である必要があります
+            // alloriginsを経由する場合、さらに全体をエンコードする必要があります
+            const brawlApiUrl = `https://api.brawlapi.com/v1/players/${encodeURIComponent('#' + tag)}`;
             
-            // ★変更点: corsproxy.io から api.codetabs.com に変更
-            // codetabsは比較的ブロックされにくく、生のJSONをそのまま返してくれます
-            const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
+            // allorigins.win/raw を使用 (CORS回避 + JSON直取得)
+            // キャッシュによる404を防ぐため、timestampを追加
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(brawlApiUrl)}&t=${Date.now()}`;
 
-            // エラーが出てもコンソールを赤くしないよう、try-catchで囲む
             const res = await fetch(proxyUrl);
             
             if (res.ok) {
                 const apiData = await res.json();
-                
-                // アイコンIDが存在すれば更新
                 if (apiData.icon && apiData.icon.id) {
                     const iconId = apiData.icon.id;
                     iconCache.set(tag, iconId);
                     imgEl.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
                 }
             } else {
-                // 403などが返ってきた場合は静かに無視（デフォルトアイコンのまま）
-                // 混雑時などはAPI側がプロキシを拒否することがあります
+                // 404や403が返ってきても、コンソールに赤文字を出さないためここで処理終了
+                // (デフォルトアイコンのままになります)
             }
         } catch (e) {
-            // 通信エラーは無視
+            // 通信エラー時も何もしない（デフォルトアイコン維持）
         }
     }
 
