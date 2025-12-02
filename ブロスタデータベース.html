@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロスタデータベース | Brawl Ultimate DB</title>
     <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索・分析ツール。5000万件以上のデータベースと公式APIを連携し、詳細な戦績や日本ランキングを表示。">
-    <!-- Faviconエラー回避 -->
     <link rel="icon" href="data:,">
     
     <style>
@@ -164,7 +163,7 @@
 
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://scheduling-assumes-maps-senior.trycloudflare.com";
+        const GCP_API = "https://chances-hide-jackie-backing.trycloudflare.com";
         
         let currentSort = 'trophies';
         let currentPage = 1;
@@ -232,14 +231,13 @@
                     document.getElementById('result-info').style.display = 'block';
                 } else {
                     if(query) {
-                        document.getElementById('result-info').innerText = `${data.length} 件ヒット`;
+                        document.getElementById('result-info').innerText = `${data.length} 件ヒット (上位表示)`;
                         document.getElementById('result-info').style.display = 'block';
                     }
                     
                     data.forEach(p => {
                         const tr = document.createElement('tr');
                         const imgId = `icon-${p.tag}`;
-                        const trpId = `trp-${p.tag}`;
                         let iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id||28000000}.png`;
                         
                         tr.innerHTML = `
@@ -250,15 +248,13 @@
                                 </div>
                             </td>
                             <td style="font-family:monospace;color:#aaa">#${p.tag}</td>
-                            <td class="trophy-cell" id="${trpId}">🏆 ${p.trophies.toLocaleString()}</td>
+                            <td class="trophy-cell">🏆 ${p.trophies.toLocaleString()}</td>
                         `;
                         tr.onclick = () => showDetails(p.tag);
                         list.appendChild(tr);
                         
-                        // GCP経由で最新情報取得
-                        fetch(`${GCP_API}/player/${p.tag}`).then(r=>r.json()).then(d=>{
-                            if(d.trophies) document.getElementById(trpId).innerText = `🏆 ${d.trophies.toLocaleString()}`;
-                            if(d.icon && d.icon.id) document.getElementById(imgId).src = `https://cdn.brawlify.com/profile-icons/regular/${d.icon.id}.png`;
+                        fetch(`${GCP_API}/get_icon/${p.tag}`).then(r=>r.json()).then(d=>{
+                            if(d.icon_id) document.getElementById(imgId).src = `https://cdn.brawlify.com/profile-icons/regular/${d.icon_id}.png`;
                         });
                     });
                     document.getElementById('result-table').style.display = 'table';
@@ -313,7 +309,7 @@
 
                 document.getElementById('modal-content').innerHTML = `
                     <div class="modal-header">
-                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon">
+                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon" onerror="this.src='https://cdn.brawlify.com/profile-icons/regular/28000001.png'">
                         <div style="flex:1">
                             <h2 style="margin:0;color:#ffc107;">${p.name}</h2>
                             <div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div>
