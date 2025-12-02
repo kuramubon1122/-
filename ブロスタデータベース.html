@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロスタデータベース検索 | Brawl Ultimate DB</title>
-    <!-- SEO -->
     <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索ツール。1300万人以上のデータを収録。名前やIDから詳細情報を瞬時に検索可能。">
     <style>
         body { background-color: #121212; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; margin: 0; }
@@ -63,16 +62,20 @@
     <div class="seo-text"><p>Brawl Stars（ブロスタ）のプレイヤー検索ツール。1300万人以上のデータベースから名前やタグで詳細な戦績を確認できます。</p></div>
 
     <script>
-        const API_BASE = "https://katodeth-brawl-database-v4.hf.space";
-        const countEl = document.getElementById('count');
+        // ★Hugging Face URL (v4)
+        const DB_API = "https://katodeth-brawl-database-v4.hf.space";
+        // ★GCP URL (画像取得用)
+        const ICON_API = "https://styles-expressions-attorney-navy.trycloudflare.com";
 
         // スロット演出
+        const countEl = document.getElementById('count');
         let dummyCount = 0;
         const spinInterval = setInterval(() => {
             dummyCount = Math.floor(Math.random() * 10000000) + 5000000;
             countEl.innerText = dummyCount.toLocaleString();
         }, 50);
-        fetch(`${API_BASE}/api/stats`).then(r=>r.json()).then(d=>{
+
+        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d=>{
             clearInterval(spinInterval);
             animateValue(countEl, 0, d.count, 800);
         }).catch(()=>{ clearInterval(spinInterval); countEl.innerText="Connecting..."; });
@@ -101,7 +104,7 @@
             list.innerHTML = '';
 
             try {
-                const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
+                const res = await fetch(`${DB_API}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`);
                 const data = await res.json();
 
                 if (data.length === 0) {
@@ -110,14 +113,12 @@
                     data.forEach(p => {
                         const tr = document.createElement('tr');
                         const imgId = `img-${p.tag}`;
-                        let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png"; 
-                        if(p.icon_id && p.icon_id > 0) {
-                            iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id}.png`;
-                        }
+                        // 一旦デフォルト画像
+                        let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png";
+                        // DBにIDがあればそれを使う
+                        if(p.icon_id && p.icon_id > 0) iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id}.png`;
 
-                        // ★修正: BrawlInsightsへのリンク形式を変更
                         const link = `https://brawlinsights.com/ja/player/profile/${p.tag}`;
-
                         tr.innerHTML = `
                             <td>
                                 <div style="display:flex;align-items:center;">
@@ -130,6 +131,8 @@
                             <td><a href="${link}" target="_blank" class="detail-link">詳細 ↗</a></td>
                         `;
                         list.appendChild(tr);
+                        
+                        // GCP経由で最新アイコン取得
                         fetchLiveIcon(p.tag, imgId);
                     });
                     document.getElementById('result-table').style.display = 'table';
@@ -143,7 +146,7 @@
 
         async function fetchLiveIcon(tag, imgId) {
             try {
-                const res = await fetch(`${API_BASE}/api/live_icon/${tag}`);
+                const res = await fetch(`${ICON_API}/get_icon/${tag}`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data.icon_id) {
