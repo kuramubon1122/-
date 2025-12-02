@@ -4,98 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロスタデータベース | Brawl Ultimate DB</title>
-    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索・分析ツール。5000万件以上のデータベースと公式APIを連携し、詳細な戦績や日本ランキングを表示。">
     <link rel="icon" href="data:,">
     <style>
-        :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; --accent: #29b6f6; --win: #4caf50; --loss: #f44336; --draw: #9e9e9e; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
-        h1 { font-size: 2.5rem; margin: 10px 0; color: var(--primary); text-shadow: 0 0 15px var(--primary); animation: glow 3s infinite alternate; }
-        @keyframes glow { from { text-shadow: 0 0 10px var(--primary); } to { text-shadow: 0 0 30px #ff9800; } }
-        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 40px; }
-        .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.5em; font-family: monospace; }
-        .search-container { max-width: 700px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .search-box { display: flex; gap: 10px; margin-top: 15px; }
-        input { flex: 1; padding: 15px; border-radius: 10px; border: 2px solid #333; background: #252525; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        button { padding: 15px 30px; border-radius: 10px; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { transform: scale(1.05); background: #ffca28; }
-        .options { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; color: #888; font-size: 0.9rem; flex-wrap: wrap; gap: 10px; }
-        .radio-group label { margin-right: 15px; cursor: pointer; }
-        .radio-group input:checked + span { color: var(--primary); font-weight: bold; border-bottom: 2px solid var(--primary); }
-        .sort-group button { background: #333; color: #ccc; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.85rem; margin-left: 5px; }
-        .sort-group button.active { background: var(--accent); color: #000; font-weight: bold; }
-        .show-all-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 30px; border-radius: 30px; cursor: pointer; margin: 30px 0; font-weight: bold; transition: 0.3s; font-size: 1rem; }
-        .show-all-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(255, 193, 7, 0.4); }
-        .result-info { margin: 20px 0; color: #aaa; font-size: 0.9rem; display: none; }
-        table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
-        th { background: #252525; color: #aaa; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
-        tr:hover { background: #2a2a2a; cursor: pointer; transition: 0.2s; }
-        .player-icon { width: 40px; height: 40px; border-radius: 8px; border: 2px solid #444; vertical-align: middle; margin-right: 15px; background: #000; object-fit: cover; }
-        .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
-        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; }
-        .pagination { margin: 30px 0; display: none; gap: 15px; justify-content: center; align-items: center; }
-        .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .page-btn:hover:not(:disabled) { background: #444; }
-        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        #page-num { font-weight: bold; font-size: 1.2em; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
-        .modal-overlay.show { opacity: 1; }
-        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; background: #151515; border-radius: 20px; padding: 0; border: 1px solid #333; box-shadow: 0 20px 60px rgba(0,0,0,0.9); transition: transform 0.3s; }
-        .modal-overlay.show .modal { transform: translate(-50%, -50%) scale(1); }
-        .modal-header { background: linear-gradient(135deg, #1e1e1e, #2a2a2a); padding: 30px; display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden; }
-        .modal-header::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--primary), #ff9800); }
-        .modal-icon { width: 90px; height: 90px; border-radius: 20px; border: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); background: #000; }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1.5rem; line-height: 1; transition: 0.2s; }
-        .close-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
-        .modal-body { padding: 25px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
-        .stat-box { background: #222; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #333; }
-        .stat-label { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .stat-val { font-size: 1.5em; font-weight: bold; color: #fff; }
-        .val-trophy { color: #ffca28; } .val-3v3 { color: #29b6f6; } .val-solo { color: #66bb6a; } .val-duo { color: #ab47bc; }
-        .brawlers-section h3 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2em; }
-        .brawlers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; }
-        .b-card { background: #222; padding: 8px 4px; border-radius: 10px; text-align: center; font-size: 0.75em; border: 1px solid #333; transition: 0.2s; }
-        .b-card:hover { transform: translateY(-5px); border-color: var(--primary); background: #2a2a2a; }
-        .b-img { width: 100%; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
-        .battle-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-        .battle-card { background: #222; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; border-left: 5px solid #555; }
-        .battle-card.victory { border-left-color: var(--win); } .battle-card.defeat { border-left-color: var(--loss); } .battle-card.draw { border-left-color: var(--draw); }
-        .b-res { font-weight: bold; width: 45px; font-size: 0.85em; }
-        .b-info { flex: 1; text-align: left; font-size: 0.85em; }
-        .b-mode { font-weight: bold; color: #ddd; } .b-map { color: #888; font-size: 0.8em; }
-        #loading { display: none; margin-top: 30px; }
+        :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; --accent: #29b6f6; }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 10px; text-align: center; }
+        
+        h1 { font-size: 2rem; margin: 10px 0; color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+        .db-count { color: #4fc3f7; font-family: monospace; font-weight: bold; }
+        
+        .search-container { max-width: 600px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 15px; }
+        .search-box { display: flex; gap: 8px; margin-top: 10px; }
+        input { flex: 1; padding: 12px; border-radius: 8px; border: none; background: #333; color: #fff; font-size: 16px; }
+        button { padding: 12px 20px; border-radius: 8px; border: none; background: var(--primary); font-weight: bold; cursor: pointer; }
+        
+        .radio-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; font-size: 0.9rem; color: #aaa; }
+        .radio-group input:checked + span { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        
+        /* 検索結果リスト */
+        table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
+        th { background: #252525; color: #aaa; font-size: 0.8em; }
+        tr:hover { background: #2a2a2a; cursor: pointer; }
+        
+        /* アイコンを大きく、わかりやすく */
+        .list-icon { width: 48px; height: 48px; border-radius: 8px; background: #000; object-fit: cover; border: 2px solid #444; }
+        .list-name { font-weight: bold; font-size: 1.1em; }
+        .list-tag { font-family: monospace; color: #aaa; font-size: 0.9em; }
+        .list-trophy { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; }
+        
+        .pagination { margin: 20px; display: none; gap: 15px; justify-content: center; }
+        .page-btn { padding: 8px 16px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+        
+        /* モーダル (詳細) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; background: #151515; border-radius: 15px; border: 1px solid #333; }
+        .modal-header { background: linear-gradient(135deg, #222, #333); padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .modal-icon { width: 70px; height: 70px; border-radius: 15px; border: 3px solid var(--primary); }
+        .close-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; }
+        
+        /* キャラクター一覧 (超コンパクト) */
+        .brawlers-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); /* 極小サイズ */
+            gap: 4px; padding: 10px; 
+        }
+        .b-card { position: relative; background: #000; border-radius: 4px; overflow: hidden; aspect-ratio: 1; }
+        .b-img { width: 100%; height: 100%; object-fit: cover; }
+        .b-trophy { 
+            position: absolute; bottom: 0; right: 0; left: 0; 
+            background: rgba(0,0,0,0.7); color: #ffca28; 
+            font-size: 0.65em; text-align: center; font-weight: bold;
+        }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px; }
+        .stat-box { background: #222; padding: 8px; border-radius: 8px; text-align: center; }
+        .stat-val { font-weight: bold; font-size: 1.1em; }
+        .stat-label { font-size: 0.7em; color: #888; }
     </style>
 </head>
 <body>
+
     <h1>⚡ BRAWL ULTIMATE DB</h1>
-    <p class="subtitle">Total Database: <span id="count" class="db-count">0</span> Players</p>
+    <p style="color:#aaa; margin-bottom:20px;">Count: <span id="count" class="db-count">Loading...</span></p>
 
     <div class="search-container">
+        <div class="radio-group">
+            <label><input type="radio" name="mode" value="partial" checked> 🔍 部分一致</label>
+            <label><input type="radio" name="mode" value="exact"> 🎯 完全一致</label>
+            <label><input type="radio" name="mode" value="tag"> 🆔 ID検索</label>
+        </div>
         <div class="search-box">
             <input type="text" id="q" placeholder="名前 または タグ(#...)">
             <button onclick="search()">検索</button>
         </div>
-        <div class="options">
-            <div class="radio-group">
-                <label><input type="radio" name="mode" value="partial" checked hidden><span>🔍 部分一致</span></label>
-                <label><input type="radio" name="mode" value="exact" hidden><span>🎯 完全一致</span></label>
-                <label><input type="radio" name="mode" value="tag" hidden><span>🆔 ID検索</span></label>
-            </div>
-            <div class="sort-group">
-                <button id="sort-trophies" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー順</button>
-                <button id="sort-tag" class="sort-btn" onclick="setSort('tag')">🆔 ID順</button>
-            </div>
-        </div>
     </div>
+    
+    <button onclick="showAll()" style="margin:20px;background:none;border:1px solid #555;color:#888;padding:8px 16px;border-radius:20px;cursor:pointer;">📚 全員表示</button>
 
-    <button class="show-all-btn" onclick="showAll()">📚 データベース一覧を表示</button>
-    <div id="result-info" class="result-info"></div>
-    <div id="loading">⏳ 照会中...</div>
+    <div id="loading" style="display:none; margin-top:20px;">⏳ 検索中...</div>
+    <div id="result-info" style="color:#aaa;margin:10px;"></div>
     
     <table id="result-table" style="display:none;">
-        <thead><tr><th>PLAYER</th><th>TAG</th><th>TROPHIES</th></tr></thead>
         <tbody id="list"></tbody>
     </table>
 
@@ -105,6 +94,7 @@
         <button class="page-btn" id="next-btn" onclick="changePage(1)">❯</button>
     </div>
 
+    <!-- モーダル -->
     <div class="modal-overlay" id="modal" onclick="closeModal()">
         <div class="modal" onclick="event.stopPropagation()">
             <button class="close-btn" onclick="closeModal()">×</button>
@@ -114,187 +104,142 @@
 
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://rather-initiatives-tea-geek.trycloudflare.com";
-        let currentSort = 'trophies';
-        let currentPage = 1;
-        let currentQuery = "";
-        let isShowAllMode = false;
+        const GCP_API = "https://union-cheaper-african-freelance.trycloudflare.com";
+        let currentPage = 1, currentQuery = "", isShowAllMode = false;
+        
+        // 総数取得
+        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d=>{
+            document.getElementById('count').innerText = d.count.toLocaleString();
+        });
 
-        const countEl = document.getElementById('count');
-        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1500)).catch(()=>countEl.innerText="---");
+        function showAll(p=1) { isShowAllMode=true; currentQuery=""; document.getElementById('q').value=''; fetchData('',p); }
+        function search() { isShowAllMode=false; const q=document.getElementById('q').value.trim(); if(!q)return; currentQuery=q; fetchData(q,1); }
+        function changePage(d) { fetchData(currentQuery, currentPage+d); }
 
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            const step = (ts) => {
-                if (!startTimestamp) startTimestamp = ts;
-                const progress = Math.min((ts - startTimestamp) / duration, 1);
-                const val = Math.floor(end * (1 - Math.pow(1 - progress, 3)));
-                obj.innerHTML = val.toLocaleString();
-                if (progress < 1) requestAnimationFrame(step); else obj.innerHTML = end.toLocaleString();
-            };
-            requestAnimationFrame(step);
-        }
-
-        function setSort(type) {
-            currentSort = type;
-            document.querySelectorAll('.sort-group button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`sort-${type}`).classList.add('active');
-            if(isShowAllMode) showAll(1); else if(currentQuery) fetchData(currentQuery, 1);
-        }
-
-        function showAll(page = 1) {
-            isShowAllMode = true; currentQuery = ""; document.getElementById('q').value = '';
-            fetchData('', page);
-        }
-
-        function search() {
-            isShowAllMode = false;
-            const q = document.getElementById('q').value.trim();
-            if(!q) return;
-            currentQuery = q; fetchData(q, 1);
-        }
-
-        function changePage(delta) { fetchData(currentQuery, currentPage + delta); }
-
-        async function fetchData(query, page) {
-            currentPage = page;
+        async function fetchData(q, p) {
+            currentPage = p;
             const mode = document.querySelector('input[name="mode"]:checked').value;
-            
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result-table').style.display = 'none';
-            document.getElementById('pagination').style.display = 'none';
-            document.getElementById('result-info').style.display = 'none';
             const list = document.getElementById('list');
+            
+            document.getElementById('loading').style.display='block';
+            document.getElementById('result-table').style.display='none';
+            document.getElementById('pagination').style.display='none';
+            document.getElementById('result-info').innerText='';
             list.innerHTML = '';
 
             try {
-                let url = `${DB_API}/api/search?q=${encodeURIComponent(query)}&mode=${mode}&sort=${currentSort}`;
-                if (!query) url += `&page=${page}`;
+                // Hugging Face検索
+                let url = `${DB_API}/api/search?q=${encodeURIComponent(q)}&mode=${mode}`;
+                if(!q) url += `&page=${p}`;
+                
                 const res = await fetch(url);
                 const data = await res.json();
 
-                if (data.length === 0) {
+                if(data.length === 0) {
                     document.getElementById('result-info').innerText = "見つかりませんでした";
-                    document.getElementById('result-info').style.display = 'block';
                 } else {
-                    if(query) {
-                        document.getElementById('result-info').innerText = `${data.length} 件ヒット (上位表示)`;
-                        document.getElementById('result-info').style.display = 'block';
-                    }
+                    if(q) document.getElementById('result-info').innerText = `${data.length} 件ヒット`;
                     
-                    data.forEach(p => {
+                    data.forEach((x, index) => {
                         const tr = document.createElement('tr');
-                        const imgId = `icon-${p.tag}`;
-                        const trpId = `trp-${p.tag}`;
-                        // デフォルト画像
-                        let iconUrl = `${GCP_API}/profile_icon/28000001`;
-                        if(p.icon_id) iconUrl = `${GCP_API}/profile_icon/${p.icon_id}`;
-
-                        tr.innerHTML = `
-                            <td>
-                                <div style="display:flex;align-items:center;">
-                                    <img src="${iconUrl}" id="${imgId}" class="player-icon" loading="lazy">
-                                    <div style="font-weight:bold;">${p.name}</div>
-                                </div>
-                            </td>
-                            <td style="font-family:monospace;color:#aaa">#${p.tag}</td>
-                            <td class="trophy-cell" id="${trpId}">🏆 ${p.trophies.toLocaleString()}</td>
-                        `;
-                        tr.onclick = () => showDetails(p.tag);
-                        list.appendChild(tr);
+                        const imgId = `img-${x.tag}`;
+                        const trpId = `trp-${x.tag}`;
                         
-                        // アイコンIDがDBにない場合のみ取得
-                        if(!p.icon_id) {
-                             fetch(`${GCP_API}/get_icon_id/${p.tag}`).then(r=>r.json()).then(d=>{
+                        // デフォルト画像 (GCPキャッシュ経由)
+                        let iconUrl = `${GCP_API}/profile_icon/${x.icon_id||28000000}`;
+                        
+                        tr.innerHTML = `
+                            <td style="width:60px; text-align:center;">
+                                <img src="${iconUrl}" id="${imgId}" class="player-icon" loading="lazy">
+                            </td>
+                            <td>
+                                <div class="list-name">${x.name}</div>
+                                <div class="list-tag">#${x.tag}</div>
+                            </td>
+                            <td class="trophy-cell" id="${trpId}">
+                                ${x.trophies ? '🏆'+x.trophies.toLocaleString() : '<span style="color:#666;font-size:0.7em">---</span>'}
+                            </td>
+                        `;
+                        tr.onclick = () => showDetails(x.tag);
+                        list.appendChild(tr);
+
+                        // GCPで最新化 (429エラー回避のため、インデックス順に少し遅らせる)
+                        setTimeout(() => {
+                            fetch(`${GCP_API}/get_icon_id/${x.tag}`).then(r=>r.json()).then(d=>{
                                 if(d.icon_id) document.getElementById(imgId).src = `${GCP_API}/profile_icon/${d.icon_id}`;
                             });
-                        }
-                        // トロフィーも最新化
-                        if(!p.trophies || p.trophies===0) {
-                            fetch(`${GCP_API}/player/${p.tag}`).then(r=>r.json()).then(d=>{
-                                 if(d.trophies) document.getElementById(trpId).innerText = `🏆 ${d.trophies.toLocaleString()}`;
-                            });
-                        }
+                            // トロフィーがない場合のみ取得
+                            if(!x.trophies) {
+                                fetch(`${GCP_API}/player/${x.tag}`).then(r=>r.json()).then(d=>{
+                                    if(d.trophies) document.getElementById(trpId).innerText = `🏆 ${d.trophies.toLocaleString()}`;
+                                });
+                            }
+                        }, index * 100); // 0.1秒ずつずらす
                     });
+
                     document.getElementById('result-table').style.display = 'table';
-                    
-                    if(!query) {
+                    if(!q) {
                         document.getElementById('pagination').style.display = 'flex';
-                        document.getElementById('page-num').innerText = page;
-                        document.getElementById('prev-btn').disabled = (page===1);
-                        document.getElementById('next-btn').disabled = (data.length < 30);
+                        document.getElementById('page-num').innerText = p;
+                        document.getElementById('prev-btn').disabled = (p===1);
+                        document.getElementById('next-btn').disabled = (data.length<30);
                     }
                 }
-            } catch(e) {
-                document.getElementById('result-info').innerText = "通信エラー (Hugging Face)";
-                document.getElementById('result-info').style.display = 'block';
-            }
+            } catch(e) { document.getElementById('result-info').innerText = "通信エラー"; }
             document.getElementById('loading').style.display = 'none';
         }
 
         async function showDetails(tag) {
             const modal = document.getElementById('modal');
             modal.style.display = 'block';
-            setTimeout(() => modal.classList.add('show'), 10);
-            document.getElementById('modal-content').innerHTML = '<div style="padding:50px;text-align:center;color:#888;"><div style="font-size:2rem;">🚀</div><div>データ取得中...</div></div>';
+            setTimeout(()=>modal.classList.add('show'),10);
+            const content = document.getElementById('modal-content');
+            content.innerHTML = '<div style="padding:50px;text-align:center;color:#888;">Loading...</div>';
             
             try {
-                const [p, logs] = await Promise.all([
-                    fetch(`${GCP_API}/player/${tag}`).then(r=>r.json()),
-                    fetch(`${GCP_API}/battlelog/${tag}`).then(r=>r.ok?r.json():{items:[]})
-                ]);
-                
+                const res = await fetch(`${GCP_API}/player/${tag}`);
+                const p = await res.json();
                 if(p.error) throw new Error();
 
+                // キャラクター (正方形・極小)
                 p.brawlers.sort((a,b)=>b.trophies-a.trophies);
                 let bHTML = p.brawlers.map(b => `
                     <div class="b-card">
-                        <img src="${GCP_API}/brawler_img/${b.id}" loading="lazy">
-                        <div style="color:#ffca28;font-weight:bold">${b.trophies}</div>
-                        <div style="color:#aaa">R${b.rank}</div>
+                        <img src="${GCP_API}/brawler_img/${b.id}" class="b-img">
+                        <div class="b-trophy">${b.trophies}</div>
                     </div>`).join('');
 
-                let lHTML = logs.items.slice(0,5).map(i => {
-                    const res = i.battle.result || '?';
-                    const cls = res==='victory'?'victory':(res==='defeat'?'defeat':'draw');
-                    return `<div class="battle-card ${cls}">
-                        <div class="b-res" style="color:${cls==='victory'?'#4caf50':'#f44336'}">${res.slice(0,1).toUpperCase()}</div>
-                        <div class="b-info">
-                            <div class="b-mode">${i.event.mode}</div>
-                            <div class="b-map" style="color:#888">${i.event.map||'Map'}</div>
-                        </div>
-                    </div>`;
-                }).join('') || '<div style="text-align:center;color:#666">履歴なし</div>';
-
-                document.getElementById('modal-content').innerHTML = `
+                content.innerHTML = `
                     <div class="modal-header">
                         <img src="${GCP_API}/profile_icon/${p.icon.id}" class="modal-icon">
-                        <div style="flex:1">
+                        <div style="flex:1; color:#fff;">
                             <h2 style="margin:0;color:#ffc107;">${p.name}</h2>
-                            <div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div>
-                            ${p.club.name ? `<div style="color:#4fc3f7;font-weight:bold;">🛡️ ${p.club.name}</div>` : ''}
+                            <div style="font-family:monospace;color:#aaa;">#${tag}</div>
+                            ${p.club.name ? `<div style="color:#29b6f6;font-weight:bold;">🛡️ ${p.club.name}</div>` : ''}
                         </div>
                     </div>
                     <div class="modal-body">
                         <div class="stat-grid">
-                            <div class="stat-box"><span class="stat-label">トロフィー</span><div class="stat-val val-trophy">${p.trophies.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">最高</span><div class="stat-val">${p.highestTrophies.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">3vs3勝</span><div class="stat-val val-3v3">${p['3vs3Victories'].toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">ソロ勝</span><div class="stat-val val-solo">${p.soloVictories.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">デュオ勝</span><div class="stat-val val-duo">${p.duoVictories.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">EXP</span><div class="stat-val">${p.expLevel}</div></div>
+                            <div class="stat-box"><span class="stat-label">🏆 現在</span><div class="stat-val" style="color:#ffca28">${p.trophies.toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">📈 最高</span><div class="stat-val">${p.highestTrophies.toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">⚔️ 3v3</span><div class="stat-val" style="color:#29b6f6">${p['3vs3Victories'].toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">💀 Solo</span><div class="stat-val" style="color:#66bb6a">${p.soloVictories.toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">🤝 Duo</span><div class="stat-val" style="color:#ab47bc">${p.duoVictories.toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">⭐ EXP</span><div class="stat-val">${p.expLevel}</div></div>
                         </div>
-                        <h4 style="border-bottom:1px solid #333;margin-bottom:10px;">直近の戦闘</h4>
-                        <div class="battle-list">${lHTML}</div>
-                        <h4 style="border-bottom:1px solid #333;margin-top:20px;">キャラクター</h4>
+                        <h4 style="border-bottom:1px solid #444; margin-bottom:10px; color:#ccc;">キャラクター (${p.brawlers.length})</h4>
                         <div class="brawlers-grid">${bHTML}</div>
+                        
+                        <div style="text-align:center; margin-top:20px;">
+                            <a href="https://brawlinsight.com/?tag=${tag}" target="_blank" style="color:#29b6f6;text-decoration:none;font-weight:bold;border:1px solid #29b6f6;padding:10px 20px;border-radius:20px;">BrawlInsight で詳しく見る ↗</a>
+                        </div>
                     </div>`;
             } catch(e) {
-                document.getElementById('modal-content').innerHTML = '<div style="padding:40px;text-align:center;color:red;">データ取得失敗<br>GCPサーバーを確認してください</div>';
+                content.innerHTML = '<div style="padding:30px;text-align:center;color:red;">データ取得失敗<br>GCPサーバーを確認してください</div>';
             }
         }
-        function closeModal() { document.getElementById('modal').style.display='none'; }
 
+        function closeModal() { document.getElementById('modal').classList.remove('show'); setTimeout(()=>document.getElementById('modal').style.display='none',300); }
         document.getElementById('q').addEventListener('keypress', e => { if(e.key==='Enter') search() });
     </script>
 </body>
