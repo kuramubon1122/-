@@ -95,6 +95,7 @@
         .b-info { flex: 1; text-align: left; font-size: 0.85em; }
         .b-mode { font-weight: bold; color: #ddd; }
         .b-map { color: #888; font-size: 0.8em; }
+        .b-char img { width: 35px; height: 35px; border-radius: 4px; border: 1px solid #444; }
 
         .ranking-section { margin-top: 80px; max-width: 800px; margin-left: auto; margin-right: auto; }
         .ranking-title { text-align: left; border-left: 6px solid var(--primary); padding-left: 20px; margin-bottom: 20px; font-size: 1.6em; font-weight: bold; color: #fff; }
@@ -163,7 +164,7 @@
 
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://chances-hide-jackie-backing.trycloudflare.com";
+        const GCP_API = "https://discussion-negotiation-inquire-relationship.trycloudflare.com";
         
         let currentSort = 'trophies';
         let currentPage = 1;
@@ -238,6 +239,7 @@
                     data.forEach(p => {
                         const tr = document.createElement('tr');
                         const imgId = `icon-${p.tag}`;
+                        const trpId = `trp-${p.tag}`;
                         let iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id||28000000}.png`;
                         
                         tr.innerHTML = `
@@ -248,13 +250,18 @@
                                 </div>
                             </td>
                             <td style="font-family:monospace;color:#aaa">#${p.tag}</td>
-                            <td class="trophy-cell">🏆 ${p.trophies.toLocaleString()}</td>
+                            <td class="trophy-cell" id="${trpId}">🏆 ${p.trophies.toLocaleString()}</td>
                         `;
                         tr.onclick = () => showDetails(p.tag);
                         list.appendChild(tr);
                         
                         fetch(`${GCP_API}/get_icon/${p.tag}`).then(r=>r.json()).then(d=>{
                             if(d.icon_id) document.getElementById(imgId).src = `https://cdn.brawlify.com/profile-icons/regular/${d.icon_id}.png`;
+                        });
+                        
+                        // トロフィーも最新化
+                        fetch(`${GCP_API}/player/${p.tag}`).then(r=>r.json()).then(d=>{
+                             if(d.trophies) document.getElementById(trpId).innerText = `🏆 ${d.trophies.toLocaleString()}`;
                         });
                     });
                     document.getElementById('result-table').style.display = 'table';
@@ -309,7 +316,7 @@
 
                 document.getElementById('modal-content').innerHTML = `
                     <div class="modal-header">
-                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon" onerror="this.src='https://cdn.brawlify.com/profile-icons/regular/28000001.png'">
+                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon">
                         <div style="flex:1">
                             <h2 style="margin:0;color:#ffc107;">${p.name}</h2>
                             <div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div>
