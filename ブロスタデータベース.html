@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロスタデータベース | Brawl Ultimate DB</title>
+    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索・分析ツール。公式API連携により最新のトロフィー数やアイコンを表示。">
+    
     <style>
         :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
         
-        h1 { font-size: 2.5rem; margin: 10px 0; color: var(--primary); text-shadow: 0 0 15px var(--primary); animation: glow 3s infinite alternate; }
+        h1 { 
+            font-size: 2.5rem; margin: 10px 0; color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: glow 3s infinite alternate;
+        }
         @keyframes glow { from { text-shadow: 0 0 10px var(--primary); } to { text-shadow: 0 0 30px #ff9800; } }
-        
-        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 40px; }
+
+        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; }
         .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.5em; font-family: monospace; }
 
         .search-container { max-width: 700px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -21,31 +27,43 @@
         button { padding: 15px 30px; border-radius: 10px; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:hover { transform: scale(1.05); background: #ffca28; }
         
-        .options { display: flex; justify-content: space-between; margin-top: 15px; color: #888; font-size: 0.9rem; }
-        .radio-group label { margin-right: 15px; cursor: pointer; }
+        .options { display: flex; justify-content: center; margin-top: 15px; color: #888; font-size: 0.9rem; gap: 20px; }
+        .radio-group label { cursor: pointer; }
         .radio-group input:checked + span { color: var(--primary); font-weight: bold; border-bottom: 2px solid var(--primary); }
-        .sort-group button { background: #333; color: #ccc; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; margin-left: 5px; }
-        .sort-group button.active { background: #29b6f6; color: #000; font-weight: bold; }
 
-        table { width: 100%; max-width: 800px; margin: 30px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; }
+        /* 結果リスト */
+        .result-info { margin: 20px 0; color: #aaa; font-size: 0.9rem; display: none; }
+        table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
-        th { background: #252525; color: #aaa; font-size: 0.85em; }
-        tr:hover { background: #2a2a2a; }
-        .player-icon { width: 40px; height: 40px; border-radius: 8px; border: 2px solid #444; vertical-align: middle; margin-right: 15px; background: #000; }
-        .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
-        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; }
+        th { background: #252525; color: #aaa; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+        tr:hover { background: #2a2a2a; cursor: pointer; transition: 0.2s; }
         
-        a.detail-link { display: inline-block; background: #29b6f6; color: #fff; padding: 6px 15px; text-decoration: none; border-radius: 20px; font-size: 0.8em; font-weight: bold; transition: 0.2s; }
+        /* アイコンと名前 */
+        .player-info { display: flex; align-items: center; gap: 15px; }
+        .player-icon { width: 45px; height: 45px; border-radius: 10px; border: 2px solid #444; background: #000; object-fit: cover; }
+        .player-name { font-weight: bold; font-size: 1.1em; }
+        
+        .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
+        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.2em; min-width: 100px; }
+        
+        .loading-text { font-size: 0.8em; color: #666; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .pagination { margin: 30px 0; display: none; gap: 15px; justify-content: center; align-items: center; }
+        .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .page-btn:hover:not(:disabled) { background: #444; }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        a.detail-link { display: inline-block; background: #29b6f6; color: #fff; padding: 6px 15px; text-decoration: none; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
         a.detail-link:hover { background: #039be5; transform: translateY(-2px); }
         
-        #loading { display: none; margin-top: 20px; color: #888; }
-        .error { color: #ff5252; margin-top: 20px; }
+        #loading { display: none; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <h1>⚡ BRAWL ULTIMATE DB</h1>
-    <p class="subtitle">Database: <span id="count" class="db-count">0</span> Players</p>
+    <p class="subtitle">Database Size: <span id="count" class="db-count">0</span> Players</p>
 
     <div class="search-container">
         <div class="search-box">
@@ -58,96 +76,144 @@
                 <label><input type="radio" name="mode" value="exact" hidden><span>🎯 完全一致</span></label>
                 <label><input type="radio" name="mode" value="tag" hidden><span>🆔 ID検索</span></label>
             </div>
-            <div class="sort-group">
-                <button id="sort-trophies" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー</button>
-                <button id="sort-tag" class="sort-btn" onclick="setSort('tag')">🆔 ID</button>
-            </div>
         </div>
     </div>
 
-    <div id="loading">データベース照会中...</div>
-    <p id="error" class="error"></p>
+    <div id="result-info" class="result-info"></div>
+    <div id="loading">⏳ 検索中...</div>
     
     <table id="result-table" style="display:none;">
-        <thead><tr><th>PLAYER</th><th>TAG</th><th>ACTION</th></tr></thead>
+        <thead><tr><th>PLAYER</th><th>TAG</th><th>TROPHIES</th><th>LINK</th></tr></thead>
         <tbody id="list"></tbody>
     </table>
 
+    <div class="pagination" id="pagination">
+        <button class="page-btn" id="prev-btn" onclick="changePage(-1)">❮</button>
+        <span id="page-num">1</span>
+        <button class="page-btn" id="next-btn" onclick="changePage(1)">❯</button>
+    </div>
+
     <script>
-        const API_BASE = "https://katodeth-brawl-database-v4.hf.space";
-        let currentSort = 'trophies';
+        const DB_API = "https://katodeth-brawl-database-v4.hf.space";
+        const GCP_API = "https://hardware-voters-listprice-sewing.trycloudflare.com";
         
-        // スロット演出
+        let currentPage = 1;
+        let currentQuery = "";
+
+        // 総数カウント (スロット演出)
         const countEl = document.getElementById('count');
-        let dummyCount = 0;
-        const spinInterval = setInterval(() => {
-            dummyCount = Math.floor(Math.random() * 10000000) + 5000000;
-            countEl.innerText = dummyCount.toLocaleString();
-        }, 50);
+        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1500));
 
-        fetch(`${API_BASE}/api/stats`).then(r=>r.json()).then(d=>{
-            clearInterval(spinInterval);
-            countEl.innerText = d.count.toLocaleString();
-        }).catch(()=>{ clearInterval(spinInterval); countEl.innerText="Connecting..."; });
-
-        function setSort(type) {
-            currentSort = type;
-            document.querySelectorAll('.sort-group button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`sort-${type}`).classList.add('active');
-            const q = document.getElementById('q').value.trim();
-            if(q) search();
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (ts) => {
+                if (!startTimestamp) startTimestamp = ts;
+                const progress = Math.min((ts - startTimestamp) / duration, 1);
+                const val = Math.floor(end * (1 - Math.pow(1 - progress, 3)));
+                obj.innerHTML = val.toLocaleString();
+                if (progress < 1) requestAnimationFrame(step); else obj.innerHTML = end.toLocaleString();
+            };
+            requestAnimationFrame(step);
         }
 
-        async function search() {
+        function search() {
             const q = document.getElementById('q').value.trim();
             if(!q) return;
+            currentQuery = q;
+            currentPage = 1;
+            fetchData(q, 1);
+        }
+
+        function changePage(delta) { fetchData(currentQuery, currentPage + delta); }
+
+        async function fetchData(query, page) {
+            currentPage = page;
             const mode = document.querySelector('input[name="mode"]:checked').value;
+            const list = document.getElementById('list');
             
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result-table').style.display = 'none';
-            document.getElementById('error').innerText = '';
-            const list = document.getElementById('list');
+            document.getElementById('pagination').style.display = 'none';
+            document.getElementById('result-info').style.display = 'none';
             list.innerHTML = '';
 
             try {
-                const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&mode=${mode}&sort=${currentSort}`);
+                // 1. DBから候補を取得 (タグと名前だけ)
+                const res = await fetch(`${DB_API}/api/search?q=${encodeURIComponent(query)}&mode=${mode}&page=${page}`);
                 const data = await res.json();
 
                 if (data.length === 0) {
-                    document.getElementById('error').innerText = "見つかりませんでした";
+                    document.getElementById('result-info').innerText = "見つかりませんでした";
+                    document.getElementById('result-info').style.display = 'block';
                 } else {
+                    if(query) {
+                        document.getElementById('result-info').innerText = `${data.length} 件ヒット`;
+                        document.getElementById('result-info').style.display = 'block';
+                    }
+                    
                     data.forEach(p => {
                         const tr = document.createElement('tr');
-                        // デフォルトアイコン
-                        let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png";
-                        // DBにアイコンIDがあればそれを使用
-                        if(p.icon_id && p.icon_id > 0) {
-                            iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id}.png`;
-                        }
+                        const imgId = `img-${p.tag}`;
+                        const trophyId = `trp-${p.tag}`;
 
-                        const link = `https://brawlinsights.com/ja/player/profile/${p.tag}`;
-
+                        // デフォルト表示 (アイコンは仮、トロフィーは読込中)
                         tr.innerHTML = `
                             <td>
-                                <div style="display:flex;align-items:center;">
-                                    <img src="${iconUrl}" class="player-icon" onerror="this.src='https://cdn.brawlify.com/profile-icons/regular/28000001.png'">
-                                    <div>
-                                        <div style="font-weight:bold;font-size:1.1em;">${p.name}</div>
-                                        <div style="color:#ffca28;font-size:0.85em;font-weight:bold;">🏆 ${p.trophies ? p.trophies.toLocaleString() : '0'}</div>
-                                    </div>
+                                <div class="player-info">
+                                    <img src="https://cdn.brawlify.com/profile-icons/regular/28000001.png" id="${imgId}" class="player-icon">
+                                    <span class="player-name">${p.name}</span>
                                 </div>
                             </td>
                             <td class="tag">#${p.tag}</td>
-                            <td><a href="${link}" target="_blank" class="detail-link">詳細 ↗</a></td>
+                            <td class="trophy-cell" id="${trophyId}"><span class="loading-text">---</span></td>
+                            <td><a href="https://brawlinsights.com/ja/player/profile/${p.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>
                         `;
                         list.appendChild(tr);
+                        
+                        // 2. GCP経由で公式APIを叩き、最新情報を埋め込む (非同期)
+                        fetchLiveInfo(p.tag, imgId, trophyId);
                     });
+                    
                     document.getElementById('result-table').style.display = 'table';
+                    
+                    if(!query) {
+                        document.getElementById('pagination').style.display = 'flex';
+                        document.getElementById('page-num').innerText = page;
+                        document.getElementById('prev-btn').disabled = (page === 1);
+                        document.getElementById('next-btn').disabled = (data.length < 30);
+                    }
                 }
             } catch(e) {
-                document.getElementById('error').innerText = "通信エラー: サーバーを確認してください";
-            } finally {
-                document.getElementById('loading').style.display = 'none';
+                console.error(e);
+                document.getElementById('result-info').innerText = "通信エラー";
+                document.getElementById('result-info').style.display = 'block';
+            }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // GCPサーバーから最新情報を取得してDOMを更新
+        async function fetchLiveInfo(tag, imgId, trophyId) {
+            try {
+                const res = await fetch(`${GCP_API}/player/${tag}`);
+                if(res.ok) {
+                    const d = await res.json();
+                    
+                    // アイコン更新
+                    const iconId = d.icon && d.icon.id ? d.icon.id : 28000001;
+                    const img = document.getElementById(imgId);
+                    if(img) img.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+
+                    // トロフィー更新
+                    const trp = document.getElementById(trophyId);
+                    if(trp) trp.innerHTML = `🏆 ${d.trophies.toLocaleString()}`;
+                } else {
+                    // エラー時 (404など)
+                    document.getElementById(trophyId).innerHTML = '<span style="color:#666;font-size:0.7em;">取得失敗</span>';
+                }
+            } catch(e) {
+                // 通信エラー時
+                const trp = document.getElementById(trophyId);
+                if(trp) trp.innerHTML = '<span style="color:#666;font-size:0.7em;">Err</span>';
             }
         }
 
