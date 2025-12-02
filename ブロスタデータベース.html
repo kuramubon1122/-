@@ -10,7 +10,6 @@
         :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; --accent: #29b6f6; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
         
-        /* タイトル */
         h1 { 
             font-size: 2.5rem; margin: 10px 0; color: var(--primary);
             text-shadow: 0 0 15px var(--primary);
@@ -21,7 +20,6 @@
         .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 40px; }
         .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.5em; font-family: monospace; }
 
-        /* 検索エリア */
         .search-container { max-width: 700px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .search-box { display: flex; gap: 10px; margin-top: 15px; }
         input { flex: 1; padding: 15px; border-radius: 10px; border: 2px solid #333; background: #252525; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
@@ -35,11 +33,9 @@
         .sort-group button { background: #333; color: #ccc; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.85rem; margin-left: 5px; }
         .sort-group button.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        /* 全員表示ボタン */
         .show-all-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 30px; border-radius: 30px; cursor: pointer; margin: 30px 0; font-weight: bold; transition: 0.3s; font-size: 1rem; }
         .show-all-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(255, 193, 7, 0.4); }
 
-        /* 結果リスト */
         .result-info { margin: 20px 0; color: #aaa; font-size: 0.9rem; display: none; }
         table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
@@ -49,14 +45,13 @@
         .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
         .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; }
         
-        /* ページネーション */
         .pagination { margin: 30px 0; display: none; gap: 15px; justify-content: center; align-items: center; }
         .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .page-btn:hover:not(:disabled) { background: #444; }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         #page-num { font-weight: bold; font-size: 1.2em; }
 
-        /* モーダル (詳細) */
+        /* モーダル */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { opacity: 1; }
         .modal { 
@@ -78,18 +73,14 @@
         .stat-box { background: #222; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #333; }
         .stat-label { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .stat-val { font-size: 1.5em; font-weight: bold; color: #fff; }
-        .val-trophy { color: #ffca28; }
-        .val-3v3 { color: #29b6f6; }
-        .val-solo { color: #66bb6a; }
-        .val-duo { color: #ab47bc; }
-
+        
         .brawlers-section h3 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2em; }
         .brawlers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; }
         .b-card { background: #222; padding: 8px 4px; border-radius: 10px; text-align: center; font-size: 0.75em; border: 1px solid #333; transition: 0.2s; }
         .b-card:hover { transform: translateY(-5px); border-color: var(--primary); background: #2a2a2a; }
+        /* 修正: 安定した画像URLを使用 */
         .b-img { width: 100%; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
         
-        /* ランキング */
         .ranking-section { margin-top: 80px; max-width: 800px; margin-left: auto; margin-right: auto; }
         .ranking-title { text-align: left; border-left: 6px solid var(--primary); padding-left: 20px; margin-bottom: 20px; font-size: 1.6em; font-weight: bold; color: #fff; letter-spacing: 1px; }
         .rank-num { font-weight: bold; margin-right: 15px; width: 30px; display: inline-block; text-align: right; font-family: monospace; font-size: 1.2em; }
@@ -117,7 +108,8 @@
             </div>
             <div class="sort-group">
                 <span style="font-size:0.8em;color:#666;">並び替え:</span>
-                <button id="sort-trophy" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー</button>
+                <!-- 修正: ID名をスクリプトと一致させました -->
+                <button id="sort-trophies" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー</button>
                 <button id="sort-tag" class="sort-btn" onclick="setSort('tag')">🆔 ID</button>
             </div>
         </div>
@@ -167,7 +159,6 @@
         let isShowAllMode = false;
         let currentQuery = "";
 
-        // スロット演出 (増加のみ)
         const countEl = document.getElementById('count');
         fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1500))
         .catch(()=>countEl.innerText="---");
@@ -243,7 +234,6 @@
                     data.forEach(p => {
                         const tr = document.createElement('tr');
                         const imgId = `icon-${p.tag}`;
-                        // DBのアイコンがあれば使う、なければデフォルト
                         let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png";
                         if(p.icon_id) iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id}.png`;
 
@@ -262,7 +252,6 @@
                         tr.onclick = () => showDetails(p.tag);
                         list.appendChild(tr);
                         
-                        // GCP経由で最新アイコン更新
                         fetch(`${GCP_API}/get_icon/${p.tag}`).then(r=>r.json()).then(d=>{
                             if(d.icon_id) {
                                 document.getElementById(imgId).src = `https://cdn.brawlify.com/profile-icons/regular/${d.icon_id}.png`;
@@ -271,7 +260,6 @@
                     });
                     document.getElementById('result-table').style.display = 'table';
                     
-                    // ページネーション制御
                     if(!query) {
                         document.getElementById('pagination').style.display = 'flex';
                         document.getElementById('page-num').innerText = page;
@@ -280,7 +268,6 @@
                     }
                 }
             } catch(e) {
-                console.error(e);
                 info.innerText = "通信エラー";
                 info.style.display = 'block';
             }
@@ -304,11 +291,13 @@
                 if(p.error) throw new Error();
 
                 p.brawlers.sort((a,b) => b.trophies - a.trophies);
+                
                 let brawlersHtml = '';
                 p.brawlers.forEach(b => {
+                    // 修正: キャラクター画像URLを安定したものに変更
                     brawlersHtml += `
                         <div class="b-card">
-                            <img src="https://cdn.brawlify.com/brawler-pins/${b.id}.png" class="b-img" loading="lazy">
+                            <img src="https://cdn.brawlify.com/brawlers/borderless/${b.id}.png" class="b-img" loading="lazy" onerror="this.src='https://cdn.brawlify.com/brawler-pins/${b.id}.png'">
                             <div style="color:var(--primary);font-weight:bold;">🏆${b.trophies}</div>
                             <div style="color:#aaa;">R${b.rank}</div>
                         </div>
@@ -334,7 +323,7 @@
                             <div class="stat-box"><div class="stat-label">経験値レベル</div><div class="stat-val">${p.expLevel}</div></div>
                         </div>
                         <h3 style="border-bottom:1px solid #333;padding-bottom:5px;margin-top:0;">所持キャラクター (${p.brawlers.length})</h3>
-                        <div class="brawlers-list">${brawlersHtml}</div>
+                        <div class="brawlers-grid">${brawlersHtml}</div>
                     </div>
                 `;
             } catch(e) {
