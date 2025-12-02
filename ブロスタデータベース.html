@@ -52,7 +52,7 @@
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         #page-num { font-weight: bold; font-size: 1.2em; }
 
-        /* モーダル */
+        /* モーダル (詳細) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { opacity: 1; }
         .modal { 
@@ -124,8 +124,8 @@
             </div>
             <div class="sort-group">
                 <span style="font-size:0.8em;color:#666;">並び替え:</span>
-                <button id="sort-trophies" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー</button>
-                <button id="sort-tag" class="sort-btn" onclick="setSort('tag')">🆔 ID</button>
+                <button id="sort-trophies" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー順</button>
+                <button id="sort-tag" class="sort-btn" onclick="setSort('tag')">🆔 ID順</button>
             </div>
         </div>
     </div>
@@ -164,7 +164,7 @@
 
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://lounge-styles-passengers-managing.trycloudflare.com";
+        const GCP_API = "https://unexpected-border-petroleum-outstanding.trycloudflare.com";
         
         let currentSort = 'trophies';
         let currentPage = 1;
@@ -228,10 +228,13 @@
                 const data = await res.json();
 
                 if (data.length === 0) {
-                    info.innerText = "見つかりませんでした";
-                    info.style.display = 'block';
+                    document.getElementById('result-info').innerText = "見つかりませんでした";
+                    document.getElementById('result-info').style.display = 'block';
                 } else {
-                    if(query) { info.innerText = `${data.length} 件ヒット`; info.style.display = 'block'; }
+                    if(query) {
+                        document.getElementById('result-info').innerText = `${data.length} 件ヒット`;
+                        document.getElementById('result-info').style.display = 'block';
+                    }
                     
                     data.forEach(p => {
                         const tr = document.createElement('tr');
@@ -246,7 +249,7 @@
                                 </div>
                             </td>
                             <td style="font-family:monospace;color:#aaa">#${p.tag}</td>
-                            <td class="trophy-cell">🏆 ${p.trophies ? p.trophies.toLocaleString() : '0'}</td>
+                            <td class="trophy-cell">🏆 ${p.trophies.toLocaleString()}</td>
                         `;
                         tr.onclick = () => showDetails(p.tag);
                         list.appendChild(tr);
@@ -265,8 +268,8 @@
                     }
                 }
             } catch(e) {
-                info.innerText = "通信エラー";
-                info.style.display = 'block';
+                document.getElementById('result-info').innerText = "通信エラー (Hugging Face)";
+                document.getElementById('result-info').style.display = 'block';
             }
             document.getElementById('loading').style.display = 'none';
         }
@@ -288,7 +291,7 @@
                 p.brawlers.sort((a,b)=>b.trophies-a.trophies);
                 let bHTML = p.brawlers.map(b => `
                     <div class="b-card">
-                        <img src="https://cdn.brawlify.com/brawler-pins/${b.id}.png" class="b-img" onerror="this.src='https://cdn.brawlify.com/brawler-pins/16000000.png'">
+                        <img src="https://cdn.brawlify.com/brawler-pins/${b.id}.png">
                         <div style="color:#ffca28;font-weight:bold">${b.trophies}</div>
                         <div style="color:#aaa">R${b.rank}</div>
                     </div>`).join('');
@@ -307,7 +310,7 @@
 
                 document.getElementById('modal-content').innerHTML = `
                     <div class="modal-header">
-                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon" onerror="this.src='https://cdn.brawlify.com/profile-icons/regular/28000001.png'">
+                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon">
                         <div style="flex:1">
                             <h2 style="margin:0;color:#ffc107;">${p.name}</h2>
                             <div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div>
