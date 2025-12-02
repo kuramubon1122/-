@@ -10,6 +10,7 @@
         :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; --accent: #29b6f6; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
         
+        /* タイトル */
         h1 { 
             font-size: 2.5rem; margin: 10px 0; color: var(--primary);
             text-shadow: 0 0 15px var(--primary);
@@ -34,9 +35,11 @@
         .sort-group button { background: #333; color: #ccc; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.85rem; margin-left: 5px; }
         .sort-group button.active { background: var(--accent); color: #000; font-weight: bold; }
 
+        /* 全員表示ボタン */
         .show-all-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 30px; border-radius: 30px; cursor: pointer; margin: 30px 0; font-weight: bold; transition: 0.3s; font-size: 1rem; }
         .show-all-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(255, 193, 7, 0.4); }
 
+        /* 結果リスト */
         .result-info { margin: 20px 0; color: #aaa; font-size: 0.9rem; display: none; }
         table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
@@ -46,12 +49,14 @@
         .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
         .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; }
         
+        /* ページネーション */
         .pagination { margin: 30px 0; display: none; gap: 15px; justify-content: center; align-items: center; }
         .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .page-btn:hover:not(:disabled) { background: #444; }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         #page-num { font-weight: bold; font-size: 1.2em; }
 
+        /* モーダル (詳細) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { opacity: 1; }
         .modal { 
@@ -84,6 +89,7 @@
         .b-card:hover { transform: translateY(-5px); border-color: var(--primary); background: #2a2a2a; }
         .b-img { width: 100%; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
         
+        /* ランキング */
         .ranking-section { margin-top: 80px; max-width: 800px; margin-left: auto; margin-right: auto; }
         .ranking-title { text-align: left; border-left: 6px solid var(--primary); padding-left: 20px; margin-bottom: 20px; font-size: 1.6em; font-weight: bold; color: #fff; letter-spacing: 1px; }
         .rank-num { font-weight: bold; margin-right: 15px; width: 30px; display: inline-block; text-align: right; font-family: monospace; font-size: 1.2em; }
@@ -154,13 +160,14 @@
 
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://recorded-trainer-publicly-physicians.trycloudflare.com";
+        const GCP_API = "https://signing-approx-tip-spectacular.trycloudflare.com";
         
         let currentSort = 'trophies';
         let currentPage = 1;
         let isShowAllMode = false;
         let currentQuery = "";
 
+        // スロット演出 (増加のみ)
         const countEl = document.getElementById('count');
         fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1500))
         .catch(()=>countEl.innerText="---");
@@ -236,6 +243,7 @@
                     data.forEach(p => {
                         const tr = document.createElement('tr');
                         const imgId = `icon-${p.tag}`;
+                        // DBのアイコンがあれば使う、なければデフォルト
                         let iconUrl = "https://cdn.brawlify.com/profile-icons/regular/28000001.png";
                         if(p.icon_id) iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id}.png`;
 
@@ -256,11 +264,14 @@
                         
                         // GCP経由で最新アイコン更新
                         fetch(`${GCP_API}/get_icon/${p.tag}`).then(r=>r.json()).then(d=>{
-                            if(d.icon_id) document.getElementById(imgId).src = `https://cdn.brawlify.com/profile-icons/regular/${d.icon_id}.png`;
+                            if(d.icon_id) {
+                                document.getElementById(imgId).src = `https://cdn.brawlify.com/profile-icons/regular/${d.icon_id}.png`;
+                            }
                         });
                     });
                     document.getElementById('result-table').style.display = 'table';
                     
+                    // ページネーション制御
                     if(!query) {
                         document.getElementById('pagination').style.display = 'flex';
                         document.getElementById('page-num').innerText = page;
@@ -269,6 +280,7 @@
                     }
                 }
             } catch(e) {
+                console.error(e);
                 info.innerText = "通信エラー";
                 info.style.display = 'block';
             }
@@ -278,6 +290,7 @@
         async function showDetails(tag) {
             const modal = document.getElementById('modal');
             const content = document.getElementById('modal-content');
+            
             modal.style.display = 'block';
             setTimeout(() => modal.classList.add('show'), 10);
             
@@ -315,15 +328,13 @@
                         <div class="stat-grid">
                             <div class="stat-box"><div class="stat-label">現在トロフィー</div><div class="stat-val val-trophy">${p.trophies.toLocaleString()}</div></div>
                             <div class="stat-box"><div class="stat-label">最高トロフィー</div><div class="stat-val">${p.highestTrophies.toLocaleString()}</div></div>
-                            <div class="stat-box"><div class="stat-label">3vs3 勝利</div><div class="stat-val val-3v3">${p['3vs3Victories'].toLocaleString()}</div></div>
-                            <div class="stat-box"><div class="stat-label">ソロ 勝利</div><div class="stat-val val-solo">${p.soloVictories.toLocaleString()}</div></div>
-                            <div class="stat-box"><div class="stat-label">デュオ 勝利</div><div class="stat-val val-duo">${p.duoVictories.toLocaleString()}</div></div>
-                            <div class="stat-box"><div class="stat-label">EXPレベル</div><div class="stat-val">${p.expLevel}</div></div>
+                            <div class="stat-box"><div class="stat-label">3vs3 勝利数</div><div class="stat-val" style="color:#29b6f6">${p['3vs3Victories'].toLocaleString()}</div></div>
+                            <div class="stat-box"><div class="stat-label">ソロ 勝利数</div><div class="stat-val" style="color:#66bb6a">${p.soloVictories.toLocaleString()}</div></div>
+                            <div class="stat-box"><div class="stat-label">デュオ 勝利数</div><div class="stat-val" style="color:#ab47bc">${p.duoVictories.toLocaleString()}</div></div>
+                            <div class="stat-box"><div class="stat-label">経験値レベル</div><div class="stat-val">${p.expLevel}</div></div>
                         </div>
-                        <div class="brawlers-section">
-                            <h3>キャラクター (${p.brawlers.length})</h3>
-                            <div class="brawlers-grid">${brawlersHtml}</div>
-                        </div>
+                        <h3 style="border-bottom:1px solid #333;padding-bottom:5px;margin-top:0;">所持キャラクター (${p.brawlers.length})</h3>
+                        <div class="brawlers-list">${brawlersHtml}</div>
                     </div>
                 `;
             } catch(e) {
@@ -337,13 +348,14 @@
             setTimeout(() => modal.style.display = 'none', 300);
         }
 
-        // ランキング
+        // --- ランキング (GCP経由) ---
         fetch(`${GCP_API}/rankings/jp?limit=10`).then(r=>r.json()).then(d=>{
             const list = document.getElementById('ranking-list');
             list.innerHTML = '';
             d.items.forEach((p, i) => {
                 const rank = i + 1;
                 const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
