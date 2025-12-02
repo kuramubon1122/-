@@ -4,20 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブロスタデータベース | Brawl Ultimate DB</title>
-    <meta name="description" content="ブロスタ(Brawl Stars)のプレイヤー検索・分析ツール。公式API連携により最新のトロフィー数やアイコンを表示。">
-    
     <style>
-        :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; }
+        :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; --accent: #29b6f6; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
-        
-        h1 { 
-            font-size: 2.5rem; margin: 10px 0; color: var(--primary);
-            text-shadow: 0 0 15px var(--primary);
-            animation: glow 3s infinite alternate;
-        }
+        h1 { font-size: 2.5rem; margin: 10px 0; color: var(--primary); text-shadow: 0 0 15px var(--primary); animation: glow 3s infinite alternate; }
         @keyframes glow { from { text-shadow: 0 0 10px var(--primary); } to { text-shadow: 0 0 30px #ff9800; } }
-
-        .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 30px; }
+        .subtitle { color: #aaa; margin-bottom: 30px; }
         .db-count { color: #4fc3f7; font-weight: bold; font-size: 1.5em; font-family: monospace; }
 
         .search-container { max-width: 700px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -27,43 +19,61 @@
         button { padding: 15px 30px; border-radius: 10px; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:hover { transform: scale(1.05); background: #ffca28; }
         
-        .options { display: flex; justify-content: center; margin-top: 15px; color: #888; font-size: 0.9rem; gap: 20px; }
-        .radio-group label { cursor: pointer; }
+        .options { display: flex; justify-content: space-between; flex-wrap: wrap; margin-top: 15px; color: #888; font-size: 0.9rem; gap: 10px; }
+        .radio-group label { margin-right: 15px; cursor: pointer; }
         .radio-group input:checked + span { color: var(--primary); font-weight: bold; border-bottom: 2px solid var(--primary); }
+        
+        .sort-group button { background: #333; color: #ccc; border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; margin-left: 5px; font-size: 0.85rem; transition: 0.2s; }
+        .sort-group button:hover { background: #444; }
+        .sort-group button.active { background: var(--accent); color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(41,182,246,0.3); }
 
-        /* 結果リスト */
+        .show-all-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 30px; border-radius: 30px; cursor: pointer; margin: 30px 0; font-weight: bold; transition: 0.3s; }
+        .show-all-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(255, 193, 7, 0.4); }
+
         .result-info { margin: 20px 0; color: #aaa; font-size: 0.9rem; display: none; }
         table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
-        th { background: #252525; color: #aaa; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+        th { background: #252525; color: #aaa; font-size: 0.85em; }
         tr:hover { background: #2a2a2a; cursor: pointer; transition: 0.2s; }
-        
-        /* アイコンと名前 */
-        .player-info { display: flex; align-items: center; gap: 15px; }
-        .player-icon { width: 45px; height: 45px; border-radius: 10px; border: 2px solid #444; background: #000; object-fit: cover; }
-        .player-name { font-weight: bold; font-size: 1.1em; }
-        
+        .player-icon { width: 40px; height: 40px; border-radius: 8px; border: 2px solid #444; background: #000; object-fit: cover; margin-right: 15px; }
         .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
-        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.2em; min-width: 100px; }
+        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; }
         
-        .loading-text { font-size: 0.8em; color: #666; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-
         .pagination { margin: 30px 0; display: none; gap: 15px; justify-content: center; align-items: center; }
-        .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .page-btn:hover:not(:disabled) { background: #444; }
+        .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        a.detail-link { display: inline-block; background: #29b6f6; color: #fff; padding: 6px 15px; text-decoration: none; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
-        a.detail-link:hover { background: #039be5; transform: translateY(-2px); }
+        /* モーダル */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; background: #151515; border-radius: 20px; border: 1px solid #333; box-shadow: 0 20px 60px rgba(0,0,0,0.9); }
+        .modal-header { background: linear-gradient(135deg, #1e1e1e, #2a2a2a); padding: 30px; display: flex; align-items: center; gap: 20px; }
+        .modal-icon { width: 80px; height: 80px; border-radius: 20px; border: 4px solid var(--primary); }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: none; color: #fff; border: none; font-size: 2rem; cursor: pointer; }
         
-        #loading { display: none; margin-top: 20px; }
+        .modal-body { padding: 25px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
+        .stat-box { background: #222; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+        .stat-val { font-size: 1.5em; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 0.75em; color: #888; text-transform: uppercase; }
+        
+        .brawlers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; }
+        .b-card { background: #222; padding: 5px; border-radius: 8px; text-align: center; font-size: 0.7em; border: 1px solid #333; }
+        .b-card img { width: 100%; border-radius: 4px; }
+        
+        .battle-card { background: #222; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; border-left: 5px solid #555; margin-bottom: 5px; }
+        .battle-card.victory { border-left-color: #4caf50; }
+        .battle-card.defeat { border-left-color: #f44336; }
+
+        .ranking-section { margin-top: 80px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .ranking-title { text-align: left; border-left: 6px solid var(--primary); padding-left: 20px; margin-bottom: 20px; font-size: 1.6em; font-weight: bold; color: #fff; }
+        .rank-num { font-weight: bold; margin-right: 15px; width: 30px; display: inline-block; text-align: right; }
+        .rank-1 { color: #ffd700; font-size: 1.5em; }
     </style>
 </head>
 <body>
 
     <h1>⚡ BRAWL ULTIMATE DB</h1>
-    <p class="subtitle">Database Size: <span id="count" class="db-count">0</span> Players</p>
+    <p class="subtitle">Total Database: <span id="count" class="db-count">0</span> Players</p>
 
     <div class="search-container">
         <div class="search-box">
@@ -76,14 +86,19 @@
                 <label><input type="radio" name="mode" value="exact" hidden><span>🎯 完全一致</span></label>
                 <label><input type="radio" name="mode" value="tag" hidden><span>🆔 ID検索</span></label>
             </div>
+            <div class="sort-group">
+                <button id="sort-trophies" class="sort-btn active" onclick="setSort('trophies')">🏆 トロフィー順</button>
+                <button id="sort-tag_len" class="sort-btn" onclick="setSort('tag_len')">📏 ID短い順</button>
+            </div>
         </div>
     </div>
 
+    <button class="show-all-btn" onclick="showAll()">📚 データベース一覧を表示</button>
     <div id="result-info" class="result-info"></div>
-    <div id="loading">⏳ 検索中...</div>
+    <div id="loading" style="display:none; margin-top:30px;">⏳ 照会中...</div>
     
     <table id="result-table" style="display:none;">
-        <thead><tr><th>PLAYER</th><th>TAG</th><th>TROPHIES</th><th>LINK</th></tr></thead>
+        <thead><tr><th>PLAYER</th><th>TAG</th><th>TROPHIES</th></tr></thead>
         <tbody id="list"></tbody>
     </table>
 
@@ -93,16 +108,28 @@
         <button class="page-btn" id="next-btn" onclick="changePage(1)">❯</button>
     </div>
 
+    <div class="ranking-section">
+        <div class="ranking-title">🇯🇵 日本トップランカー (Live)</div>
+        <table id="ranking-table"><tbody id="ranking-list"><tr><td style="padding:30px;color:#888;">取得中...</td></tr></tbody></table>
+    </div>
+
+    <div class="modal-overlay" id="modal" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://hardware-voters-listprice-sewing.trycloudflare.com";
-        
+        const GCP_API = "https://signing-approx-tip-spectacular.trycloudflare.com";
+        let currentSort = 'trophies';
         let currentPage = 1;
         let currentQuery = "";
+        let isShowAllMode = false;
 
-        // 総数カウント (スロット演出)
         const countEl = document.getElementById('count');
-        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1500));
+        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1000)).catch(()=>countEl.innerText="---");
 
         function animateValue(obj, start, end, duration) {
             let startTimestamp = null;
@@ -116,106 +143,153 @@
             requestAnimationFrame(step);
         }
 
-        function search() {
-            const q = document.getElementById('q').value.trim();
-            if(!q) return;
-            currentQuery = q;
-            currentPage = 1;
-            fetchData(q, 1);
+        function setSort(type) {
+            currentSort = type;
+            document.querySelectorAll('.sort-group button').forEach(b => b.classList.remove('active'));
+            document.getElementById(`sort-${type}`).classList.add('active');
+            if(isShowAllMode) showAll(1); else if(currentQuery) fetchData(currentQuery, 1);
         }
 
-        function changePage(delta) { fetchData(currentQuery, currentPage + delta); }
+        function showAll(page = 1) {
+            isShowAllMode = true; currentQuery = ""; document.getElementById('q').value = '';
+            fetchData('', page);
+        }
+
+        function search() {
+            isShowAllMode = false;
+            const q = document.getElementById('q').value.trim();
+            if(!q) return;
+            currentQuery = q; fetchData(q, 1);
+        }
+
+        function changePage(d) { fetchData(currentQuery, currentPage + d); }
 
         async function fetchData(query, page) {
             currentPage = page;
             const mode = document.querySelector('input[name="mode"]:checked').value;
             const list = document.getElementById('list');
+            const info = document.getElementById('result-info');
             
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result-table').style.display = 'none';
             document.getElementById('pagination').style.display = 'none';
-            document.getElementById('result-info').style.display = 'none';
             list.innerHTML = '';
+            info.style.display = 'none';
 
             try {
-                // 1. DBから候補を取得 (タグと名前だけ)
-                const res = await fetch(`${DB_API}/api/search?q=${encodeURIComponent(query)}&mode=${mode}&page=${page}`);
+                // サーバー側でソートと検索を行う
+                let url = `${DB_API}/api/search?q=${encodeURIComponent(query)}&mode=${mode}&sort=${currentSort}`;
+                if (!query) url += `&page=${page}`;
+
+                const res = await fetch(url);
                 const data = await res.json();
 
                 if (data.length === 0) {
-                    document.getElementById('result-info').innerText = "見つかりませんでした";
-                    document.getElementById('result-info').style.display = 'block';
+                    info.innerText = "見つかりませんでした";
+                    info.style.display = 'block';
                 } else {
-                    if(query) {
-                        document.getElementById('result-info').innerText = `${data.length} 件ヒット`;
-                        document.getElementById('result-info').style.display = 'block';
-                    }
+                    if(query) { info.innerText = `${data.length} 件ヒット`; info.style.display = 'block'; }
                     
                     data.forEach(p => {
                         const tr = document.createElement('tr');
-                        const imgId = `img-${p.tag}`;
-                        const trophyId = `trp-${p.tag}`;
-
-                        // デフォルト表示 (アイコンは仮、トロフィーは読込中)
+                        // DBから取得したアイコンIDを使用
+                        let iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${p.icon_id || 28000000}.png`;
+                        
                         tr.innerHTML = `
                             <td>
-                                <div class="player-info">
-                                    <img src="https://cdn.brawlify.com/profile-icons/regular/28000001.png" id="${imgId}" class="player-icon">
-                                    <span class="player-name">${p.name}</span>
+                                <div style="display:flex;align-items:center;">
+                                    <img src="${iconUrl}" class="player-icon" loading="lazy" onerror="this.src='https://cdn.brawlify.com/profile-icons/regular/28000001.png'">
+                                    <div style="font-weight:bold;">${p.name}</div>
                                 </div>
                             </td>
-                            <td class="tag">#${p.tag}</td>
-                            <td class="trophy-cell" id="${trophyId}"><span class="loading-text">---</span></td>
-                            <td><a href="https://brawlinsights.com/ja/player/profile/${p.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>
+                            <td style="font-family:monospace;color:#aaa">#${p.tag}</td>
+                            <td class="trophy-cell">🏆 ${p.trophies.toLocaleString()}</td>
                         `;
+                        tr.onclick = () => showDetails(p.tag);
                         list.appendChild(tr);
-                        
-                        // 2. GCP経由で公式APIを叩き、最新情報を埋め込む (非同期)
-                        fetchLiveInfo(p.tag, imgId, trophyId);
                     });
-                    
                     document.getElementById('result-table').style.display = 'table';
-                    
                     if(!query) {
                         document.getElementById('pagination').style.display = 'flex';
                         document.getElementById('page-num').innerText = page;
-                        document.getElementById('prev-btn').disabled = (page === 1);
+                        document.getElementById('prev-btn').disabled = (page===1);
                         document.getElementById('next-btn').disabled = (data.length < 30);
                     }
                 }
-            } catch(e) {
-                console.error(e);
-                document.getElementById('result-info').innerText = "通信エラー";
-                document.getElementById('result-info').style.display = 'block';
-            }
+            } catch(e) { info.innerText = "通信エラー"; info.style.display = 'block'; }
             document.getElementById('loading').style.display = 'none';
         }
 
-        // GCPサーバーから最新情報を取得してDOMを更新
-        async function fetchLiveInfo(tag, imgId, trophyId) {
-            try {
-                const res = await fetch(`${GCP_API}/player/${tag}`);
-                if(res.ok) {
-                    const d = await res.json();
-                    
-                    // アイコン更新
-                    const iconId = d.icon && d.icon.id ? d.icon.id : 28000001;
-                    const img = document.getElementById(imgId);
-                    if(img) img.src = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+        async function showDetails(tag) {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'block';
+            document.getElementById('modal-content').innerHTML = '<div style="padding:50px;text-align:center;color:#888;">読み込み中...</div>';
 
-                    // トロフィー更新
-                    const trp = document.getElementById(trophyId);
-                    if(trp) trp.innerHTML = `🏆 ${d.trophies.toLocaleString()}`;
-                } else {
-                    // エラー時 (404など)
-                    document.getElementById(trophyId).innerHTML = '<span style="color:#666;font-size:0.7em;">取得失敗</span>';
-                }
+            try {
+                const [p, logs] = await Promise.all([
+                    fetch(`${GCP_API}/player/${tag}`).then(r=>r.json()),
+                    fetch(`${GCP_API}/battlelog/${tag}`).then(r=>r.ok?r.json():{items:[]})
+                ]);
+                
+                if(p.error) throw new Error();
+
+                p.brawlers.sort((a,b)=>b.trophies-a.trophies);
+                let bHTML = p.brawlers.map(b => `
+                    <div class="b-card">
+                        <img src="https://cdn.brawlify.com/brawler-pins/${b.id}.png" loading="lazy">
+                        <div style="color:#ffca28;font-weight:bold">${b.trophies}</div>
+                    </div>`).join('');
+
+                let lHTML = logs.items.slice(0,5).map(i => {
+                    const res = i.battle.result || '?';
+                    const cls = res==='victory'?'victory':(res==='defeat'?'defeat':'draw');
+                    return `<div class="battle-card ${cls}">
+                        <div class="b-res" style="color:${cls==='victory'?'#4caf50':'#f44336'}">${res.slice(0,1).toUpperCase()}</div>
+                        <div class="b-info">
+                            <div class="b-mode">${i.event.mode}</div>
+                            <div class="b-map" style="color:#888">${i.event.map||'Map'}</div>
+                        </div>
+                    </div>`;
+                }).join('') || '<div style="color:#666">履歴なし</div>';
+
+                document.getElementById('modal-content').innerHTML = `
+                    <div class="modal-header">
+                        <img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="modal-icon">
+                        <div style="flex:1">
+                            <h2 style="margin:0;color:#ffc107;">${p.name}</h2>
+                            <div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="stat-grid">
+                            <div class="stat-box"><span class="stat-label">トロフィー</span><div class="stat-val val-trophy">${p.trophies.toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">3vs3勝</span><div class="stat-val val-3v3">${p['3vs3Victories'].toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">ソロ勝</span><div class="stat-val val-solo">${p.soloVictories.toLocaleString()}</div></div>
+                            <div class="stat-box"><span class="stat-label">デュオ勝</span><div class="stat-val val-duo">${p.duoVictories.toLocaleString()}</div></div>
+                        </div>
+                        <h4 style="border-bottom:1px solid #333;margin-bottom:10px;">戦闘ログ</h4>
+                        <div class="battle-list">${lHTML}</div>
+                        <h4 style="border-bottom:1px solid #333;margin-top:20px;">キャラクター</h4>
+                        <div class="brawlers-grid">${bHTML}</div>
+                    </div>`;
             } catch(e) {
-                // 通信エラー時
-                const trp = document.getElementById(trophyId);
-                if(trp) trp.innerHTML = '<span style="color:#666;font-size:0.7em;">Err</span>';
+                document.getElementById('modal-content').innerHTML = '<div style="padding:40px;text-align:center;color:red;">取得失敗</div>';
             }
         }
+        function closeModal() { document.getElementById('modal').style.display='none'; }
+
+        fetch(`${GCP_API}/rankings/jp?limit=10`).then(r=>r.json()).then(d=>{
+            const list = document.getElementById('ranking-list');
+            list.innerHTML = '';
+            d.items.forEach((p, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><div style="display:flex;align-items:center;"><span class="rank-num" style="color:${i<3?'#ffeb3b':'#aaa'}">${i+1}</span><img src="https://cdn.brawlify.com/profile-icons/regular/${p.icon.id}.png" class="player-icon" style="width:30px;height:30px;"><span>${p.name}</span></div></td>
+                    <td style="text-align:right;color:#ffca28;font-weight:bold;">🏆 ${p.trophies.toLocaleString()}</td>`;
+                tr.onclick = () => showDetails(p.tag.replace("#",""));
+                list.appendChild(tr);
+            });
+        }).catch(() => document.getElementById('ranking-list').innerHTML = '<tr><td style="text-align:center;padding:20px;">ランキング取得失敗</td></tr>');
 
         document.getElementById('q').addEventListener('keypress', e => { if(e.key==='Enter') search() });
     </script>
