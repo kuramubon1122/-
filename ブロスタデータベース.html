@@ -10,7 +10,6 @@
     <style>
         :root { --primary: #ffc107; --bg: #121212; --card: #1e1e1e; --text: #fff; --accent: #29b6f6; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
-        
         h1 { font-size: 2.5rem; margin: 10px 0; color: var(--primary); text-shadow: 0 0 15px var(--primary); animation: glow 3s infinite alternate; }
         @keyframes glow { from { text-shadow: 0 0 10px var(--primary); } to { text-shadow: 0 0 30px #ff9800; } }
         .subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 40px; }
@@ -33,19 +32,26 @@
         .show-all-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(255, 193, 7, 0.4); }
 
         .result-info { margin: 20px 0; color: #aaa; font-size: 0.9rem; display: none; }
+        
+        /* テーブルスタイル (アイコンサイズ修正) */
         table { width: 100%; max-width: 800px; margin: 10px auto; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
         th { background: #252525; color: #aaa; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+        tr { transition: transform 0.3s ease; }
         tr:hover { background: #2a2a2a; cursor: pointer; transition: 0.2s; }
-        .player-icon { width: 40px; height: 40px; border-radius: 8px; border: 2px solid #444; vertical-align: middle; margin-right: 15px; background: #000; object-fit: cover; }
+        
+        .player-info { display: flex; align-items: center; gap: 15px; }
+        /* アイコンサイズを固定 */
+        .player-icon { width: 40px; height: 40px; min-width: 40px; border-radius: 8px; border: 2px solid #444; background: #000; object-fit: cover; }
+        .player-name { font-weight: bold; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        
         .tag { font-family: monospace; color: var(--primary); font-size: 0.9em; }
-        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; min-width: 80px; }
+        .trophy-cell { color: #ffca28; font-weight: bold; text-align: right; font-family: monospace; font-size: 1.1em; min-width: 90px; }
         
         .pagination { margin: 30px 0; display: none; gap: 15px; justify-content: center; align-items: center; }
         .page-btn { padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .page-btn:hover:not(:disabled) { background: #444; }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        #page-num { font-weight: bold; font-size: 1.2em; }
 
         /* モーダル */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
@@ -53,26 +59,21 @@
         .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; background: #151515; border-radius: 20px; padding: 0; border: 1px solid #333; box-shadow: 0 20px 60px rgba(0,0,0,0.9); transition: transform 0.3s; }
         .modal-overlay.show .modal { transform: translate(-50%, -50%) scale(1); }
         .modal-header { background: linear-gradient(135deg, #1e1e1e, #2a2a2a); padding: 30px; display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden; }
-        .modal-header::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--primary), #ff9800); }
-        .modal-icon { width: 90px; height: 90px; border-radius: 20px; border: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); background: #000; }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1.5rem; line-height: 1; transition: 0.2s; }
-        .close-btn:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
+        .modal-icon { width: 80px; height: 80px; border-radius: 20px; border: 4px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1.5rem; }
         .modal-body { padding: 25px; }
         .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
         .stat-box { background: #222; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #333; }
         .stat-label { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .stat-val { font-size: 1.5em; font-weight: bold; color: #fff; }
-        .val-trophy { color: #ffca28; } .val-3v3 { color: #29b6f6; } .val-solo { color: #66bb6a; } .val-duo { color: #ab47bc; }
+        .val-trophy { color: #ffca28; } .val-3v3 { color: #29b6f6; }
         .brawlers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; }
-        .b-card { background: #222; padding: 8px 4px; border-radius: 10px; text-align: center; font-size: 0.75em; border: 1px solid #333; transition: 0.2s; }
-        .b-card:hover { transform: translateY(-5px); border-color: var(--primary); background: #2a2a2a; }
-        .b-img { width: 100%; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
+        .b-card { background: #222; padding: 5px; border-radius: 8px; text-align: center; font-size: 0.7em; border: 1px solid #333; }
+        .b-card img { width: 100%; border-radius: 4px; margin-bottom: 5px; }
         .battle-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
         .battle-card { background: #222; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; border-left: 5px solid #555; }
-        .battle-card.victory { border-left-color: var(--win); } .battle-card.defeat { border-left-color: var(--loss); } .battle-card.draw { border-left-color: var(--draw); }
-        .b-res { font-weight: bold; width: 45px; font-size: 0.85em; }
-        .b-info { flex: 1; text-align: left; font-size: 0.85em; }
-        .b-mode { font-weight: bold; color: #ddd; } .b-map { color: #888; font-size: 0.8em; }
+        .battle-card.victory { border-left-color: #4caf50; } .battle-card.defeat { border-left-color: #f44336; } .battle-card.draw { border-left-color: #9e9e9e; }
+        .b-res { font-weight: bold; width: 45px; font-size: 0.85em; } .b-info { flex: 1; text-align: left; font-size: 0.85em; }
         .ranking-section { margin-top: 80px; max-width: 800px; margin-left: auto; margin-right: auto; }
         .ranking-title { text-align: left; border-left: 6px solid var(--primary); padding-left: 20px; margin-bottom: 20px; font-size: 1.6em; font-weight: bold; color: #fff; }
         .rank-num { font-weight: bold; margin-right: 15px; width: 30px; display: inline-block; text-align: right; font-family: monospace; font-size: 1.2em; }
@@ -120,24 +121,19 @@
 
     <div class="ranking-section">
         <div class="ranking-title">🇯🇵 日本トップランカー (Live)</div>
-        <table id="ranking-table"><tbody id="ranking-list"><tr><td style="padding:30px;color:#888;">取得中...</td></tr></tbody></table>
+        <table id="ranking-table"><tbody id="ranking-list"><tr><td style="padding:30px;color:#888;">GCPサーバーから取得中...</td></tr></tbody></table>
     </div>
 
-    <div class="modal-overlay" id="modal" onclick="closeModal()">
-        <div class="modal" onclick="event.stopPropagation()">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <div id="modal-content"></div>
-        </div>
-    </div>
+    <div class="modal-overlay" id="modal" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()"><button class="close-btn" onclick="closeModal()">×</button><div id="modal-content"></div></div></div>
 
     <script>
         const DB_API = "https://katodeth-brawl-database-v4.hf.space";
-        const GCP_API = "https://tribute-laundry-assuming-composite.trycloudflare.com";
+        const GCP_API = "https://hist-tucson-year-carroll.trycloudflare.com";
         let currentSort = 'trophies', currentPage = 1, currentQuery = "", isShowAllMode = false;
         let sortTimer = null;
 
         const countEl = document.getElementById('count');
-        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1000)).catch(()=>countEl.innerText="---");
+        fetch(`${DB_API}/api/stats`).then(r=>r.json()).then(d => animateValue(countEl, 0, d.count, 1000));
 
         function animateValue(obj, start, end, duration) {
             let startTimestamp = null;
@@ -151,60 +147,43 @@
             requestAnimationFrame(step);
         }
 
-        function setSort(type) {
-            currentSort = type;
+        function setSort(t) {
+            currentSort = t;
             document.querySelectorAll('.sort-group button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`sort-${type}`).classList.add('active');
+            document.getElementById(`sort-${t}`).classList.add('active');
             sortListNow();
         }
-
+        
         function sortListNow() {
             const list = document.getElementById('list');
             const rows = Array.from(list.querySelectorAll('tr'));
             if(rows.length===0) return;
             
             rows.sort((a, b) => {
-                if (currentSort === 'trophies') {
-                    // トロフィー降順
-                    return parseInt(b.dataset.trophies) - parseInt(a.dataset.trophies);
-                } else {
-                    // タグ昇順
-                    return a.dataset.tag.localeCompare(b.dataset.tag);
-                }
+                if (currentSort === 'trophies') return parseInt(b.dataset.trophies) - parseInt(a.dataset.trophies);
+                return a.dataset.tag.localeCompare(b.dataset.tag);
             });
-
-            rows.forEach(row => list.appendChild(row));
+            rows.forEach(r => list.appendChild(r));
         }
 
-        function showAll(page = 1) {
-            isShowAllMode = true; currentQuery = ""; document.getElementById('q').value = '';
-            fetchData('', page);
-        }
+        function showAll(p=1) { isShowAllMode=true; currentQuery=""; document.getElementById('q').value=''; fetchData('',p); }
+        function search() { isShowAllMode=false; const q=document.getElementById('q').value.trim(); if(!q)return; currentQuery=q; fetchData(q,1); }
+        function changePage(d) { fetchData(currentQuery, currentPage+d); }
 
-        function search() {
-            isShowAllMode = false;
-            const q = document.getElementById('q').value.trim();
-            if(!q) return;
-            currentQuery = q; fetchData(q, 1);
-        }
-
-        function changePage(delta) { fetchData(currentQuery, currentPage + delta); }
-
-        async function fetchData(query, page) {
-            currentPage = page;
+        async function fetchData(q, p) {
+            currentPage = p;
             const mode = document.querySelector('input[name="mode"]:checked').value;
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result-table').style.display = 'none';
-            document.getElementById('pagination').style.display = 'none';
-            document.getElementById('result-info').style.display = 'none';
+            document.getElementById('loading').style.display='block';
+            document.getElementById('result-table').style.display='none';
+            document.getElementById('pagination').style.display='none';
+            document.getElementById('result-info').style.display='none';
             const list = document.getElementById('list');
             list.innerHTML = '';
 
             try {
-                // DB検索 (並び替えはクライアント側で行うためAPI側には指定しないか、デフォルト任せ)
-                let url = `${DB_API}/api/search?q=${encodeURIComponent(query)}&mode=${mode}`;
-                if (!query) url += `&page=${page}`;
-
+                let url = `${DB_API}/api/search?q=${encodeURIComponent(q)}&mode=${mode}&sort=${currentSort}`;
+                if(!q) url += `&page=${p}`;
+                
                 const res = await fetch(url);
                 const data = await res.json();
 
@@ -212,147 +191,78 @@
                     document.getElementById('result-info').innerText = "見つかりませんでした";
                     document.getElementById('result-info').style.display = 'block';
                 } else {
-                    if(query) {
-                        document.getElementById('result-info').innerText = `${data.length} 件ヒット`;
-                        document.getElementById('result-info').style.display = 'block';
-                    }
+                    if(q) { document.getElementById('result-info').innerText = `${data.length} 件ヒット`; document.getElementById('result-info').style.display = 'block'; }
                     
-                    data.forEach((p, idx) => {
+                    data.forEach((x, idx) => {
                         const tr = document.createElement('tr');
-                        const imgId = `img-${p.tag}`;
-                        const trpId = `trp-${p.tag}`;
+                        tr.dataset.tag = x.tag;
+                        tr.dataset.trophies = x.trophies || 0;
+
+                        const imgId = `img-${x.tag}`;
+                        const trpId = `trp-${x.tag}`;
                         
-                        // ソート用データ初期値
-                        tr.dataset.trophies = p.trophies || 0;
-                        tr.dataset.tag = p.tag;
-                        
-                        // デフォルトアイコン (GCPプロキシ)
-                        let iconUrl = `${GCP_API}/profile_icon/${p.icon_id||28000000}`;
+                        // ★重要: デフォルトアイコンもGCP経由で取得 (CORS/404回避)
+                        let iconUrl = `${GCP_API}/profile_icon/${x.icon_id||28000000}`;
                         
                         tr.innerHTML = `
                             <td>
-                                <div style="display:flex;align-items:center;">
+                                <div class="player-info">
                                     <img src="${iconUrl}" id="${imgId}" class="player-icon" loading="lazy">
-                                    <div style="font-weight:bold;">${p.name}</div>
+                                    <span class="player-name">${x.name}</span>
                                 </div>
                             </td>
-                            <td class="tag">#${p.tag}</td>
-                            <td class="trophy-cell" id="${trpId}">🏆 ${p.trophies ? p.trophies.toLocaleString() : '...'}</td>
-                            <td><a href="https://brawlinsights.com/ja/player/profile/${p.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>`;
-                        tr.onclick = (e) => { if(!e.target.closest('a')) showDetails(p.tag); };
+                            <td class="tag">#${x.tag}</td>
+                            <td class="trophy-cell" id="${trpId}">🏆 ${x.trophies?x.trophies.toLocaleString():'...'}</td>
+                            <td><a href="https://brawlinsights.com/ja/player/profile/${x.tag}" target="_blank" class="detail-link">詳細 ↗</a></td>`;
+                        tr.onclick = (e) => { if(!e.target.closest('a')) showDetails(x.tag); };
                         list.appendChild(tr);
                         
-                        // GCP経由で最新化 & 自動ソートトリガー
+                        // 非同期で詳細取得
                         setTimeout(() => {
-                            if(!p.icon_id) fetch(`${GCP_API}/get_icon/${p.tag}`).then(r=>r.json()).then(d=>{ if(d.icon_id) document.getElementById(imgId).src=`${GCP_API}/profile_icon/${d.icon_id}`; });
-                            if(!p.trophies) fetch(`${GCP_API}/player/${p.tag}`).then(r=>r.json()).then(d=>{
+                            fetch(`${GCP_API}/summary/${x.tag}`).then(r=>r.json()).then(d=>{
+                                if(d.icon_id) document.getElementById(imgId).src=`${GCP_API}/profile_icon/${d.icon_id}`;
                                 if(d.trophies) {
                                     document.getElementById(trpId).innerText=`🏆 ${d.trophies.toLocaleString()}`;
-                                    tr.dataset.trophies = d.trophies; // 更新
+                                    tr.dataset.trophies = d.trophies;
                                     if(currentSort === 'trophies') {
                                         clearTimeout(sortTimer);
-                                        sortTimer = setTimeout(sortListNow, 500);
+                                        sortTimer = setTimeout(sortListNow, 800);
                                     }
                                 }
-                            });
+                            }).catch(()=>{});
                         }, idx * 50);
                     });
-                    document.getElementById('result-table').style.display = 'table';
-                    if(!query) {
-                        document.getElementById('pagination').style.display = 'flex';
-                        document.getElementById('page-num').innerText = page;
-                        document.getElementById('prev-btn').disabled = (page===1);
-                        document.getElementById('next-btn').disabled = (data.length < 30);
+                    document.getElementById('result-table').style.display='table';
+                    if(!q) {
+                        document.getElementById('pagination').style.display='flex';
+                        document.getElementById('page-num').innerText=p;
+                        document.getElementById('prev-btn').disabled=(p===1);
+                        document.getElementById('next-btn').disabled=(data.length<30);
                     }
-                    // 初期ソート実行
                     sortListNow();
                 }
-            } catch(e) {
-                document.getElementById('result-info').innerText = "通信エラー";
-                document.getElementById('result-info').style.display = 'block';
-            }
-            document.getElementById('loading').style.display = 'none';
+            } catch(e) { document.getElementById('result-info').innerText="通信エラー"; document.getElementById('result-info').style.display='block'; }
+            document.getElementById('loading').style.display='none';
         }
 
         async function showDetails(tag) {
-            const modal = document.getElementById('modal');
-            modal.style.display = 'block';
-            setTimeout(() => modal.classList.add('show'), 10);
-            document.getElementById('modal-content').innerHTML = '<div style="padding:50px;text-align:center;color:#888;"><div style="font-size:2rem;">🚀</div><div>データ取得中...</div></div>';
-            
+            const modal = document.getElementById('modal'); modal.style.display='block';
+            setTimeout(()=>modal.classList.add('show'),10);
+            document.getElementById('modal-content').innerHTML='<div style="padding:50px;text-align:center;color:#888;">Loading...</div>';
             try {
-                const [p, logs] = await Promise.all([
-                    fetch(`${GCP_API}/player/${tag}`).then(r=>r.json()),
-                    fetch(`${GCP_API}/battlelog/${tag}`).then(r=>r.ok?r.json():{items:[]})
-                ]);
-                
+                const [p, logs] = await Promise.all([fetch(`${GCP_API}/player/${tag}`).then(r=>r.json()), fetch(`${GCP_API}/battlelog/${tag}`).then(r=>r.ok?r.json():{items:[]})]);
                 if(p.error) throw new Error();
-
-                p.brawlers.sort((a,b)=>b.trophies-a.trophies);
-                let bHTML = p.brawlers.map(b => `
-                    <div class="b-card">
-                        <img src="${GCP_API}/brawler_img/${b.id}" class="b-img">
-                        <div style="color:#ffca28;font-weight:bold">${b.trophies}</div>
-                        <div style="color:#aaa">R${b.rank}</div>
-                    </div>`).join('');
-
-                let lHTML = logs.items.slice(0,5).map(i => {
-                    const res = i.battle.result || '?';
-                    const cls = res==='victory'?'victory':(res==='defeat'?'defeat':'draw');
-                    return `<div class="battle-card ${cls}">
-                        <div class="b-res" style="color:${cls==='victory'?'#4caf50':'#f44336'}">${res.slice(0,1).toUpperCase()}</div>
-                        <div class="b-info">
-                            <div class="b-mode">${i.event.mode}</div>
-                            <div class="b-map" style="color:#888">${i.event.map||'Map'}</div>
-                        </div>
-                    </div>`;
-                }).join('') || '<div style="text-align:center;color:#666">履歴なし</div>';
-
-                document.getElementById('modal-content').innerHTML = `
-                    <div class="modal-header">
-                        <img src="${GCP_API}/profile_icon/${p.icon.id}" class="modal-icon">
-                        <div style="flex:1">
-                            <h2 style="margin:0;color:#ffc107;">${p.name}</h2>
-                            <div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div>
-                            ${p.club.name ? `<div style="color:#4fc3f7;font-weight:bold;">🛡️ ${p.club.name}</div>` : ''}
-                        </div>
-                    </div>
-                    <div class="modal-body">
-                        <div class="stat-grid">
-                            <div class="stat-box"><span class="stat-label">トロフィー</span><div class="stat-val val-trophy">${p.trophies.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">最高</span><div class="stat-val">${p.highestTrophies.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">3vs3勝</span><div class="stat-val val-3v3">${p['3vs3Victories'].toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">ソロ勝</span><div class="stat-val val-solo">${p.soloVictories.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">デュオ勝</span><div class="stat-val val-duo">${p.duoVictories.toLocaleString()}</div></div>
-                            <div class="stat-box"><span class="stat-label">EXP</span><div class="stat-val">${p.expLevel}</div></div>
-                        </div>
-                        <h4 style="border-bottom:1px solid #333;margin-bottom:10px;">直近の戦闘</h4>
-                        <div class="battle-list">${lHTML}</div>
-                        <h4 style="border-bottom:1px solid #333;margin-top:20px;">キャラクター</h4>
-                        <div class="brawlers-grid">${bHTML}</div>
-                    </div>`;
-            } catch(e) {
-                document.getElementById('modal-content').innerHTML = '<div style="padding:40px;text-align:center;color:red;">取得失敗 (GCP)</div>';
-            }
+                let bHtml = p.brawlers.sort((a,b)=>b.trophies-a.trophies).map(b=>`<div class="b-card"><img src="${GCP_API}/brawler_img/${b.id}" class="b-img"><div style="color:#ffca28;font-weight:bold">${b.trophies}</div></div>`).join('');
+                let lHtml = logs.items.slice(0,5).map(i=>{ const res=i.battle.result||'?'; const cls=res==='victory'?'victory':(res==='defeat'?'defeat':'draw'); return `<div class="battle-card ${cls}"><div class="b-res">${res.slice(0,1).toUpperCase()}</div><div class="b-info"><div class="b-mode">${i.event.mode}</div><div class="b-map">${i.event.map||'Map'}</div></div></div>`; }).join('')||'履歴なし';
+                document.getElementById('modal-content').innerHTML = `<div class="modal-header"><img src="${GCP_API}/profile_icon/${p.icon.id}" class="modal-icon"><div style="flex:1"><h2 style="margin:0;color:#ffc107;">${p.name}</h2><div style="color:#aaa;font-family:monospace;">#${p.tag.replace('#','')}</div></div></div><div class="modal-body"><div class="stat-grid"><div class="stat-box"><span class="stat-label">トロフィー</span><div class="stat-val val-trophy">${p.trophies.toLocaleString()}</div></div><div class="stat-box"><span class="stat-label">3vs3</span><div class="stat-val val-3v3">${p['3vs3Victories'].toLocaleString()}</div></div></div><h4>直近バトル</h4><div class="battle-list">${lHtml}</div><h4>キャラクター</h4><div class="brawlers-grid">${bHtml}</div><div style="text-align:center;margin-top:20px;"><a href="https://brawlinsights.com/ja/player/profile/${tag}" target="_blank" class="detail-link">BrawlInsights ↗</a></div></div>`;
+            } catch(e) { document.getElementById('modal-content').innerHTML='<div style="padding:40px;text-align:center;color:red;">取得失敗</div>'; }
         }
-        function closeModal() { document.getElementById('modal').style.display='none'; }
+        function closeModal() { document.getElementById('modal').classList.remove('show'); setTimeout(()=>document.getElementById('modal').style.display='none',300); }
 
-        // ランキング
         fetch(`${GCP_API}/rankings/jp?limit=10`).then(r=>r.json()).then(d=>{
-            const list = document.getElementById('ranking-list');
-            list.innerHTML = '';
-            d.items.forEach((p, i) => {
-                const rank = i + 1;
-                const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><div style="display:flex;align-items:center;"><span class="rank-num ${rankClass}">${rank}</span><img src="${GCP_API}/profile_icon/${p.icon.id}" class="player-icon" style="width:30px;height:30px;"><span>${p.name}</span></div></td>
-                    <td style="text-align:right;color:#ffca28;font-weight:bold;">🏆 ${p.trophies.toLocaleString()}</td>`;
-                tr.onclick = () => showDetails(p.tag.replace("#",""));
-                list.appendChild(tr);
-            });
-        }).catch(() => document.getElementById('ranking-list').innerHTML = '<tr><td style="text-align:center;padding:20px;">ランキング取得失敗</td></tr>');
-
+            const l = document.getElementById('ranking-list'); l.innerHTML='';
+            d.items.forEach((p,i)=>{ l.innerHTML += `<tr onclick="showDetails('${p.tag.replace('#','')}')"><td><div style="display:flex;align-items:center;"><span class="rank-num">${i+1}</span><img src="${GCP_API}/profile_icon/${p.icon.id}" class="player-icon" style="width:30px;height:30px;"><span>${p.name}</span></div></td><td class="trophy-cell">🏆 ${p.trophies.toLocaleString()}</td></tr>`; });
+        }).catch(()=>{ document.getElementById('ranking-list').innerHTML='<tr><td>ランキング取得失敗</td></tr>'; });
         document.getElementById('q').addEventListener('keypress', e => { if(e.key==='Enter') search() });
     </script>
 </body>
