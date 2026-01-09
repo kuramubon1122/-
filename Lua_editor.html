@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GameGuardian Lua Pro Editor</title>
+    <title>GameGuardian Lua Editor V13 (Smart Format & Search)</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
             --sidebar-bg: #252526;
-            --text-color: #d4d4d4;
-            --highlight: #007acc;
+            --header-bg: #2d2d2d;
+            --text-color: #cccccc;
+            --highlight: #0e639c;
             --border: #3e3e42;
-            --btn-bg: #333333;
-            --btn-hover: #444444;
+            --btn-bg: #3c3c3c;
+            --btn-hover: #505050;
+            --func-color: #dcdcaa;
+            --const-color: #4fc1ff;
+            --keyword-color: #c586c0;
         }
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; outline: none; }
         body {
             margin: 0; padding: 0;
             width: 100vw; height: 100vh;
@@ -23,535 +27,581 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
         }
 
-        /* Header / Toolbar */
         #toolbar {
-            height: auto;
-            min-height: 50px;
-            background-color: var(--sidebar-bg);
+            background-color: var(--header-bg);
             border-bottom: 1px solid var(--border);
+            padding: 4px 8px;
             display: flex;
-            align-items: center;
-            padding: 5px;
             flex-wrap: wrap;
-            gap: 5px;
-            z-index: 10;
+            gap: 6px;
+            align-items: center;
+            z-index: 100;
         }
         .btn-group {
-            display: flex;
-            gap: 2px;
-            margin-right: 10px;
+            display: flex; gap: 1px; background: #444; padding: 2px; border-radius: 4px;
         }
         button {
-            background-color: var(--btn-bg);
-            color: #fff;
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            cursor: pointer;
-            font-size: 12px;
-            border-radius: 3px;
-            white-space: nowrap;
+            background-color: var(--btn-bg); color: #eee; border: 1px solid transparent;
+            padding: 5px 10px; cursor: pointer; font-size: 12px; border-radius: 2px;
+            transition: all 0.1s; user-select: none;
         }
         button:hover { background-color: var(--btn-hover); }
         button:active { background-color: var(--highlight); }
         
-        input[type="text"] {
-            background: #111;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 5px;
-            width: 150px;
+        .search-container {
+            display: flex; align-items: center; background: #333; padding: 2px 5px; border-radius: 4px; border: 1px solid #555;
+        }
+        #search-input {
+            background: transparent; border: none; color: white; width: 140px; font-size: 12px; margin-right: 5px;
+        }
+        .search-badge {
+            font-size: 10px; color: #aaa; margin-right: 5px; min-width: 40px; text-align: center;
+        }
+        .search-opt {
+            font-size: 10px; color: #ccc; display: flex; align-items: center; gap: 3px; margin-right: 5px; cursor: pointer; user-select: none;
+        }
+        
+        #filename {
+            background: #333; border: 1px solid #555; color: #eee; padding: 4px; font-size: 12px; width: 100px; border-radius: 3px;
         }
 
-        /* Main Area */
-        #main-area {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 100px); /* Adjust for toolbars */
-            overflow: hidden;
-        }
+        #main-area { display: flex; flex: 1; height: calc(100vh - 80px); position: relative; }
+        #editor-container { flex: 1; height: 100%; overflow: hidden; }
 
-        /* Editor */
-        #editor-container {
-            flex: 1;
-            height: 100%;
-        }
-
-        /* Sidebar (Right) */
         #sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            font-size: 12px;
+            width: 250px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; z-index: 90;
         }
-        #sidebar-search {
-            padding: 5px;
-            border-bottom: 1px solid var(--border);
+        #sidebar-header {
+            padding: 5px; background: #222; font-size: 11px;
+            border-bottom: 1px solid var(--border); color: #aaa; text-align: center;
         }
-        #sidebar-search input { width: 100%; }
-        #candidate-list {
-            flex: 1;
-            overflow-y: auto;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        #candidate-list { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
+        
         .candidate-item {
-            padding: 6px 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #2d2d30;
-            display: flex;
-            justify-content: space-between;
+            padding: 4px 8px; cursor: pointer; border-bottom: 1px solid #333;
+            display: flex; flex-direction: column; justify-content: center;
         }
-        .candidate-item:hover, .candidate-item.selected {
-            background-color: #2a2d2e;
-            border-left: 3px solid var(--highlight);
+        .candidate-item:hover { background-color: #2a2d2e; }
+        .cand-top { display: flex; justify-content: space-between; align-items: center; }
+        .cand-label { font-weight: bold; font-size: 12px; }
+        .cand-type { font-size: 9px; padding: 1px 3px; border-radius: 3px; background: #333; }
+        .cand-desc { font-size: 10px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        #statusbar {
+            height: 22px; background: #007acc; color: white; font-size: 11px;
+            display: flex; align-items: center; padding: 0 10px; justify-content: space-between;
+            white-space: nowrap; overflow: hidden;
         }
-        .type-tag {
-            font-size: 10px;
-            opacity: 0.7;
-            background: #444;
-            padding: 0 4px;
+
+        #toast {
+            visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 4px; padding: 8px; position: fixed;
+            z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 12px; border: 1px solid #555;
+            opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+        /* 検索ハイライト */
+        .search-line-highlight {
+            background: rgba(255, 0, 0, 0.4) !important;
+            border-left: 3px solid #ff0000;
+        }
+        .search-match-text {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            font-weight: bold !important;
             border-radius: 2px;
         }
 
-        /* Footer/Status */
-        #footer {
-            height: 25px;
-            background: var(--highlight);
-            color: white;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            #sidebar { width: 180px; display: none; /* Toggle via button */ }
-            #sidebar.visible { display: flex; position: absolute; right: 0; top: 50px; bottom: 0; z-index: 20; box-shadow: -5px 0 10px rgba(0,0,0,0.5); }
+            #sidebar { display: none; position: absolute; right: 0; top: 0; bottom: 0; width: 220px; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+            #sidebar.open { display: flex; }
+            #search-input { width: 80px; }
+            #filename { width: 70px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Toolbar -->
 <div id="toolbar">
     <div class="btn-group">
-        <button onclick="triggerAction('undo')" title="元に戻す">↩ 元に戻す</button>
-        <button onclick="triggerAction('redo')" title="やり直し">↪ やり直し</button>
+        <button onclick="execCmd('undo')" title="元に戻す">↩</button>
+        <button onclick="execCmd('redo')" title="やり直し">↪</button>
     </div>
+    
     <div class="btn-group">
-        <button onclick="triggerAction('editor.action.clipboardCopyAction')" title="コピー">コピー</button>
-        <button onclick="triggerAction('editor.action.clipboardPasteAction')" title="貼り付け">貼り付け</button>
-        <button onclick="editor.trigger('source', 'editor.action.selectAll')" title="全選択">全選択</button>
+        <button onclick="formatCode()" title="適切なインデントで整形">整形</button>
+        <button onclick="autoComment()" title="解説を追加">解説</button>
     </div>
-    <div class="btn-group">
-        <button onclick="toggleSidebar()">候補一覧</button>
-        <button onclick="addComments()">解説追加</button>
+
+    <!-- 検索機能 -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="リアルタイム検索..." oninput="doSearch()" onkeydown="if(event.key==='Enter') searchNext(true)">
+        <label class="search-opt"><input type="checkbox" id="search-fuzzy" checked onchange="doSearch()">部分一致</label>
+        <div class="search-badge" id="search-count">0/0</div>
+        <div class="btn-group">
+            <button onclick="searchNext(false)" title="前へ">▲</button>
+            <button onclick="searchNext(true)" title="次へ">▼</button>
+        </div>
     </div>
+
     <div class="btn-group" style="margin-left:auto;">
-        <input type="file" id="fileInput" accept=".txt,.lua" style="display:none" onchange="loadFile(this)">
-        <button onclick="document.getElementById('fileInput').click()">読込</button>
+        <button onclick="toggleSidebar()">候補</button>
+        <button onclick="document.getElementById('fileInput').click()">開く</button>
         <input type="text" id="filename" value="script.lua" placeholder="ファイル名">
         <button onclick="saveFile()">保存</button>
+        <input type="file" id="fileInput" accept=".txt,.lua" style="display:none" onchange="importFile(this)">
     </div>
 </div>
 
-<!-- Main Content -->
 <div id="main-area">
     <div id="editor-container"></div>
-    
     <div id="sidebar">
-        <div id="sidebar-search">
-            <input type="text" id="sb-input" placeholder="候補を検索..." oninput="filterSidebar()">
-        </div>
-        <ul id="candidate-list">
-            <!-- Items injected by JS -->
-        </ul>
+        <div id="sidebar-header">候補一覧 (クリックで挿入)</div>
+        <ul id="candidate-list"></ul>
     </div>
 </div>
 
-<div id="footer">
-    <span id="status-msg">Ready - Ctrl+Spaceで補完</span>
+<div id="statusbar">
+    <span id="hint-msg">GameGuardian Lua Editor V13</span>
+    <span id="cursor-pos">Ln 1, Col 1</span>
 </div>
 
-<!-- Monaco Loader -->
+<div id="toast">Message</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 
 <script>
-    let editor;
-    let allCandidates = []; // Stores all API, Lua, and User definitions
-    let userVariables = new Set();
-    
-    // API Data Definitions
-    const ggApi = [
-        // Basic
-        { l: 'gg.alert', d: 'メッセージを表示', i: 'gg.alert(${1:"msg"})', t: 'func' },
-        { l: 'gg.toast', d: 'トースト通知', i: 'gg.toast(${1:"msg"}, ${2:true})', t: 'func' },
-        { l: 'gg.sleep', d: '待機 (ms)', i: 'gg.sleep(${1:1000})', t: 'func' },
-        { l: 'gg.isVisible', d: 'UI表示状態', i: 'gg.isVisible()', t: 'func' },
-        { l: 'gg.setVisible', d: 'UI表示設定', i: 'gg.setVisible(${1:true})', t: 'func' },
-        { l: 'gg.clearResults', d: '検索結果消去', i: 'gg.clearResults()', t: 'func' },
-        // Search
-        { l: 'gg.searchNumber', d: '数値検索', i: 'gg.searchNumber(${1:"100"}, ${2:gg.TYPE_DWORD})', t: 'func' },
-        { l: 'gg.refineNumber', d: '数値絞り込み', i: 'gg.refineNumber(${1:"100"}, ${2:gg.TYPE_DWORD})', t: 'func' },
-        { l: 'gg.searchAddress', d: 'アドレス検索', i: 'gg.searchAddress(${1:"text"}, ${2:mask})', t: 'func' },
-        { l: 'gg.getResults', d: '結果取得', i: 'gg.getResults(${1:100})', t: 'func' },
-        { l: 'gg.editAll', d: '全置換', i: 'gg.editAll(${1:"val"}, ${2:gg.TYPE_DWORD})', t: 'func' },
-        { l: 'gg.getResultCount', d: '結果数', i: 'gg.getResultCount()', t: 'func' },
-        // Memory
-        { l: 'gg.getValues', d: '値取得', i: 'gg.getValues(${1:table})', t: 'func' },
-        { l: 'gg.setValues', d: '値設定', i: 'gg.setValues(${1:table})', t: 'func' },
-        { l: 'gg.addListItems', d: '保存リストへ追加', i: 'gg.addListItems(${1:table})', t: 'func' },
-        { l: 'gg.getListItems', d: '保存リスト取得', i: 'gg.getListItems()', t: 'func' },
-        // Types
-        { l: 'gg.TYPE_DWORD', d: '4 Byte', i: 'gg.TYPE_DWORD', t: 'const' },
-        { l: 'gg.TYPE_FLOAT', d: 'Float', i: 'gg.TYPE_FLOAT', t: 'const' },
-        { l: 'gg.TYPE_DOUBLE', d: 'Double', i: 'gg.TYPE_DOUBLE', t: 'const' },
-        { l: 'gg.TYPE_WORD', d: '2 Byte', i: 'gg.TYPE_WORD', t: 'const' },
-        { l: 'gg.TYPE_BYTE', d: '1 Byte', i: 'gg.TYPE_BYTE', t: 'const' },
-        { l: 'gg.TYPE_QWORD', d: '8 Byte', i: 'gg.TYPE_QWORD', t: 'const' },
-        { l: 'gg.TYPE_AUTO', d: 'Auto', i: 'gg.TYPE_AUTO', t: 'const' },
-        // Regions
-        { l: 'gg.REGION_ANONYMOUS', d: 'Xa', i: 'gg.REGION_ANONYMOUS', t: 'const' },
-        { l: 'gg.REGION_C_ALLOC', d: 'Ca', i: 'gg.REGION_C_ALLOC', t: 'const' },
-        { l: 'gg.REGION_JAVA_HEAP', d: 'Jh', i: 'gg.REGION_JAVA_HEAP', t: 'const' },
-        { l: 'gg.REGION_C_HEAP', d: 'Ch', i: 'gg.REGION_C_HEAP', t: 'const' },
-        // Menus
-        { l: 'gg.choice', d: '選択ダイアログ', i: 'gg.choice({${1:"A","B"}}, ${2:nil}, ${3:"Title"})', t: 'func' },
-        { l: 'gg.prompt', d: '入力ダイアログ', i: 'gg.prompt({${1:"Msg"}}, {${2}}, {${3:"number"}})', t: 'func' },
-        { l: 'gg.multiChoice', d: '複数選択', i: 'gg.multiChoice({${1:"A","B"}}, {${2}}, ${3:"Title"})', t: 'func' },
-        // Misc
-        { l: 'gg.copyText', d: 'クリップボードコピー', i: 'gg.copyText(${1:"txt"})', t: 'func' },
-        { l: 'gg.time.year', d: '年', i: 'gg.time.year', t: 'prop' },
-        { l: 'gg.makeRequest', d: 'HTTPリクエスト', i: 'gg.makeRequest(${1:"url"})', t: 'func' },
-        { l: 'gg.getFile', d: 'ファイル選択', i: 'gg.getFile()', t: 'func' },
+    // --- API Data (Excerpt) ---
+    const apiData = [
+        {l:'gg.alert', d:'警告ダイアログ', t:'func', i:'gg.alert("${1:msg}")'},
+        {l:'gg.toast', d:'通知を表示', t:'func', i:'gg.toast("${1:msg}")'},
+        {l:'gg.searchNumber', d:'数値を検索', t:'func', i:'gg.searchNumber("${1:100}", ${2:gg.TYPE_DWORD})'},
+        {l:'gg.clearResults', d:'検索結果を消去', t:'func', i:'gg.clearResults()'},
+        {l:'gg.getResults', d:'結果リストを取得', t:'func', i:'gg.getResults(${1:100})'},
+        {l:'gg.editAll', d:'結果を一括書き換え', t:'func', i:'gg.editAll("${1:val}", ${2:gg.TYPE_DWORD})'},
+        {l:'gg.setValues', d:'メモリに値を書き込み', t:'func', i:'gg.setValues(${1:t})'},
+        {l:'gg.getValues', d:'メモリから値を読み込み', t:'func', i:'gg.getValues(${1:t})'},
+        {l:'gg.process', d:'プロセスを選択', t:'func', i:'gg.process(${1:proc})'},
+        {l:'gg.sleep', d:'待機 (ミリ秒)', t:'func', i:'gg.sleep(${1:1000})'},
+        {l:'gg.isVisible', d:'UIが表示中か確認', t:'func', i:'gg.isVisible()'},
+        {l:'gg.setVisible', d:'UIの表示/非表示', t:'func', i:'gg.setVisible(${1:true})'},
+        {l:'gg.prompt', d:'入力ダイアログ', t:'func', i:'gg.prompt({${1:"Msg"}}, {${2}}, {${3:"number"}})'},
+        {l:'gg.choice', d:'選択リスト', t:'func', i:'gg.choice({${1:"A","B"}}, ${2:nil}, ${3:"Title"})'},
+        {l:'gg.multiChoice', d:'複数選択リスト', t:'func', i:'gg.multiChoice({${1:"A","B"}}, {${2}}, ${3:"Title"})'},
+        {l:'gg.bytes', d:'文字列をバイト列に変換', t:'func', i:'gg.bytes("${1:str}", "UTF-8")'},
+        {l:'gg.makeRequest', d:'HTTPリクエスト送信', t:'func', i:'gg.makeRequest("${1:url}")'},
+        {l:'gg.copyText', d:'クリップボードにコピー', t:'func', i:'gg.copyText("${1:text}")'},
+        
+        {l:'gg.TYPE_DWORD', t:'const', d:'4バイト整数'}, {l:'gg.TYPE_FLOAT', t:'const', d:'浮動小数点'}, 
+        {l:'gg.TYPE_DOUBLE', t:'const', d:'倍精度浮動小数点'}, {l:'gg.TYPE_QWORD', t:'const', d:'8バイト整数'}, 
+        {l:'gg.TYPE_WORD', t:'const', d:'2バイト整数'}, {l:'gg.TYPE_BYTE', t:'const', d:'1バイト整数'},
+        {l:'gg.TYPE_AUTO', t:'const', d:'自動型'}, {l:'gg.REGION_ANONYMOUS', t:'const', d:'Xa領域'}, 
+        
+        {l:'print', t:'func', i:'print(${1})', d:'ログ出力'}, {l:'tonumber', t:'func', i:'tonumber(${1})', d:'数値変換'},
+        {l:'tostring', t:'func', i:'tostring(${1})', d:'文字列変換'}, {l:'type', t:'func', i:'type(${1})', d:'型確認'},
+        {l:'pairs', t:'func', i:'pairs(${1:t})', d:'ペア反復'}, {l:'ipairs', t:'func', i:'ipairs(${1:t})', d:'配列反復'},
+        {l:'string.format', t:'func', i:'string.format("${1:%s}", ${2:v})', d:'書式化文字列'}, 
+        {l:'string.find', t:'func', i:'string.find(${1:s}, "${2:pat}")', d:'文字列検索'},
+        {l:'table.insert', t:'func', i:'table.insert(${1:t}, ${2:v})', d:'テーブル挿入'}, 
+        {l:'table.remove', t:'func', i:'table.remove(${1:t}, ${2:pos})', d:'テーブル削除'},
+        {l:'os.clock', t:'func', i:'os.clock()', d:'CPU時間'}, {l:'os.time', t:'func', i:'os.time()', d:'現在時刻'}, 
+        {l:'os.exit', t:'func', i:'os.exit()', d:'スクリプト終了'}, {l:'io.open', t:'func', i:'io.open("${1:file}", "${2:w}")', d:'ファイルを開く'},
+        
+        {l:'local', t:'key', i:'local ', d:'ローカル変数'}, {l:'function', t:'key', i:'function ${1:name}(${2})\n\t${3}\nend', d:'関数定義'},
+        {l:'return', t:'key', i:'return ', d:'値を返す'}, {l:'if', t:'key', i:'if ${1:cond} then\n\t${2}\nend', d:'もし～なら'},
+        {l:'while', t:'key', i:'while ${1:cond} do\n\t${2}\nend', d:'条件ループ'}, {l:'for', t:'key', i:'for i = ${1:1}, ${2:10} do\n\t${3}\nend', d:'回数ループ'},
+        {l:'else', t:'key', i:'else', d:'そうでなければ'}, {l:'elseif', t:'key', i:'elseif', d:'そうでなくもし'}, {l:'then', t:'key', i:'then', d:'ならば'},
+        {l:'end', t:'key', i:'end', d:'ブロック終了'}, {l:'repeat', t:'key', i:'repeat', d:'～まで繰り返す'}, {l:'until', t:'key', i:'until', d:'条件(終了)'},
     ];
 
-    const luaApi = [
-        { l: 'print', d: 'ログ出力', i: 'print(${1:"msg"})', t: 'func' },
-        { l: 'tonumber', d: '数値変換', i: 'tonumber(${1})', t: 'func' },
-        { l: 'tostring', d: '文字列変換', i: 'tostring(${1})', t: 'func' },
-        { l: 'type', d: '型確認', i: 'type(${1})', t: 'func' },
-        { l: 'pairs', d: 'テーブル反復', i: 'pairs(${1:table})', t: 'func' },
-        { l: 'ipairs', d: '配列反復', i: 'ipairs(${1:table})', t: 'func' },
-        { l: 'table.insert', d: 'テーブル挿入', i: 'table.insert(${1:tab}, ${2:val})', t: 'func' },
-        { l: 'table.remove', d: 'テーブル削除', i: 'table.remove(${1:tab}, ${2:pos})', t: 'func' },
-        { l: 'table.concat', d: '結合', i: 'table.concat(${1:tab}, ${2:","})', t: 'func' },
-        { l: 'string.format', d: 'フォーマット', i: 'string.format("${1:%d}", ${2:val})', t: 'func' },
-        { l: 'string.find', d: '検索', i: 'string.find(${1:str}, ${2:pattern})', t: 'func' },
-        { l: 'string.sub', d: '部分文字列', i: 'string.sub(${1:str}, ${2:start}, ${3:end})', t: 'func' },
-        { l: 'string.len', d: '長さ', i: 'string.len(${1:str})', t: 'func' },
-        { l: 'math.floor', d: '切り捨て', i: 'math.floor(${1})', t: 'func' },
-        { l: 'math.ceil', d: '切り上げ', i: 'math.ceil(${1})', t: 'func' },
-        { l: 'math.random', d: '乱数', i: 'math.random(${1:min}, ${2:max})', t: 'func' },
-        { l: 'os.date', d: '日付', i: 'os.date("%Y-%m-%d %H:%M:%S")', t: 'func' },
-        { l: 'os.time', d: '時間', i: 'os.time()', t: 'func' },
-        // Keywords
-        { l: 'if', d: '条件分岐', i: 'if ${1:condition} then\n\t${2}\nend', t: 'key' },
-        { l: 'for', d: 'ループ', i: 'for i = ${1:1}, ${2:10} do\n\t${3}\nend', t: 'key' },
-        { l: 'while', d: '条件ループ', i: 'while ${1:cond} do\n\t${2}\nend', t: 'key' },
-        { l: 'function', d: '関数定義', i: 'function ${1:name}(${2})\n\t${3}\nend', t: 'key' },
-        { l: 'local', d: 'ローカル変数', i: 'local ', t: 'key' },
-        { l: 'return', d: '戻り値', i: 'return ', t: 'key' },
-        { l: 'goto', d: 'ジャンプ', i: 'goto ${1:label}', t: 'key' },
-    ];
+    let editor;
+    let userDefinedVars = new Set();
+    let isInserting = false;
+    let searchMatches = [];
+    let currentMatchIdx = -1;
+    let currentDecorations = []; 
 
     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
 
     require(['vs/editor/editor.main'], function() {
-        
-        // 1. Initialize data
-        allCandidates = [...ggApi, ...luaApi];
-
-        // 2. Register Completion Provider (Auto-complete in editor)
         monaco.languages.registerCompletionItemProvider('lua', {
             provideCompletionItems: function(model, position) {
-                const word = model.getWordUntilPosition(position);
+                const wordInfo = model.getWordUntilPosition(position);
                 const range = {
-                    startLineNumber: position.lineNumber,
-                    endLineNumber: position.lineNumber,
-                    startColumn: word.startColumn,
-                    endColumn: word.endColumn
+                    startLineNumber: position.lineNumber, endLineNumber: position.lineNumber,
+                    startColumn: wordInfo.startColumn, endColumn: wordInfo.endColumn
                 };
-
-                // Create Monaco suggestion objects
+                
                 const suggestions = [
-                    ...allCandidates.map(item => ({
-                        label: item.l,
-                        kind: item.t === 'func' ? monaco.languages.CompletionItemKind.Function : 
-                              item.t === 'const' ? monaco.languages.CompletionItemKind.Constant :
-                              item.t === 'key' ? monaco.languages.CompletionItemKind.Keyword :
-                              monaco.languages.CompletionItemKind.Property,
-                        documentation: item.d,
-                        insertText: item.i,
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        range: range,
-                        detail: item.d
+                    ...apiData.map(item => ({
+                        label: item.l, kind: getKind(item.t), documentation: item.d,
+                        insertText: item.i || item.l, insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        range: range, detail: item.d
                     })),
-                    // Add User defined variables
-                    ...Array.from(userVariables).map(v => ({
-                        label: v,
-                        kind: monaco.languages.CompletionItemKind.Variable,
-                        insertText: v,
-                        range: range,
-                        detail: 'User Variable'
+                    ...Array.from(userDefinedVars).map(v => ({
+                        label: v, kind: monaco.languages.CompletionItemKind.Variable,
+                        insertText: v, range: range, detail: 'User Var'
                     }))
                 ];
                 return { suggestions: suggestions };
             }
         });
 
-        // 3. Create Editor
         editor = monaco.editor.create(document.getElementById('editor-container'), {
-            value: '-- GameGuardian Script\n\ngg.alert("Start")\n',
+            value: '-- GameGuardian Script V13\n\nlocal input = gg.prompt(\n    {"認証番号を入力してください"}, \n    {""}, \n    {"number"}\n)\n\nif input then\n    print("OK")\nend\n',
             language: 'lua',
             theme: 'vs-dark',
             automaticLayout: true,
             fontSize: 14,
             minimap: { enabled: true },
-            lineNumbers: 'on',
-            scrollBeyondLastLine: false,
-            // Typo tolerance in Quick Suggestions is handled by Monaco internals mostly,
-            // but we ensure filtered list in sidebar helps.
-            quickSuggestions: { other: true, comments: false, strings: false },
-            wordBasedSuggestions: true
+            wordWrap: 'off',
+            scrollBeyondLastColumn: 5,
+            suggest: { filterGraceful: true, snippetsPreventQuickSuggestions: false }
         });
 
-        // 4. Events
-        editor.onDidChangeModelContent(() => {
-            parseUserVariables();
-            // Debounce sidebar update
-            setTimeout(() => {
-                const pos = editor.getPosition();
-                updateSidebar(pos);
-            }, 100);
-        });
-
+        editor.onDidChangeModelContent(() => { parseUserVars(); updateSidebar(); });
         editor.onDidChangeCursorPosition((e) => {
-            updateSidebar(e.position);
+            updateSidebarPosition(e.position);
+            document.getElementById('cursor-pos').innerText = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
         });
         
-        // "Linux-style" selection listener (auto-copy logic simulation)
-        // Note: Browsers block direct clipboard write without event usually, 
-        // but we can make it ready for the copy button.
-        editor.onDidChangeCursorSelection((e) => {
-            if (!e.selection.isEmpty()) {
-                document.getElementById('status-msg').innerText = "選択範囲あり - コピーボタンでコピー";
-            }
-        });
+        editor.onMouseUp(() => checkSelectionCopy());
+        editor.onKeyUp(() => checkSelectionCopy());
 
-        // Initial render
-        renderSidebarList(allCandidates);
+        parseUserVars();
+        updateSidebar();
+        startHintCycle();
     });
 
-    // --- Sidebar Logic ---
-
-    function updateSidebar(position) {
-        if (!editor) return;
-        const model = editor.getModel();
-        const wordInfo = model.getWordUntilPosition(position);
-        const currentWord = wordInfo.word.toLowerCase();
-
-        // If typing, filter fuzzy. If empty, show all (or limit to top 50 for perf).
-        filterSidebar(currentWord);
+    function checkSelectionCopy() {
+        if(isInserting) { isInserting = false; return; }
+        const sel = editor.getSelection();
+        if(!sel || sel.isEmpty()) return;
+        const txt = editor.getModel().getValueInRange(sel);
+        if(txt) navigator.clipboard.writeText(txt).then(() => showToast("コピーしました")).catch(()=>{});
     }
 
-    function filterSidebar(queryOverride = null) {
-        let query = queryOverride;
-        if (query === null) {
-            const input = document.getElementById('sb-input');
-            query = input ? input.value.toLowerCase() : "";
-        }
+    function insertCode(item) {
+        if (!editor) return;
+        isInserting = true;
+        editor.focus();
+        const pos = editor.getPosition();
+        const model = editor.getModel();
+        const wordInfo = model.getWordUntilPosition(pos);
+        const lineContent = model.getLineContent(pos.lineNumber);
+        const textBeforeCursor = lineContent.substring(0, pos.column - 1);
         
-        // Combine static API + dynamic user vars
-        let dynamicList = Array.from(userVariables).map(v => ({ l: v, d: 'User Var', i: v, t: 'var' }));
-        let fullList = [...dynamicList, ...allCandidates];
+        let insertText = item.i || item.l;
+        const rawLabel = item.l; 
 
+        if (rawLabel.includes('.')) {
+            const parts = rawLabel.split('.');
+            const prefix = parts[0] + '.'; 
+            const checkStr = textBeforeCursor.trim();
+            if (new RegExp(prefix.replace('.', '\\.') + '[a-zA-Z0-9_]*$').test(checkStr)) {
+                if (insertText.startsWith(prefix)) {
+                    insertText = insertText.substring(prefix.length);
+                }
+            }
+        }
+
+        const range = new monaco.Range(pos.lineNumber, wordInfo.startColumn, pos.lineNumber, wordInfo.endColumn);
+        editor.setSelection(range);
+        const contrib = editor.getContribution('snippetController2');
+        if (contrib) contrib.insert(insertText);
+        else editor.trigger('keyboard', 'type', { text: insertText });
+        setTimeout(() => { isInserting = false; }, 100);
+    }
+
+    // --- V13 整形機能 (過剰改行廃止 & スマートインデント) ---
+    function formatCode() {
+        if (!editor) return;
+        const model = editor.getModel();
+        const rawCode = model.getValue();
+        
+        // 1. 文字列保護
+        const stringStore = [];
+        const maskedCode = rawCode.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, function(match) {
+            stringStore.push(match);
+            return `__STR_${stringStore.length - 1}__`;
+        });
+
+        // 2. 改行ルールの緩和
+        // V11/V12にあった「カンマや{での強制改行」を廃止。
+        // ブロック制御文のみ改行を促す。
+        let code = maskedCode;
+        code = code.replace(/(\b(then|do|repeat)\b)(?!\s*(--.*)?$)/g, "$1\n");
+        code = code.replace(/(?<!^)(?<!\n)\s*(\b(end|until)\b)/g, "\n$1");
+        code = code.replace(/;\s*/g, ";\n");
+
+        let lines = code.split(/\r?\n/);
+        let formattedLines = [];
+        let depth = 0;
+        const indentStr = "    ";
+
+        // インデント計算用Regex
+        // else/elseif は「現在の深さ-1で表示」し、「次の深さは変わらない(あるいは+1して-1する)」
+        const reElse = /^\s*(else|elseif)\b/;
+        const reBlockEnd = /^\s*(end|until|\}|\))/;
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (!line) continue;
+
+            const cleanLine = line.split('--')[0].trim();
+
+            // この行が「閉じ」または「途中(else)」で始まるなら、表示用深さを減らす
+            let printDepth = depth;
+            if (reBlockEnd.test(cleanLine)) {
+                depth--; // 閉じるので深さを減らす
+                printDepth = depth;
+            } else if (reElse.test(cleanLine)) {
+                printDepth = depth - 1; // elseはブロック内だが1つ左に表示
+            }
+
+            if (printDepth < 0) printDepth = 0;
+            if (depth < 0) depth = 0;
+
+            formattedLines.push(indentStr.repeat(printDepth) + line);
+
+            // 次の行への深さ計算
+            // 開き括弧・キーワードの数
+            const opens = (cleanLine.match(/(\b(function|then|do|repeat)\b|\{|\()/g) || []).length;
+            // 閉じ括弧・キーワードの数
+            const closes = (cleanLine.match(/(\b(end|until)\b|\}|\))/g) || []).length;
+            
+            // 行内での増減
+            let delta = opens - closes;
+            
+            // もし行頭で既に下げていたら(reBlockEnd)、closesのカウントと重複して下げすぎるのを防ぐ？
+            // いえ、depth変数は「次の行の深さ」を保持する。
+            // reBlockEndの判定で depth-- したのは「この行が閉じ括弧で始まるから、この行から下げる」ため。
+            // 行内にさらに閉じ括弧がある場合（例: `end end`）、それはさらに下げる必要がある。
+            // ただし、行頭の閉じ括弧分は既に depth-- で処理済みなので、delta計算では考慮が必要。
+            // 簡易ロジックとして、行頭閉じの場合は closesのカウントから1引く（既に処理したとみなす）
+            
+            if (reBlockEnd.test(cleanLine)) {
+                // 行頭の1つ分は処理済みなのでdeltaへの影響をキャンセル（+1相当）
+                // ただし正規表現マッチは全数マッチなので、単純に opens - closes を足すと
+                // depth = (depth_prev - 1) + (opens - closes) となり、
+                // 例えば `end` だけの行なら closes=1, delta=-1. 
+                // depth = d - 1 + 0 - 1 = d - 2 になってしまう。
+                // よって、行頭で下げた分は delta に加算（補正）する。
+                delta += 1;
+            }
+
+            depth += delta;
+        }
+
+        let finalCode = formattedLines.join("\n");
+        finalCode = finalCode.replace(/__STR_(\d+)__/g, (m, id) => stringStore[id]);
+
+        const fullRange = model.getFullModelRange();
+        editor.executeEdits('formatCode', [{ range: fullRange, text: finalCode, forceMoveMarkers: true }]);
+        showToast("整形完了");
+    }
+
+    // --- V13 リアルタイム・スマート検索 ---
+    function doSearch() {
+        const query = document.getElementById('search-input').value;
+        const model = editor.getModel();
+        
+        // 入力が空ならハイライト解除
         if (!query) {
-            renderSidebarList(fullList);
+            document.getElementById('search-count').innerText = "0/0";
+            currentDecorations = editor.deltaDecorations(currentDecorations, []);
+            searchMatches = [];
             return;
         }
 
-        // Fuzzy/Typo tolerance logic (Simple includes check split by char or Levenshtein simplified)
-        // For this requirement: "Typo tolerance", we use a relaxed inclusion check.
-        const filtered = fullList.filter(item => {
-            const lowerLabel = item.l.toLowerCase();
-            if (lowerLabel.includes(query)) return true;
+        // 部分一致ロジックの強化
+        const isFuzzy = document.getElementById('search-fuzzy').checked;
+        let regexQuery;
+        
+        if (isFuzzy) {
+            // 文字列をトークンに分割（スペース区切り）
+            // "local gg=gg" -> "local", "gg=gg"
+            // 記号も分割したいが、単純にスペースを [\s\S]*? (非貪欲マッチ) にする
+            // ユーザー要望「local gg = gg」で「local gg=gg --hello」を検索したい？
+            // いえ、「local gg=gg」というコードを、「local gg = gg --hello」というクエリで探すのは無理（クエリの方が情報量が多い）。
+            // ユーザーの要望は逆。「local gg = gg」のようなコードを「local gg = gg -- hello」のように検索すると検索できない、
+            // つまり「local gg = gg」まで入力した時点でヒットしてほしい、あるいは
+            // 「local gg = gg」を探したいのにスペースが違ってヒットしないのを直してほしい、のどちらか。
+            // 文脈的に「入力された情報に最も近いコード」＝「入力された文字が含まれるコード」
             
-            // Allow 1 char typo if length > 3
-            if (query.length > 3 && isFuzzyMatch(query, lowerLabel)) return true;
-            
-            return false;
-        });
+            // スペースを「任意の空白または記号」として扱う柔軟なRegex
+            const parts = query.split(/\s+/).filter(p => p);
+            const escapedParts = parts.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            // 単語間に柔軟なマッチを挿入
+            regexQuery = escapedParts.join('[\\s\\S]*?'); 
+        } else {
+            regexQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
 
-        renderSidebarList(filtered);
+        try {
+            searchMatches = model.findMatches(regexQuery, false, true, false, null, true);
+        } catch(e) {
+            searchMatches = [];
+        }
+
+        const countEl = document.getElementById('search-count');
+        countEl.innerText = searchMatches.length > 0 ? `1/${searchMatches.length}` : "0/0";
+
+        // ハイライト更新
+        const decorations = searchMatches.map(match => ({
+            range: match.range,
+            options: {
+                className: 'search-match-text', // 文字白
+                isWholeLine: false,
+                overviewRuler: { color: 'red', position: 1 } // スクロールバーに表示
+            }
+        }));
+        
+        // 行ハイライトも追加（最初の1件だけでなく全件）
+        const lineDecorations = searchMatches.map(match => ({
+            range: match.range,
+            options: {
+                isWholeLine: true,
+                className: 'search-line-highlight' // 行赤
+            }
+        }));
+
+        currentDecorations = editor.deltaDecorations(currentDecorations, [...decorations, ...lineDecorations]);
     }
 
-    function isFuzzyMatch(query, target) {
-        // Simple heuristic: if query characters appear in target in order
-        let qIdx = 0;
-        for (let i = 0; i < target.length; i++) {
-            if (target[i] === query[qIdx]) {
-                qIdx++;
-                if (qIdx === query.length) return true;
+    function searchNext(isNext) {
+        if (searchMatches.length === 0) {
+            doSearch(); // 念のため再検索
+            if (searchMatches.length === 0) return;
+        }
+
+        if (isNext) {
+            currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
+        } else {
+            currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+        }
+
+        document.getElementById('search-count').innerText = `${currentMatchIdx + 1}/${searchMatches.length}`;
+        const range = searchMatches[currentMatchIdx].range;
+        editor.revealRangeInCenter(range);
+    }
+
+    function execCmd(cmd) {
+        editor.focus();
+        if(cmd==='undo') editor.trigger('k','undo');
+        else if(cmd==='redo') editor.trigger('k','redo');
+        else editor.trigger('s', cmd);
+    }
+
+    function autoComment() {
+        const m = editor.getModel();
+        const edits = [];
+        const dict = {}; apiData.forEach(i=>dict[i.l]=i.d);
+        for(let i=1; i<=m.getLineCount(); i++){
+            const l = m.getLineContent(i);
+            if(l.includes('--')) continue;
+            for(let k in dict){
+                if(l.includes(k+'(') || l.includes(k+' ')){
+                    edits.push({ range: new monaco.Range(i, l.length+1, i, l.length+1), text: ` -- ${dict[k]}` });
+                    break;
+                }
             }
         }
-        return false;
+        if(edits.length) { editor.executeEdits('autoComment', edits); showToast("解説を追加しました"); }
     }
 
-    function renderSidebarList(items) {
+    function startHintCycle() {
+        const hints = [
+            "ヒント: リアルタイム検索で素早くコードを特定",
+            "ヒント: '整形'は過剰な改行をせず見やすく修正",
+            "ヒント: 範囲選択を終えると自動でコピー",
+            "ヒント: Ctrl+Z で変更を元に戻せます"
+        ];
+        let idx = 0;
+        const el = document.getElementById('hint-msg');
+        setInterval(() => { idx = (idx + 1) % hints.length; el.innerText = hints[idx]; }, 4000);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.className = "show";
+        setTimeout(() => t.className = "", 2000);
+    }
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    
+    function parseUserVars() {
+        if(!editor) return;
+        const c = editor.getValue();
+        const v = new Set();
+        let m;
+        const r1 = /local\s+([a-zA-Z_]\w*)/g; while((m=r1.exec(c))) v.add(m[1]);
+        const r2 = /function\s+([a-zA-Z_]\w*)/g; while((m=r2.exec(c))) v.add(m[1]);
+        userDefinedVars = v;
+    }
+
+    function updateSidebar() { if(editor) updateSidebarPosition(editor.getPosition()); }
+    function updateSidebarPosition(pos) {
+        if(!editor) return;
+        const model = editor.getModel();
+        const word = model.getWordUntilPosition(pos).word.toLowerCase();
+        let candidates = [];
+        const userVars = Array.from(userDefinedVars).map(v => ({l:v, d:'User Var', t:'var'}));
+        const allItems = [...userVars, ...apiData];
+        if (!word) candidates = allItems.slice(0, 50);
+        else candidates = allItems.filter(i => i.l.toLowerCase().includes(word)).slice(0, 50);
         const list = document.getElementById('candidate-list');
         list.innerHTML = '';
-        
-        // Limit rendering for performance if too many
-        const displayItems = items.slice(0, 100);
-
-        displayItems.forEach(item => {
+        candidates.forEach(item => {
             const li = document.createElement('li');
             li.className = 'candidate-item';
-            
-            const labelSpan = document.createElement('span');
-            labelSpan.innerText = item.l;
-            
-            const typeSpan = document.createElement('span');
-            typeSpan.className = 'type-tag';
-            typeSpan.innerText = item.t;
-            typeSpan.style.color = item.t === 'func' ? '#dcdcaa' : (item.t === 'const' ? '#4fc1ff' : '#9cdcfe');
-
-            li.appendChild(labelSpan);
-            li.appendChild(typeSpan);
-
-            // Click to insert
-            li.onclick = () => insertCandidate(item);
-            
+            let c = '#ccc';
+            if(item.t==='func') c='var(--func-color)';
+            else if(item.t==='const') c='var(--const-color)';
+            li.innerHTML = `<div class="cand-top"><span class="cand-label" style="color:${c}">${item.l}</span><span class="cand-type">${item.t}</span></div><div class="cand-desc">${item.d || ''}</div>`;
+            li.onclick = () => insertCode(item);
             list.appendChild(li);
         });
     }
 
-    function insertCandidate(item) {
-        if (!editor) return;
-        const position = editor.getPosition();
-        // Insert text snippet
-        const controller = editor.contribs['snippetController2']; // Access snippet controller
-        if (controller && item.i.includes('$')) {
-             editor.executeEdits("sidebar", []); // Focus
-             editor.focus();
-             controller.insert(item.i);
-        } else {
-             const text = item.i;
-             editor.executeEdits('sidebar', [{
-                 range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
-                 text: text,
-                 forceMoveMarkers: true
-             }]);
-             editor.focus();
-        }
-    }
-
-    function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        sb.classList.toggle('visible');
-    }
-
-    // --- Dynamic User Variable Parsing ---
-    function parseUserVariables() {
-        if (!editor) return;
-        const code = editor.getValue();
-        const vars = new Set();
-        
-        // Regex for 'local varName ='
-        const assignRegex = /local\s+([a-zA-Z_]\w*)\s*=/g;
-        let match;
-        while ((match = assignRegex.exec(code)) !== null) {
-            vars.add(match[1]);
-        }
-        
-        // Regex for 'function name('
-        const funcRegex = /function\s+([a-zA-Z_]\w*)\s*\(/g;
-        while ((match = funcRegex.exec(code)) !== null) {
-            vars.add(match[1]);
-        }
-
-        userVariables = vars;
-    }
-
-    // --- Auto Comment Feature ---
-    function addComments() {
-        if (!editor) return;
-        const model = editor.getModel();
-        const lineCount = model.getLineCount();
-        const edits = [];
-
-        // Simple map of API -> Comment
-        const commentMap = {};
-        ggApi.forEach(item => {
-            if (item.t === 'func') commentMap[item.l] = item.d;
-        });
-
-        for (let i = 1; i <= lineCount; i++) {
-            const lineContent = model.getLineContent(i);
-            // Check if line already has comment
-            if (lineContent.includes('--')) continue;
-
-            for (const key in commentMap) {
-                if (lineContent.includes(key + '(')) {
-                    edits.push({
-                        range: new monaco.Range(i, lineContent.length + 1, i, lineContent.length + 1),
-                        text: ` -- ${commentMap[key]}`
-                    });
-                    break; // One comment per line
-                }
-            }
-        }
-        
-        if (edits.length > 0) {
-            editor.executeEdits('auto-comment', edits);
-            document.getElementById('status-msg').innerText = `${edits.length}行にコメントを追加しました`;
-        } else {
-            document.getElementById('status-msg').innerText = "追加するコメントはありませんでした";
-        }
-    }
-
-    // --- File Operations ---
-    function triggerAction(actionId) {
-        if (editor) {
-            if (actionId === 'undo') editor.trigger('keyboard', 'undo');
-            else if (actionId === 'redo') editor.trigger('keyboard', 'redo');
-            else editor.trigger('source', actionId);
-            editor.focus();
-        }
+    function getKind(t) {
+        if(t==='func') return monaco.languages.CompletionItemKind.Function;
+        if(t==='const') return monaco.languages.CompletionItemKind.Constant;
+        if(t==='key') return monaco.languages.CompletionItemKind.Keyword;
+        return monaco.languages.CompletionItemKind.Variable;
     }
 
     function saveFile() {
-        const value = editor.getValue();
-        let fname = document.getElementById('filename').value;
-        if (!fname) fname = 'script.lua';
-        
-        const blob = new Blob([value], {type: "text/plain;charset=utf-8"});
+        const val = editor.getValue();
+        let name = document.getElementById('filename').value || 'script.lua';
+        if(!name.match(/\.(lua|txt)$/)) name += '.lua';
+        const blob = new Blob([val], {type: "text/plain;charset=utf-8"});
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = fname;
+        a.download = name;
         a.click();
+        showToast("保存: " + name);
     }
 
-    function loadFile(input) {
-        const file = input.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            editor.setValue(e.target.result);
-            document.getElementById('filename').value = file.name;
-        };
-        reader.readAsText(file);
+    function importFile(input) {
+        const f = input.files[0]; if(!f) return;
+        const r = new FileReader(); r.onload=e=>{
+            const fullRange = editor.getModel().getFullModelRange();
+            editor.executeEdits('import', [{ range: fullRange, text: e.target.result }]);
+            document.getElementById('filename').value=f.name;
+        }; 
+        r.readAsText(f);
     }
 </script>
-
 </body>
 </html>
