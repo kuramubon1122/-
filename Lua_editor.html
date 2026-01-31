@@ -74,7 +74,7 @@
         #editor-container { flex: 1; height: 100%; overflow: hidden; }
 
         #sidebar {
-            width: 250px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
+            width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
             display: flex; flex-direction: column; z-index: 90;
         }
         #sidebar-header {
@@ -88,6 +88,7 @@
             display: flex; flex-direction: column; justify-content: center;
         }
         .candidate-item:hover { background-color: #2a2d2e; }
+        
         .cand-top { display: flex; justify-content: space-between; align-items: center; }
         .cand-label { font-weight: bold; font-size: 12px; }
         .cand-meaning { font-size: 10px; color: var(--comment-color); margin-left: 8px; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
@@ -112,6 +113,18 @@
         .search-line-highlight { background: rgba(255, 0, 0, 0.4) !important; border-left: 3px solid #ff0000; }
         .search-match-text { background-color: #ffffff !important; color: #000000 !important; font-weight: bold !important; border-radius: 2px; }
 
+        /* モーダル */
+        #modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #252526; padding: 15px; border-radius: 5px; border: 1px solid #444;
+            width: 300px; color: #eee;
+        }
+        .modal-box input { width: 100%; margin-bottom: 10px; padding: 6px; background: #333; border: 1px solid #555; color: white; }
+        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
@@ -133,9 +146,9 @@
     </div>
     
     <div class="btn-group">
-        <button onclick="formatCode()" title="可読性重視で整形">整形</button>
+        <button onclick="formatCode()" title="可読性重視で整形 (end後空行追加)">整形</button>
         <button onclick="autoComment()" title="解説を追加">解説</button>
-        <button onclick="removeComments()" title="コメントを全削除して元のコードに戻す" style="color:#ff9999;">コメ削除</button>
+        <button onclick="showReplaceModal()" title="変数を指定文字列に一括置換">変数置換</button>
     </div>
 
     <div class="search-container">
@@ -143,8 +156,8 @@
         <label class="search-opt"><input type="checkbox" id="search-fuzzy" checked onchange="doSearch()">部分一致</label>
         <div class="search-badge" id="search-count">0/0</div>
         <div class="btn-group">
-            <button onclick="searchNext(false)">▲</button>
-            <button onclick="searchNext(true)">▼</button>
+            <button onclick="searchNext(false)" title="前へ">▲</button>
+            <button onclick="searchNext(true)" title="次へ">▼</button>
         </div>
     </div>
 
@@ -153,7 +166,7 @@
         <button onclick="document.getElementById('fileInput').click()">開く</button>
         <input type="text" id="filename" value="script.lua" placeholder="ファイル名">
         <button onclick="saveFile()">保存</button>
-        <button onclick="shareScript()" style="background-color:#007acc;">共有</button>
+        <button onclick="shareScript()" style="background-color:#007acc;" title="ファイルとして共有 (ChromeOS対応)">共有</button>
         <input type="file" id="fileInput" accept=".txt,.lua" style="display:none" onchange="importFile(this)">
     </div>
 </div>
@@ -161,7 +174,7 @@
 <div id="main-area">
     <div id="editor-container"></div>
     <div id="sidebar">
-        <div id="sidebar-header">候補一覧 (変数名+意味)</div>
+        <div id="sidebar-header">候補一覧 (コメントも表示)</div>
         <ul id="candidate-list"></ul>
     </div>
 </div>
@@ -172,6 +185,22 @@
 </div>
 
 <div id="toast">Message</div>
+
+<!-- 変数置換モーダル -->
+<div id="modal-overlay">
+    <div class="modal-box">
+        <h3>変数一括置換</h3>
+        <p style="font-size:11px; color:#aaa;">変数を指定した文字列に置き換えます。</p>
+        <label>対象の変数名:</label>
+        <input type="text" id="replace-target" placeholder="例: _a">
+        <label>置き換え後の文字列:</label>
+        <input type="text" id="replace-with" placeholder="例: myValue">
+        <div class="modal-btns">
+            <button onclick="closeModal()" style="background:#555;">キャンセル</button>
+            <button onclick="doReplaceVar()" style="background:#0e639c;">全て置換</button>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 
@@ -198,6 +227,8 @@
         {l:'gg.copyText', d:'コピー', t:'func', i:'gg.copyText("${1:text}")'},
         {l:'gg.saveVariable', d:'変数保存', t:'func', i:'gg.saveVariable("${1:k}", ${2:v})'},
         {l:'gg.loadVariable', d:'変数読込', t:'func', i:'gg.loadVariable("${1:k}")'},
+        {l:'gg.addListItems', d:'リスト追加', t:'func', i:'gg.addListItems(${1:t})'},
+        {l:'gg.removeListItems', d:'リスト削除', t:'func', i:'gg.removeListItems(${1:t})'},
         
         {l:'gg.TYPE_DWORD', t:'const', d:'4byte'}, {l:'gg.TYPE_FLOAT', t:'const', d:'Float'}, 
         {l:'gg.TYPE_DOUBLE', t:'const', d:'Double'}, {l:'gg.TYPE_QWORD', t:'const', d:'8byte'}, 
@@ -247,8 +278,7 @@
                     })),
                     ...userDefinedVars.map(v => ({
                         label: v.l, kind: v.t === 'func_user' ? monaco.languages.CompletionItemKind.Function : monaco.languages.CompletionItemKind.Variable,
-                        insertText: v.l, range: range, 
-                        detail: v.d ? v.d : 'User Defined' 
+                        insertText: v.l, range: range, detail: v.d ? v.d : 'User Defined'
                     }))
                 ];
                 return { suggestions: suggestions };
@@ -256,7 +286,7 @@
         });
 
         editor = monaco.editor.create(document.getElementById('editor-container'), {
-            value: '-- GameGuardian Script V15\n\nlocal val = 100 -- 体力\n\nif val > 0 then\n    gg.toast("生存")\nend\n\n-- つめつめ防止テスト\nfunction test()\n    gg.alert("ok")\nend\n',
+            value: '-- GameGuardian Script V15\n\nfunction main()\n    local _count = 0\n    if _count < 10 then\n        gg.toast("Start")\n    end\nend\n\nmain()\n',
             language: 'lua',
             theme: 'vs-dark',
             automaticLayout: true,
@@ -280,6 +310,45 @@
         updateSidebar();
         startHintCycle();
     });
+
+    // --- 変数一括置換機能 ---
+    function showReplaceModal() {
+        const sel = editor.getSelection();
+        const txt = editor.getModel().getValueInRange(sel);
+        if(txt) document.getElementById('replace-target').value = txt;
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+    
+    function closeModal() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    }
+
+    function doReplaceVar() {
+        const target = document.getElementById('replace-target').value;
+        const replaceWith = document.getElementById('replace-with').value;
+        
+        if (!target) {
+            showToast("対象の変数名を入力してください");
+            return;
+        }
+
+        const model = editor.getModel();
+        const matches = model.findMatches(target, false, false, true, null, true); // matchWord=true で単語単位で検索
+        
+        if (matches.length === 0) {
+            showToast("対象の変数が見つかりません");
+            return;
+        }
+
+        const edits = matches.map(match => ({
+            range: match.range,
+            text: replaceWith
+        }));
+
+        editor.executeEdits('replaceVar', edits);
+        closeModal();
+        showToast(`${matches.length}箇所の変数を置換しました`);
+    }
 
     function checkSelectionCopy() {
         if(isInserting) { isInserting = false; return; }
@@ -307,7 +376,9 @@
             const prefix = parts[0] + '.'; 
             const checkStr = textBeforeCursor.trim();
             if (new RegExp(prefix.replace('.', '\\.') + '[a-zA-Z0-9_]*$').test(checkStr)) {
-                if (insertText.startsWith(prefix)) insertText = insertText.substring(prefix.length);
+                if (insertText.startsWith(prefix)) {
+                    insertText = insertText.substring(prefix.length);
+                }
             }
         }
 
@@ -319,7 +390,7 @@
         setTimeout(() => { isInserting = false; }, 100);
     }
 
-    // --- V15 整形機能 (end後に2行空ける・可読性重視) ---
+    // --- V15 改良版 整形機能 (end後に空行2行追加) ---
     function formatCode() {
         if (!editor) return;
         const model = editor.getModel();
@@ -331,8 +402,8 @@
             return `__STR_${stringStore.length - 1}__`;
         });
 
+        // 制御構造のみ改行
         let code = maskedCode;
-        // ブロック制御文のみ改行を促す
         code = code.replace(/(\b(then|do|repeat)\b)(?!\s*(--.*)?$)/g, "$1\n");
         code = code.replace(/(?<!^)(?<!\n)\s*(\b(end|until)\b)/g, "\n$1");
         code = code.replace(/;\s*/g, ";\n");
@@ -346,12 +417,11 @@
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i].trim();
-            if (!line) continue;
+            if (!line) continue; // 一旦空行はすべて詰めて再配置する
 
             const cleanLine = line.split('--')[0].trim();
             let printDepth = depth;
             
-            // 行頭が閉じカッコ/キーワードの場合
             if (reBlockEnd.test(cleanLine)) {
                 depth--;
                 printDepth = depth;
@@ -364,79 +434,48 @@
 
             formattedLines.push(indentStr.repeat(printDepth) + line);
 
-            // end/until/} で終わる行の場合、空行を2つ追加 (ぎゅうぎゅう防止)
-            // ただし、} だけで終わるテーブル定義などは1行空けぐらいにする？
-            // 要望は「endごとに2行開ける」
-            if (/\b(end|until)\b/.test(cleanLine) && depth === 0) {
-                 // トップレベルのendなら2行空ける
-                 formattedLines.push("");
-                 formattedLines.push("");
-            } else if (reBlockEnd.test(cleanLine)) {
-                 // ネスト内部や } の場合は適度に
-                 // ここではendが含まれていれば空けることにする
-                 if (/\bend\b/.test(cleanLine)) {
-                     formattedLines.push("");
-                     formattedLines.push("");
-                 }
-            }
-
-            // インデント計算
             const opens = (cleanLine.match(/(\b(function|then|do|repeat)\b|\{|\()/g) || []).length;
             const closes = (cleanLine.match(/(\b(end|until)\b|\}|\))/g) || []).length;
             let delta = opens - closes;
             if (reBlockEnd.test(cleanLine)) delta += 1;
+            
+            // --- V15: end でブロックが閉じた後、空行を2行追加 ---
+            // 行が end または until で終わっている場合 (コメント除く)
+            if (/\b(end|until)\b(\s*--.*)?$/.test(cleanLine)) {
+                // 次の行に空行を追加 (formattedLinesにプッシュ)
+                formattedLines.push("");
+                formattedLines.push(""); 
+            }
+
             depth += delta;
         }
 
-        // 連続する3行以上の空行を2行にまとめる
         let finalCode = formattedLines.join("\n");
-        finalCode = finalCode.replace(/\n{4,}/g, "\n\n\n"); 
+        // 連続しすぎた空行(3行以上)は2行にまとめる
+        finalCode = finalCode.replace(/\n{4,}/g, "\n\n\n");
+
         finalCode = finalCode.replace(/__STR_(\d+)__/g, (m, id) => stringStore[id]);
 
         const fullRange = model.getFullModelRange();
         editor.executeEdits('formatCode', [{ range: fullRange, text: finalCode, forceMoveMarkers: true }]);
-        showToast("整形完了 (読みやすく調整)");
-    }
-
-    // --- コメント一括削除機能 (変数リセット) ---
-    function removeComments() {
-        if (!editor) return;
-        const model = editor.getModel();
-        const rawCode = model.getValue();
-        
-        // 文字列保護
-        const stringStore = [];
-        const maskedCode = rawCode.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, function(match) {
-            stringStore.push(match);
-            return `__STR_${stringStore.length - 1}__`;
-        });
-
-        // コメント削除 (--以降を消す)
-        const noCommentCode = maskedCode.replace(/--.*$/gm, '');
-        
-        // 復元
-        let finalCode = noCommentCode.replace(/__STR_(\d+)__/g, (m, id) => stringStore[id]);
-        
-        // 末尾の空白削除
-        finalCode = finalCode.split('\n').map(l => l.trimRight()).join('\n');
-
-        const fullRange = model.getFullModelRange();
-        editor.executeEdits('removeComments', [{ range: fullRange, text: finalCode, forceMoveMarkers: true }]);
-        showToast("コメントを削除しました");
+        showToast("可読性重視で整形しました");
     }
 
     // --- 検索機能 ---
     function doSearch() {
         const query = document.getElementById('search-input').value;
         const model = editor.getModel();
+        
         if (!query) {
             document.getElementById('search-count').innerText = "0/0";
             currentDecorations = editor.deltaDecorations(currentDecorations, []);
             searchMatches = [];
             return;
         }
+
         const isFuzzy = document.getElementById('search-fuzzy').checked;
         let regexQuery;
+        
         if (isFuzzy) {
             const parts = query.split(/\s+/).filter(p => p);
             const escapedParts = parts.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
@@ -444,17 +483,35 @@
         } else {
             regexQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
-        try { searchMatches = model.findMatches(regexQuery, false, true, false, null, true); } catch(e) { searchMatches = []; }
-        document.getElementById('search-count').innerText = searchMatches.length > 0 ? `1/${searchMatches.length}` : "0/0";
-        const decorations = searchMatches.map(match => ({ range: match.range, options: { className: 'search-match-text', isWholeLine: false, overviewRuler: { color: 'red', position: 1 } } }));
-        const lineDecorations = searchMatches.map(match => ({ range: match.range, options: { isWholeLine: true, className: 'search-line-highlight' } }));
+
+        try {
+            searchMatches = model.findMatches(regexQuery, false, true, false, null, true);
+        } catch(e) { searchMatches = []; }
+
+        const countEl = document.getElementById('search-count');
+        countEl.innerText = searchMatches.length > 0 ? `1/${searchMatches.length}` : "0/0";
+
+        const decorations = searchMatches.map(match => ({
+            range: match.range,
+            options: { className: 'search-match-text', isWholeLine: false, overviewRuler: { color: 'red', position: 1 } }
+        }));
+        
+        const lineDecorations = searchMatches.map(match => ({
+            range: match.range,
+            options: { isWholeLine: true, className: 'search-line-highlight' }
+        }));
+
         currentDecorations = editor.deltaDecorations(currentDecorations, [...decorations, ...lineDecorations]);
     }
 
     function searchNext(isNext) {
-        if (searchMatches.length === 0) { doSearch(); if (searchMatches.length === 0) return; }
+        if (searchMatches.length === 0) {
+            doSearch();
+            if (searchMatches.length === 0) return;
+        }
         if (isNext) currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
         else currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+
         document.getElementById('search-count').innerText = `${currentMatchIdx + 1}/${searchMatches.length}`;
         editor.revealRangeInCenter(searchMatches[currentMatchIdx].range);
     }
@@ -485,10 +542,10 @@
 
     function startHintCycle() {
         const hints = [
-            "ヒント: 'コメ削除'で変数の横のコメントを一括削除",
-            "ヒント: Chromeで'共有'ボタンを押すとファイル送信可能",
-            "ヒント: '整形'はendの後に空行を入れて読みやすくします",
-            "ヒント: Ctrl+Z で全ての操作を元に戻せます"
+            "ヒント: '変数置換'で一括リネームが可能",
+            "ヒント: 共有ボタンでChromeOSやスマホと連携",
+            "ヒント: 整形でend後に空行を追加し読みやすくします",
+            "ヒント: Ctrl+Z で元に戻すことができます"
         ];
         let idx = 0;
         const el = document.getElementById('hint-msg');
@@ -508,12 +565,14 @@
         const model = editor.getModel();
         const lineCount = model.getLineCount();
         const vars = new Map();
+
         for (let i = 1; i <= lineCount; i++) {
             const line = model.getLineContent(i);
             let comment = "";
             const commentMatch = line.match(/--\s*(.*)$/);
             if (commentMatch) comment = commentMatch[1].trim();
             const codePart = line.split('--')[0];
+
             const localMatch = codePart.match(/local\s+([a-zA-Z_]\w*)/);
             if (localMatch) {
                 vars.set(localMatch[1], { l: localMatch[1], d: comment || 'ローカル変数', t: 'var' });
@@ -523,6 +582,15 @@
             if (funcMatch) {
                 vars.set(funcMatch[1], { l: funcMatch[1], d: comment || 'ユーザー関数', t: 'func_user' });
                 continue;
+            }
+            const globalMatch = codePart.match(/^([a-zA-Z_]\w*)\s*=/);
+            if (globalMatch) {
+                const name = globalMatch[1];
+                if (!["if", "while", "for", "local", "else", "elseif", "end", "return"].includes(name)) {
+                    if (!vars.has(name)) {
+                        vars.set(name, { l: name, d: comment || 'グローバル変数', t: 'var' });
+                    }
+                }
             }
         }
         userDefinedVars = Array.from(vars.values());
@@ -537,6 +605,7 @@
         let candidates = [];
         if (!word) candidates = allItems.slice(0, 50);
         else candidates = allItems.filter(i => i.l.toLowerCase().includes(word)).slice(0, 50);
+        
         const list = document.getElementById('candidate-list');
         list.innerHTML = '';
         candidates.forEach(item => {
@@ -546,8 +615,17 @@
             if(item.t==='func') c='var(--func-color)';
             else if(item.t==='const') c='var(--const-color)';
             else if(item.t==='var') c='var(--var-color)';
+            
             let meaningHtml = item.d ? `<span class="cand-meaning">${item.d}</span>` : '';
-            li.innerHTML = `<div class="cand-top"><div style="display:flex; align-items:center;"><span class="cand-label" style="color:${c}">${item.l}</span>${meaningHtml}</div><span class="cand-type">${item.t}</span></div><div class="cand-desc">${item.d || ''}</div>`;
+            li.innerHTML = `
+                <div class="cand-top">
+                    <div style="display:flex; align-items:center;">
+                        <span class="cand-label" style="color:${c}">${item.l}</span>
+                        ${meaningHtml}
+                    </div>
+                    <span class="cand-type">${item.t}</span>
+                </div>
+                <div class="cand-desc">${item.d || ''}</div>`;
             li.onclick = () => insertCode(item);
             list.appendChild(li);
         });
@@ -572,29 +650,33 @@
         showToast("保存: " + name);
     }
 
-    // --- Chrome対応 共有機能 (File Object対応) ---
+    // --- V15 強化版共有機能 (Chrome/ChromeOS対応) ---
     async function shareScript() {
         const val = editor.getValue();
         let name = document.getElementById('filename').value || 'script.lua';
         if(!name.match(/\.(lua|txt)$/)) name += '.lua';
 
-        try {
-            // Android Chrome等での共有にはFileオブジェクトが必須
-            const file = new File([val], name, { type: "text/plain" });
-            
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: name,
-                    text: 'GG Script'
-                });
-                showToast("共有しました");
-            } else {
-                throw new Error("ファイル共有非対応");
+        const file = new File([val], name, { type: "text/plain" });
+        const shareData = {
+            title: name,
+            text: 'GG Lua Editorスクリプト',
+            files: [file]
+        };
+
+        // Web Share API 対応かつファイル共有可能な場合
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showToast("共有失敗: ダウンロードに切り替えます");
+                    saveFile(); // フォールバック
+                }
             }
-        } catch (err) {
-            // PCや非対応ブラウザ
-            navigator.clipboard.writeText(val).then(() => showToast("クリップボードにコピーしました (共有非対応環境)"));
+        } else {
+            // PC版ChromeやChromeOSなどAPI非対応/制限環境
+            showToast("共有非対応環境です。ファイルを保存します。");
+            saveFile(); // 自動的に保存処理へ
         }
     }
 
