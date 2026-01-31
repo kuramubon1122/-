@@ -1,10 +1,9 @@
---- START OF FILE Paste February 01, 2026 - 12:15AM ---
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GG Lua Editor V14 (Smart Variable & Share)</title>
+    <title>GameGuardian Lua Editor V14 (Smart Parse & Share)</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -19,7 +18,6 @@
             --const-color: #4fc1ff;
             --keyword-color: #c586c0;
             --var-color: #9cdcfe;
-            --share-color: #28a745;
         }
         * { box-sizing: border-box; outline: none; }
         body {
@@ -53,46 +51,48 @@
         }
         button:hover { background-color: var(--btn-hover); }
         button:active { background-color: var(--highlight); }
-        .btn-share { background-color: var(--share-color) !important; font-weight: bold; }
+        
+        /* 共有ボタン専用スタイル */
+        .btn-share { background-color: #28a745; }
+        .btn-share:hover { background-color: #218838; }
 
         .search-container {
             display: flex; align-items: center; background: #333; padding: 2px 5px; border-radius: 4px; border: 1px solid #555;
         }
         #search-input {
-            background: transparent; border: none; color: white; width: 140px; font-size: 12px; margin-right: 5px;
+            background: transparent; border: none; color: white; width: 120px; font-size: 12px; margin-right: 5px;
         }
         .search-badge {
-            font-size: 10px; color: #aaa; margin-right: 5px; min-width: 40px; text-align: center;
+            font-size: 10px; color: #aaa; margin-right: 5px; min-width: 35px; text-align: center;
         }
         
         #filename {
-            background: #333; border: 1px solid #555; color: #eee; padding: 4px; font-size: 12px; width: 100px; border-radius: 3px;
+            background: #333; border: 1px solid #555; color: #eee; padding: 4px; font-size: 12px; width: 90px; border-radius: 3px;
         }
 
         #main-area { display: flex; flex: 1; height: calc(100vh - 80px); position: relative; }
         #editor-container { flex: 1; height: 100%; overflow: hidden; }
 
         #sidebar {
-            width: 280px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
+            width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
             display: flex; flex-direction: column; z-index: 90;
         }
         #sidebar-header {
             padding: 8px; background: #222; font-size: 11px;
             border-bottom: 1px solid var(--border); color: #aaa; text-align: center;
-            font-weight: bold; letter-spacing: 1px;
         }
         #candidate-list { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
         
         .candidate-item {
-            padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #333;
+            padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #333;
             display: flex; flex-direction: column; gap: 2px;
         }
         .candidate-item:hover { background-color: #2a2d2e; }
         .cand-top { display: flex; justify-content: space-between; align-items: center; }
-        .cand-label { font-weight: bold; font-size: 13px; }
-        .cand-type { font-size: 9px; padding: 1px 4px; border-radius: 3px; background: #444; color: #bbb; }
-        .cand-desc { font-size: 11px; color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .cand-val { font-size: 10px; color: #6a9955; font-style: italic; }
+        .cand-label { font-weight: bold; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px;}
+        .cand-type { font-size: 9px; padding: 1px 4px; border-radius: 3px; background: #444; color: #fff; }
+        .cand-desc { font-size: 10px; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cand-val { font-size: 10px; color: #ce9178; font-style: italic; }
 
         #statusbar {
             height: 22px; background: #007acc; color: white; font-size: 11px;
@@ -100,20 +100,20 @@
         }
 
         #toast {
-            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
-            text-align: center; border-radius: 4px; padding: 12px; position: fixed;
+            visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 4px; padding: 10px; position: fixed;
             z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6); font-size: 13px; border: 1px solid var(--share-color);
-            opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 12px; border: 1px solid #555;
+            opacity: 0; transition: opacity 0.3s;
         }
-        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+        #toast.show { visibility: visible; opacity: 1; }
 
         .search-line-highlight { background: rgba(255, 0, 0, 0.2) !important; border-left: 3px solid #ff0000; }
-        .search-match-text { background-color: #ffff00 !important; color: #000 !important; font-weight: bold; }
+        .search-match-text { background-color: #ffff00 !important; color: #000 !important; }
 
         @media (max-width: 768px) {
-            #sidebar { display: none; position: absolute; right: 0; top: 0; bottom: 0; width: 80%; }
-            #sidebar.open { display: flex; }
+            #sidebar { display: none; position: absolute; right: 0; top: 0; bottom: 0; width: 240px; }
+            #sidebar.open { display: flex; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
         }
     </style>
 </head>
@@ -121,24 +121,24 @@
 
 <div id="toolbar">
     <div class="btn-group">
-        <button onclick="execCmd('undo')" title="元に戻す">↩</button>
-        <button onclick="execCmd('redo')" title="やり直し">↪</button>
+        <button onclick="execCmd('undo')">↩</button>
+        <button onclick="execCmd('redo')">↪</button>
     </div>
     
     <div class="btn-group">
-        <button onclick="formatCode()" title="適切なインデントで整形">整形</button>
-        <button onclick="autoComment()" title="解説を追加">解説</button>
+        <button onclick="formatCode()">整形</button>
+        <button onclick="autoComment()">解説</button>
+        <button onclick="shareCode()" class="btn-share">共有</button>
     </div>
 
     <div class="search-container">
         <input type="text" id="search-input" placeholder="検索..." oninput="doSearch()">
         <div class="search-badge" id="search-count">0/0</div>
-        <button onclick="searchNext(false)">▲</button>
-        <button onclick="searchNext(true)">▼</button>
+        <button onclick="searchNext(false)" style="padding:2px 5px">▲</button>
+        <button onclick="searchNext(true)" style="padding:2px 5px">▼</button>
     </div>
 
     <div class="btn-group" style="margin-left:auto;">
-        <button onclick="shareCode()" class="btn-share">共有</button>
         <button onclick="toggleSidebar()">候補</button>
         <button onclick="document.getElementById('fileInput').click()">開く</button>
         <input type="text" id="filename" value="script.lua">
@@ -150,7 +150,7 @@
 <div id="main-area">
     <div id="editor-container"></div>
     <div id="sidebar">
-        <div id="sidebar-header">定義・候補一覧</div>
+        <div id="sidebar-header">変数・関数・API一覧</div>
         <ul id="candidate-list"></ul>
     </div>
 </div>
@@ -165,36 +165,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 
 <script>
-    // API Data
+    // --- API Data ---
     const apiData = [
         {l:'gg.alert', d:'警告ダイアログ', t:'func', i:'gg.alert("${1:msg}")'},
         {l:'gg.toast', d:'通知を表示', t:'func', i:'gg.toast("${1:msg}")'},
         {l:'gg.searchNumber', d:'数値を検索', t:'func', i:'gg.searchNumber("${1:100}", ${2:gg.TYPE_DWORD})'},
-        {l:'gg.clearResults', d:'検索結果を消去', t:'func', i:'gg.clearResults()'},
-        {l:'gg.getResults', d:'結果リストを取得', t:'func', i:'gg.getResults(${1:100})'},
-        {l:'gg.editAll', d:'結果を一括書き換え', t:'func', i:'gg.editAll("${1:val}", ${2:gg.TYPE_DWORD})'},
-        {l:'gg.setValues', d:'メモリに値を書き込み', t:'func', i:'gg.setValues(${1:t})'},
-        {l:'gg.getValues', d:'メモリから値を読み込み', t:'func', i:'gg.getValues(${1:t})'},
-        {l:'gg.process', d:'プロセスを選択', t:'func', i:'gg.process(${1:proc})'},
-        {l:'gg.sleep', d:'待機 (ミリ秒)', t:'func', i:'gg.sleep(${1:1000})'},
-        {l:'gg.isVisible', d:'UIが表示中か確認', t:'func', i:'gg.isVisible()'},
-        {l:'gg.setVisible', d:'UIの表示/非表示', t:'func', i:'gg.setVisible(${1:true})'},
-        {l:'gg.prompt', d:'入力ダイアログ', t:'func', i:'gg.prompt({${1:"Msg"}}, {${2}}, {${3:"number"}})'},
-        {l:'gg.choice', d:'選択リスト', t:'func', i:'gg.choice({${1:"A","B"}}, ${2:nil}, ${3:"Title"})'},
-        {l:'gg.multiChoice', d:'複数選択リスト', t:'func', i:'gg.multiChoice({${1:"A","B"}}, {${2}}, ${3:"Title"})'},
-        {l:'gg.bytes', d:'文字列をバイト列に変換', t:'func', i:'gg.bytes("${1:str}", "UTF-8")'},
-        {l:'gg.makeRequest', d:'HTTPリクエスト送信', t:'func', i:'gg.makeRequest("${1:url}")'},
-        {l:'gg.copyText', d:'クリップボードにコピー', t:'func', i:'gg.copyText("${1:text}")'},
-        {l:'gg.TYPE_DWORD', t:'const', d:'4バイト整数 (Dword)'}, 
-        {l:'gg.TYPE_FLOAT', t:'const', d:'浮動小数点 (Float)'}, 
-        {l:'gg.REGION_ANONYMOUS', t:'const', d:'Xa (Anonymous) 領域'}, 
-        {l:'local', t:'key', i:'local ', d:'ローカル変数の宣言'},
-        {l:'function', t:'key', i:'function ${1:name}(${2})\n\t${3}\nend', d:'関数の定義'},
-        {l:'if', t:'key', i:'if ${1:cond} then\n\t${2}\nend', d:'条件分岐'},
+        {l:'gg.getResults', d:'結果を取得', t:'func', i:'gg.getResults(${1:100})'},
+        {l:'gg.editAll', d:'一括書き換え', t:'func', i:'gg.editAll("${1:123}", ${2:gg.TYPE_DWORD})'},
+        {l:'gg.sleep', d:'待機(ms)', t:'func', i:'gg.sleep(${1:1000})'},
+        {l:'gg.choice', d:'選択メニュー', t:'func', i:'gg.choice({${1:"A","B"}}, nil, "Title")'},
+        {l:'gg.prompt', d:'入力フォーム', t:'func', i:'gg.prompt({${1:"Input"}}, {${2:""}}, {${3:"number"}})'},
+        {l:'gg.TYPE_DWORD', t:'const', d:'4バイト整数'}, {l:'gg.TYPE_FLOAT', t:'const', d:'浮動小数点'},
+        {l:'print', t:'func', i:'print(${1})', d:'ログ出力'},
+        {l:'local', t:'key', i:'local ', d:'ローカル変数宣言'},
+        {l:'function', t:'key', i:'function ${1:name}(${2})\n\t${3}\nend', d:'関数定義'}
     ];
 
     let editor;
-    let userDefinedObjects = []; // {name, val, type, desc}
+    let parsedUserItems = []; // 名前, 値/引数, 型 を保持
     let isInserting = false;
     let searchMatches = [];
     let currentMatchIdx = -1;
@@ -203,13 +191,6 @@
     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
 
     require(['vs/editor/editor.main'], function() {
-        // 起動時にURLからコードを復元
-        const urlParams = new URLSearchParams(window.location.search);
-        let initialCode = '-- GameGuardian Script V14\n\nlocal targetValue = 1234 -- 検索する値\nlocal msg = "Hello World" -- 表示メッセージ\n\nfunction search(val)\n    gg.searchNumber(val, gg.TYPE_DWORD)\nend\n\nsearch(targetValue)\ngg.toast(msg)\n';
-        if(urlParams.has('code')) {
-            try { initialCode = decodeURIComponent(escape(atob(urlParams.get('code')))); } catch(e) {}
-        }
-
         monaco.languages.registerCompletionItemProvider('lua', {
             provideCompletionItems: function(model, position) {
                 const wordInfo = model.getWordUntilPosition(position);
@@ -224,9 +205,9 @@
                         insertText: item.i || item.l, insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         range: range, detail: item.d
                     })),
-                    ...userDefinedObjects.map(obj => ({
-                        label: obj.name, kind: obj.type === 'func' ? monaco.languages.CompletionItemKind.Function : monaco.languages.CompletionItemKind.Variable,
-                        insertText: obj.name, range: range, detail: obj.val ? `Val: ${obj.val}` : obj.desc
+                    ...parsedUserItems.map(v => ({
+                        label: v.l, kind: v.t === 'func' ? monaco.languages.CompletionItemKind.Function : monaco.languages.CompletionItemKind.Variable,
+                        insertText: v.l, range: range, detail: v.d
                     }))
                 ];
                 return { suggestions: suggestions };
@@ -234,127 +215,160 @@
         });
 
         editor = monaco.editor.create(document.getElementById('editor-container'), {
-            value: initialCode,
+            value: '-- GG Script V14\nlocal speed = 100 -- 速度の初期値\nlocal name = "User1"\n\nfunction activate(val)\n    gg.toast("Setting: " .. val)\nend\n\nactivate(speed)',
             language: 'lua',
             theme: 'vs-dark',
             automaticLayout: true,
             fontSize: 14,
-            minimap: { enabled: true },
-            suggest: { filterGraceful: true }
+            minimap: { enabled: false }
         });
 
-        editor.onDidChangeModelContent(() => { parseUserVars(); updateSidebar(); });
+        editor.onDidChangeModelContent(() => { parseUserCode(); updateSidebar(); });
         editor.onDidChangeCursorPosition((e) => {
             document.getElementById('cursor-pos').innerText = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
         });
         
-        parseUserVars();
+        // 選択コピー機能
+        editor.onMouseUp(() => {
+            const txt = editor.getModel().getValueInRange(editor.getSelection());
+            if(txt && txt.length > 0) {
+                navigator.clipboard.writeText(txt).then(() => showToast("選択範囲をコピー"));
+            }
+        });
+
+        parseUserCode();
         updateSidebar();
         startHintCycle();
     });
 
-    // 解析：変数とその値、関数と引数を抽出
-    function parseUserVars() {
+    // --- 解析ロジック (V14: 値と引数を取得) ---
+    function parseUserCode() {
         if(!editor) return;
         const code = editor.getValue();
+        const items = [];
         const lines = code.split('\n');
-        const objects = [];
-        const seen = new Set();
 
-        // 1. 関数の抽出: function name(args)
-        const funcRegex = /function\s+([a-zA-Z_]\w*)\s*\((.*?)\)/g;
-        let m;
-        while((m = funcRegex.exec(code))) {
-            if(!seen.has(m[1])) {
-                objects.push({ name: m[1], val: `(${m[2]})`, type: 'func', desc: 'ユーザー定義関数' });
-                seen.add(m[1]);
+        lines.forEach(line => {
+            // 1. 関数定義の解析: function name(args)
+            const funcMatch = line.match(/function\s+([a-zA-Z_]\w*)\s*\((.*)\)/);
+            if(funcMatch) {
+                items.push({ l: funcMatch[1], d: `引数: (${funcMatch[2] || 'なし'})`, t: 'func' });
             }
-        }
-
-        // 2. 変数の抽出: local name = value
-        const varRegex = /(?:local\s+)?([a-zA-Z_]\w*)\s*=\s*([^--\n;]+)/g;
-        while((m = varRegex.exec(code))) {
-            const name = m[1].trim();
-            // キーワードは除外
-            if(["if","then","else","end","function","local","repeat","until","while","do","for","in","return","gg"].includes(name)) continue;
-            if(!seen.has(name)) {
-                let val = m[2].trim();
+            // 2. ローカル変数の解析: local name = value
+            const varMatch = line.match(/local\s+([a-zA-Z_]\w*)\s*=\s*([^--\n;]+)/);
+            if(varMatch) {
+                let val = varMatch[2].trim();
                 if(val.length > 20) val = val.substring(0, 17) + "...";
-                objects.push({ name: name, val: val, type: 'var', desc: 'ユーザー変数' });
-                seen.add(name);
+                items.push({ l: varMatch[1], d: `初期値: ${val}`, t: 'var' });
+            } else {
+                // 値がない単なる宣言 local name
+                const simpleVar = line.match(/local\s+([a-zA-Z_]\w*)/);
+                if(simpleVar && !line.includes('function')) {
+                    // 重複チェック
+                    if(!items.some(i => i.l === simpleVar[1])) {
+                        items.push({ l: simpleVar[1], d: 'ローカル変数', t: 'var' });
+                    }
+                }
             }
+        });
+        parsedUserItems = items;
+    }
+
+    // --- 共有機能 ---
+    async function shareCode() {
+        const code = editor.getValue();
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: document.getElementById('filename').value,
+                    text: code
+                });
+            } catch (err) {
+                console.log("Share cancelled or failed", err);
+            }
+        } else {
+            // Web Share API非対応ブラウザ用
+            navigator.clipboard.writeText(code);
+            showToast("共有非対応のためクリップボードにコピーしました");
         }
-        userDefinedObjects = objects;
     }
 
     function updateSidebar() {
         const list = document.getElementById('candidate-list');
         list.innerHTML = '';
         
-        // ユーザー定義
-        userDefinedObjects.forEach(obj => {
-            const li = createItemEl(obj.name, obj.type, obj.desc, obj.val);
-            li.onclick = () => insertRawText(obj.name);
+        // ユーザー定義アイテム
+        parsedUserItems.forEach(item => {
+            const li = createItemEl(item, 'var(--var-color)');
             list.appendChild(li);
         });
 
-        // API (一部抜粋表示)
-        apiData.forEach(api => {
-            const li = createItemEl(api.l, api.t, api.d, "");
-            li.onclick = () => insertCode(api);
+        // 区切り
+        if(parsedUserItems.length > 0) {
+            const hr = document.createElement('div');
+            hr.style = "padding:10px; font-size:10px; color:#555; background:#1a1a1a";
+            hr.innerText = "--- GG API ---";
+            list.appendChild(hr);
+        }
+
+        // APIアイテム
+        apiData.forEach(item => {
+            const color = item.t === 'func' ? 'var(--func-color)' : 'var(--const-color)';
+            const li = createItemEl(item, color);
             list.appendChild(li);
         });
     }
 
-    function createItemEl(label, type, desc, val) {
+    function createItemEl(item, color) {
         const li = document.createElement('li');
         li.className = 'candidate-item';
-        let color = '#ccc';
-        if(type==='func') color = 'var(--func-color)';
-        else if(type==='const') color = 'var(--const-color)';
-        else if(type==='var') color = 'var(--var-color)';
-
         li.innerHTML = `
             <div class="cand-top">
-                <span class="cand-label" style="color:${color}">${label}</span>
-                <span class="cand-type">${type}</span>
+                <span class="cand-label" style="color:${color}">${item.l}</span>
+                <span class="cand-type">${item.t}</span>
             </div>
-            <div class="cand-desc">${desc}</div>
-            ${val ? `<div class="cand-val">Current: ${val}</div>` : ''}
+            <div class="cand-desc">${item.d || ''}</div>
         `;
+        li.onclick = () => insertCode(item);
         return li;
     }
 
-    function shareCode() {
-        const code = editor.getValue();
-        // UTF-8対応のBase64エンコード
-        const base64 = btoa(unescape(encodeURIComponent(code)));
-        const shareUrl = window.location.origin + window.location.pathname + "?code=" + base64;
-        
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            showToast("共有URLをコピーしました！");
-        }).catch(err => {
-            showToast("コピーに失敗しました");
-        });
-    }
-
-    function insertRawText(text) {
-        const pos = editor.getPosition();
-        const range = new monaco.Range(pos.lineNumber, pos.column, pos.lineNumber, pos.column);
-        editor.executeEdits('sidebar', [{ range: range, text: text }]);
-        editor.focus();
-    }
-
     function insertCode(item) {
+        isInserting = true;
         editor.focus();
+        const pos = editor.getPosition();
+        const model = editor.getModel();
+        const wordInfo = model.getWordUntilPosition(pos);
+        const range = new monaco.Range(pos.lineNumber, wordInfo.startColumn, pos.lineNumber, wordInfo.endColumn);
+        
+        const insertText = item.i || item.l;
         const contrib = editor.getContribution('snippetController2');
-        contrib.insert(item.i || item.l);
+        if (contrib) {
+            contrib.insert(insertText, 0, 0, 0, range);
+        } else {
+            editor.executeEdits('insert', [{ range: range, text: insertText, forceMoveMarkers: true }]);
+        }
+        setTimeout(() => isInserting = false, 100);
     }
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.className = "show";
-        setTimeout(() => t.className = "", 3000);
+    function formatCode() {
+        const model = editor.getModel();
+        let code = model.getValue();
+        // 簡易インデント整形
+        let lines = code.split('\n');
+        let depth = 0;
+        let result = [];
+        lines.forEach(line => {
+            let l = line.trim();
+            if (l.match(/^(end|until|\})/)) depth--;
+            if (depth < 0) depth = 0;
+            result.push("    ".repeat(depth) + l);
+            if (l.match(/^(function|if|while|for|repeat|do|else|elseif)/) || l.includes('{')) {
+                if (!l.match(/end$/)) depth++;
+            }
+        });
+        model.setValue(result.join('\n'));
+        showToast("コードを整形しました");
     }
 
     function doSearch() {
@@ -362,49 +376,57 @@
         const model = editor.getModel();
         if (!query) {
             currentDecorations = editor.deltaDecorations(currentDecorations, []);
+            document.getElementById('search-count').innerText = "0/0";
             return;
         }
         searchMatches = model.findMatches(query, false, false, false, null, true);
-        document.getElementById('search-count').innerText = searchMatches.length > 0 ? `1/${searchMatches.length}` : "0/0";
-        const decorations = searchMatches.map(m => ([
-            { range: m.range, options: { className: 'search-match-text' } },
-            { range: m.range, options: { isWholeLine: true, className: 'search-line-highlight' } }
-        ])).flat();
+        document.getElementById('search-count').innerText = `0/${searchMatches.length}`;
+        
+        const decorations = searchMatches.map(m => ({
+            range: m.range,
+            options: { inlineClassName: 'search-match-text', isWholeLine: false }
+        }));
         currentDecorations = editor.deltaDecorations(currentDecorations, decorations);
     }
 
-    function searchNext(isNext) {
+    function searchNext(forward) {
         if (searchMatches.length === 0) return;
-        currentMatchIdx = isNext ? (currentMatchIdx + 1) % searchMatches.length : (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+        if (forward) currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
+        else currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+        
+        const match = searchMatches[currentMatchIdx];
+        editor.revealRangeInCenter(match.range);
         document.getElementById('search-count').innerText = `${currentMatchIdx + 1}/${searchMatches.length}`;
-        editor.revealRangeInCenter(searchMatches[currentMatchIdx].range);
     }
 
-    function formatCode() {
-        editor.getAction('editor.action.formatDocument').run();
-        showToast("整形しました");
+    function execCmd(cmd) {
+        editor.focus();
+        if(cmd === 'undo') editor.trigger('keyboard', 'undo');
+        else if(cmd === 'redo') editor.trigger('keyboard', 'redo');
     }
 
     function autoComment() {
         const m = editor.getModel();
+        const lines = m.getLineCount();
         const edits = [];
-        const dict = {}; apiData.forEach(i=>dict[i.l]=i.d);
-        for(let i=1; i<=m.getLineCount(); i++){
-            const l = m.getLineContent(i);
-            if(l.includes('--')) continue;
-            for(let k in dict){
-                if(l.includes(k)){
-                    edits.push({ range: new monaco.Range(i, l.length+1, i, l.length+1), text: ` -- ${dict[k]}` });
+        const dict = {}; apiData.forEach(i => dict[i.l] = i.d);
+        for(let i=1; i<=lines; i++) {
+            let txt = m.getLineContent(i);
+            if(txt.includes('--')) continue;
+            for(let key in dict) {
+                if(txt.includes(key)) {
+                    edits.push({ range: new monaco.Range(i, txt.length+1, i, txt.length+1), text: " -- " + dict[key] });
                     break;
                 }
             }
         }
-        editor.executeEdits('autoComment', edits);
+        editor.executeEdits('comment', edits);
     }
 
-    function execCmd(cmd) {
-        if(cmd==='undo') editor.trigger('k','undo');
-        else if(cmd==='redo') editor.trigger('k','redo');
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.className = "show";
+        setTimeout(() => t.className = "", 2000);
     }
 
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -412,34 +434,33 @@
     function getKind(t) {
         if(t==='func') return monaco.languages.CompletionItemKind.Function;
         if(t==='const') return monaco.languages.CompletionItemKind.Constant;
-        if(t==='key') return monaco.languages.CompletionItemKind.Keyword;
-        return monaco.languages.CompletionItemKind.Variable;
+        return monaco.languages.CompletionItemKind.Keyword;
     }
 
     function saveFile() {
-        const val = editor.getValue();
-        const blob = new Blob([val], {type: "text/plain"});
+        const blob = new Blob([editor.getValue()], {type: "text/plain"});
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = document.getElementById('filename').value;
+        a.download = document.getElementById('filename').value || "script.lua";
         a.click();
     }
 
     function importFile(input) {
-        const f = input.files[0]; if(!f) return;
-        const r = new FileReader(); r.onload=e=>{
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
             editor.setValue(e.target.result);
-            document.getElementById('filename').value=f.name;
-        }; 
-        r.readAsText(f);
+            document.getElementById('filename').value = file.name;
+        };
+        reader.readAsText(file);
     }
 
     function startHintCycle() {
-        const hints = ["共有ボタンでURLを発行してコードをシェア！", "変数を定義すると右側のリストに値が表示されます", "整形ボタンでコードが綺麗になります"];
+        const hints = ["ヒント: '共有'ボタンで他のアプリにコードを送信！", "ヒント: 変数を作ると右側に値が表示されます", "ヒント: 関数を作ると引数が解析されます"];
         let i = 0;
         setInterval(() => {
-            document.getElementById('hint-msg').innerText = hints[i];
-            i = (i + 1) % hints.length;
+            document.getElementById('hint-msg').innerText = hints[i % hints.length];
+            i++;
         }, 5000);
     }
 </script>
