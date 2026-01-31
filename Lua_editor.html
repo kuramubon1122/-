@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GameGuardian Lua Editor V14 (Smart Parse & Share)</title>
+    <title>GameGuardian Lua Editor V13 (Smart Format & Search)</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -17,7 +18,6 @@
             --func-color: #dcdcaa;
             --const-color: #4fc1ff;
             --keyword-color: #c586c0;
-            --var-color: #9cdcfe;
         }
         * { box-sizing: border-box; outline: none; }
         body {
@@ -52,68 +52,82 @@
         button:hover { background-color: var(--btn-hover); }
         button:active { background-color: var(--highlight); }
         
-        /* 共有ボタン専用スタイル */
-        .btn-share { background-color: #28a745; }
-        .btn-share:hover { background-color: #218838; }
-
         .search-container {
             display: flex; align-items: center; background: #333; padding: 2px 5px; border-radius: 4px; border: 1px solid #555;
         }
         #search-input {
-            background: transparent; border: none; color: white; width: 120px; font-size: 12px; margin-right: 5px;
+            background: transparent; border: none; color: white; width: 140px; font-size: 12px; margin-right: 5px;
         }
         .search-badge {
-            font-size: 10px; color: #aaa; margin-right: 5px; min-width: 35px; text-align: center;
+            font-size: 10px; color: #aaa; margin-right: 5px; min-width: 40px; text-align: center;
+        }
+        .search-opt {
+            font-size: 10px; color: #ccc; display: flex; align-items: center; gap: 3px; margin-right: 5px; cursor: pointer; user-select: none;
         }
         
         #filename {
-            background: #333; border: 1px solid #555; color: #eee; padding: 4px; font-size: 12px; width: 90px; border-radius: 3px;
+            background: #333; border: 1px solid #555; color: #eee; padding: 4px; font-size: 12px; width: 100px; border-radius: 3px;
         }
 
         #main-area { display: flex; flex: 1; height: calc(100vh - 80px); position: relative; }
         #editor-container { flex: 1; height: 100%; overflow: hidden; }
 
         #sidebar {
-            width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
+            width: 250px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border);
             display: flex; flex-direction: column; z-index: 90;
         }
         #sidebar-header {
-            padding: 8px; background: #222; font-size: 11px;
+            padding: 5px; background: #222; font-size: 11px;
             border-bottom: 1px solid var(--border); color: #aaa; text-align: center;
         }
         #candidate-list { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
         
         .candidate-item {
-            padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #333;
-            display: flex; flex-direction: column; gap: 2px;
+            padding: 4px 8px; cursor: pointer; border-bottom: 1px solid #333;
+            display: flex; flex-direction: column; justify-content: center;
         }
         .candidate-item:hover { background-color: #2a2d2e; }
         .cand-top { display: flex; justify-content: space-between; align-items: center; }
-        .cand-label { font-weight: bold; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px;}
-        .cand-type { font-size: 9px; padding: 1px 4px; border-radius: 3px; background: #444; color: #fff; }
-        .cand-desc { font-size: 10px; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .cand-val { font-size: 10px; color: #ce9178; font-style: italic; }
+        .cand-label { font-weight: bold; font-size: 12px; }
+        .cand-type { font-size: 9px; padding: 1px 3px; border-radius: 3px; background: #333; }
+        .cand-desc { font-size: 10px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         #statusbar {
             height: 22px; background: #007acc; color: white; font-size: 11px;
             display: flex; align-items: center; padding: 0 10px; justify-content: space-between;
+            white-space: nowrap; overflow: hidden;
         }
 
         #toast {
             visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
-            text-align: center; border-radius: 4px; padding: 10px; position: fixed;
+            text-align: center; border-radius: 4px; padding: 8px; position: fixed;
             z-index: 2000; left: 50%; bottom: 40px; transform: translateX(-50%);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 12px; border: 1px solid #555;
-            opacity: 0; transition: opacity 0.3s;
+            opacity: 0; transition: opacity 0.3s, bottom 0.3s;
         }
-        #toast.show { visibility: visible; opacity: 1; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
-        .search-line-highlight { background: rgba(255, 0, 0, 0.2) !important; border-left: 3px solid #ff0000; }
-        .search-match-text { background-color: #ffff00 !important; color: #000 !important; }
+        /* 検索ハイライト */
+        .search-line-highlight {
+            background: rgba(255, 0, 0, 0.4) !important;
+            border-left: 3px solid #ff0000;
+        }
+        .search-match-text {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            font-weight: bold !important;
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 
         @media (max-width: 768px) {
-            #sidebar { display: none; position: absolute; right: 0; top: 0; bottom: 0; width: 240px; }
-            #sidebar.open { display: flex; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+            #sidebar { display: none; position: absolute; right: 0; top: 0; bottom: 0; width: 220px; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+            #sidebar.open { display: flex; }
+            #search-input { width: 80px; }
+            #filename { width: 70px; }
         }
     </style>
 </head>
@@ -121,27 +135,30 @@
 
 <div id="toolbar">
     <div class="btn-group">
-        <button onclick="execCmd('undo')">↩</button>
-        <button onclick="execCmd('redo')">↪</button>
+        <button onclick="execCmd('undo')" title="元に戻す">↩</button>
+        <button onclick="execCmd('redo')" title="やり直し">↪</button>
     </div>
     
     <div class="btn-group">
-        <button onclick="formatCode()">整形</button>
-        <button onclick="autoComment()">解説</button>
-        <button onclick="shareCode()" class="btn-share">共有</button>
+        <button onclick="formatCode()" title="適切なインデントで整形">整形</button>
+        <button onclick="autoComment()" title="解説を追加">解説</button>
     </div>
 
+    <!-- 検索機能 -->
     <div class="search-container">
-        <input type="text" id="search-input" placeholder="検索..." oninput="doSearch()">
+        <input type="text" id="search-input" placeholder="リアルタイム検索..." oninput="doSearch()" onkeydown="if(event.key==='Enter') searchNext(true)">
+        <label class="search-opt"><input type="checkbox" id="search-fuzzy" checked onchange="doSearch()">部分一致</label>
         <div class="search-badge" id="search-count">0/0</div>
-        <button onclick="searchNext(false)" style="padding:2px 5px">▲</button>
-        <button onclick="searchNext(true)" style="padding:2px 5px">▼</button>
+        <div class="btn-group">
+            <button onclick="searchNext(false)" title="前へ">▲</button>
+            <button onclick="searchNext(true)" title="次へ">▼</button>
+        </div>
     </div>
 
     <div class="btn-group" style="margin-left:auto;">
         <button onclick="toggleSidebar()">候補</button>
         <button onclick="document.getElementById('fileInput').click()">開く</button>
-        <input type="text" id="filename" value="script.lua">
+        <input type="text" id="filename" value="script.lua" placeholder="ファイル名">
         <button onclick="saveFile()">保存</button>
         <input type="file" id="fileInput" accept=".txt,.lua" style="display:none" onchange="importFile(this)">
     </div>
@@ -150,13 +167,13 @@
 <div id="main-area">
     <div id="editor-container"></div>
     <div id="sidebar">
-        <div id="sidebar-header">変数・関数・API一覧</div>
+        <div id="sidebar-header">候補一覧 (クリックで挿入)</div>
         <ul id="candidate-list"></ul>
     </div>
 </div>
 
 <div id="statusbar">
-    <span id="hint-msg">GameGuardian Lua Editor V14</span>
+    <span id="hint-msg">GameGuardian Lua Editor V13</span>
     <span id="cursor-pos">Ln 1, Col 1</span>
 </div>
 
@@ -165,24 +182,51 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 
 <script>
-    // --- API Data ---
+    // --- API Data (Excerpt) ---
     const apiData = [
         {l:'gg.alert', d:'警告ダイアログ', t:'func', i:'gg.alert("${1:msg}")'},
         {l:'gg.toast', d:'通知を表示', t:'func', i:'gg.toast("${1:msg}")'},
         {l:'gg.searchNumber', d:'数値を検索', t:'func', i:'gg.searchNumber("${1:100}", ${2:gg.TYPE_DWORD})'},
-        {l:'gg.getResults', d:'結果を取得', t:'func', i:'gg.getResults(${1:100})'},
-        {l:'gg.editAll', d:'一括書き換え', t:'func', i:'gg.editAll("${1:123}", ${2:gg.TYPE_DWORD})'},
-        {l:'gg.sleep', d:'待機(ms)', t:'func', i:'gg.sleep(${1:1000})'},
-        {l:'gg.choice', d:'選択メニュー', t:'func', i:'gg.choice({${1:"A","B"}}, nil, "Title")'},
-        {l:'gg.prompt', d:'入力フォーム', t:'func', i:'gg.prompt({${1:"Input"}}, {${2:""}}, {${3:"number"}})'},
-        {l:'gg.TYPE_DWORD', t:'const', d:'4バイト整数'}, {l:'gg.TYPE_FLOAT', t:'const', d:'浮動小数点'},
-        {l:'print', t:'func', i:'print(${1})', d:'ログ出力'},
-        {l:'local', t:'key', i:'local ', d:'ローカル変数宣言'},
-        {l:'function', t:'key', i:'function ${1:name}(${2})\n\t${3}\nend', d:'関数定義'}
+        {l:'gg.clearResults', d:'検索結果を消去', t:'func', i:'gg.clearResults()'},
+        {l:'gg.getResults', d:'結果リストを取得', t:'func', i:'gg.getResults(${1:100})'},
+        {l:'gg.editAll', d:'結果を一括書き換え', t:'func', i:'gg.editAll("${1:val}", ${2:gg.TYPE_DWORD})'},
+        {l:'gg.setValues', d:'メモリに値を書き込み', t:'func', i:'gg.setValues(${1:t})'},
+        {l:'gg.getValues', d:'メモリから値を読み込み', t:'func', i:'gg.getValues(${1:t})'},
+        {l:'gg.process', d:'プロセスを選択', t:'func', i:'gg.process(${1:proc})'},
+        {l:'gg.sleep', d:'待機 (ミリ秒)', t:'func', i:'gg.sleep(${1:1000})'},
+        {l:'gg.isVisible', d:'UIが表示中か確認', t:'func', i:'gg.isVisible()'},
+        {l:'gg.setVisible', d:'UIの表示/非表示', t:'func', i:'gg.setVisible(${1:true})'},
+        {l:'gg.prompt', d:'入力ダイアログ', t:'func', i:'gg.prompt({${1:"Msg"}}, {${2}}, {${3:"number"}})'},
+        {l:'gg.choice', d:'選択リスト', t:'func', i:'gg.choice({${1:"A","B"}}, ${2:nil}, ${3:"Title"})'},
+        {l:'gg.multiChoice', d:'複数選択リスト', t:'func', i:'gg.multiChoice({${1:"A","B"}}, {${2}}, ${3:"Title"})'},
+        {l:'gg.bytes', d:'文字列をバイト列に変換', t:'func', i:'gg.bytes("${1:str}", "UTF-8")'},
+        {l:'gg.makeRequest', d:'HTTPリクエスト送信', t:'func', i:'gg.makeRequest("${1:url}")'},
+        {l:'gg.copyText', d:'クリップボードにコピー', t:'func', i:'gg.copyText("${1:text}")'},
+        
+        {l:'gg.TYPE_DWORD', t:'const', d:'4バイト整数'}, {l:'gg.TYPE_FLOAT', t:'const', d:'浮動小数点'}, 
+        {l:'gg.TYPE_DOUBLE', t:'const', d:'倍精度浮動小数点'}, {l:'gg.TYPE_QWORD', t:'const', d:'8バイト整数'}, 
+        {l:'gg.TYPE_WORD', t:'const', d:'2バイト整数'}, {l:'gg.TYPE_BYTE', t:'const', d:'1バイト整数'},
+        {l:'gg.TYPE_AUTO', t:'const', d:'自動型'}, {l:'gg.REGION_ANONYMOUS', t:'const', d:'Xa領域'}, 
+        
+        {l:'print', t:'func', i:'print(${1})', d:'ログ出力'}, {l:'tonumber', t:'func', i:'tonumber(${1})', d:'数値変換'},
+        {l:'tostring', t:'func', i:'tostring(${1})', d:'文字列変換'}, {l:'type', t:'func', i:'type(${1})', d:'型確認'},
+        {l:'pairs', t:'func', i:'pairs(${1:t})', d:'ペア反復'}, {l:'ipairs', t:'func', i:'ipairs(${1:t})', d:'配列反復'},
+        {l:'string.format', t:'func', i:'string.format("${1:%s}", ${2:v})', d:'書式化文字列'}, 
+        {l:'string.find', t:'func', i:'string.find(${1:s}, "${2:pat}")', d:'文字列検索'},
+        {l:'table.insert', t:'func', i:'table.insert(${1:t}, ${2:v})', d:'テーブル挿入'}, 
+        {l:'table.remove', t:'func', i:'table.remove(${1:t}, ${2:pos})', d:'テーブル削除'},
+        {l:'os.clock', t:'func', i:'os.clock()', d:'CPU時間'}, {l:'os.time', t:'func', i:'os.time()', d:'現在時刻'}, 
+        {l:'os.exit', t:'func', i:'os.exit()', d:'スクリプト終了'}, {l:'io.open', t:'func', i:'io.open("${1:file}", "${2:w}")', d:'ファイルを開く'},
+        
+        {l:'local', t:'key', i:'local ', d:'ローカル変数'}, {l:'function', t:'key', i:'function ${1:name}(${2})\n\t${3}\nend', d:'関数定義'},
+        {l:'return', t:'key', i:'return ', d:'値を返す'}, {l:'if', t:'key', i:'if ${1:cond} then\n\t${2}\nend', d:'もし～なら'},
+        {l:'while', t:'key', i:'while ${1:cond} do\n\t${2}\nend', d:'条件ループ'}, {l:'for', t:'key', i:'for i = ${1:1}, ${2:10} do\n\t${3}\nend', d:'回数ループ'},
+        {l:'else', t:'key', i:'else', d:'そうでなければ'}, {l:'elseif', t:'key', i:'elseif', d:'そうでなくもし'}, {l:'then', t:'key', i:'then', d:'ならば'},
+        {l:'end', t:'key', i:'end', d:'ブロック終了'}, {l:'repeat', t:'key', i:'repeat', d:'～まで繰り返す'}, {l:'until', t:'key', i:'until', d:'条件(終了)'},
     ];
 
     let editor;
-    let parsedUserItems = []; // 名前, 値/引数, 型 を保持
+    let userDefinedVars = new Set();
     let isInserting = false;
     let searchMatches = [];
     let currentMatchIdx = -1;
@@ -205,9 +249,9 @@
                         insertText: item.i || item.l, insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         range: range, detail: item.d
                     })),
-                    ...parsedUserItems.map(v => ({
-                        label: v.l, kind: v.t === 'func' ? monaco.languages.CompletionItemKind.Function : monaco.languages.CompletionItemKind.Variable,
-                        insertText: v.l, range: range, detail: v.d
+                    ...Array.from(userDefinedVars).map(v => ({
+                        label: v, kind: monaco.languages.CompletionItemKind.Variable,
+                        insertText: v, range: range, detail: 'User Var'
                     }))
                 ];
                 return { suggestions: suggestions };
@@ -215,212 +259,278 @@
         });
 
         editor = monaco.editor.create(document.getElementById('editor-container'), {
-            value: '-- GG Script V14\nlocal speed = 100 -- 速度の初期値\nlocal name = "User1"\n\nfunction activate(val)\n    gg.toast("Setting: " .. val)\nend\n\nactivate(speed)',
+            value: '-- GameGuardian Script V13\n\nlocal input = gg.prompt(\n    {"認証番号を入力してください"}, \n    {""}, \n    {"number"}\n)\n\nif input then\n    print("OK")\nend\n',
             language: 'lua',
             theme: 'vs-dark',
             automaticLayout: true,
             fontSize: 14,
-            minimap: { enabled: false }
+            minimap: { enabled: true },
+            wordWrap: 'off',
+            scrollBeyondLastColumn: 5,
+            suggest: { filterGraceful: true, snippetsPreventQuickSuggestions: false }
         });
 
-        editor.onDidChangeModelContent(() => { parseUserCode(); updateSidebar(); });
+        editor.onDidChangeModelContent(() => { parseUserVars(); updateSidebar(); });
         editor.onDidChangeCursorPosition((e) => {
+            updateSidebarPosition(e.position);
             document.getElementById('cursor-pos').innerText = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
         });
         
-        // 選択コピー機能
-        editor.onMouseUp(() => {
-            const txt = editor.getModel().getValueInRange(editor.getSelection());
-            if(txt && txt.length > 0) {
-                navigator.clipboard.writeText(txt).then(() => showToast("選択範囲をコピー"));
-            }
-        });
+        editor.onMouseUp(() => checkSelectionCopy());
+        editor.onKeyUp(() => checkSelectionCopy());
 
-        parseUserCode();
+        parseUserVars();
         updateSidebar();
         startHintCycle();
     });
 
-    // --- 解析ロジック (V14: 値と引数を取得) ---
-    function parseUserCode() {
-        if(!editor) return;
-        const code = editor.getValue();
-        const items = [];
-        const lines = code.split('\n');
-
-        lines.forEach(line => {
-            // 1. 関数定義の解析: function name(args)
-            const funcMatch = line.match(/function\s+([a-zA-Z_]\w*)\s*\((.*)\)/);
-            if(funcMatch) {
-                items.push({ l: funcMatch[1], d: `引数: (${funcMatch[2] || 'なし'})`, t: 'func' });
-            }
-            // 2. ローカル変数の解析: local name = value
-            const varMatch = line.match(/local\s+([a-zA-Z_]\w*)\s*=\s*([^--\n;]+)/);
-            if(varMatch) {
-                let val = varMatch[2].trim();
-                if(val.length > 20) val = val.substring(0, 17) + "...";
-                items.push({ l: varMatch[1], d: `初期値: ${val}`, t: 'var' });
-            } else {
-                // 値がない単なる宣言 local name
-                const simpleVar = line.match(/local\s+([a-zA-Z_]\w*)/);
-                if(simpleVar && !line.includes('function')) {
-                    // 重複チェック
-                    if(!items.some(i => i.l === simpleVar[1])) {
-                        items.push({ l: simpleVar[1], d: 'ローカル変数', t: 'var' });
-                    }
-                }
-            }
-        });
-        parsedUserItems = items;
-    }
-
-    // --- 共有機能 ---
-    async function shareCode() {
-        const code = editor.getValue();
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: document.getElementById('filename').value,
-                    text: code
-                });
-            } catch (err) {
-                console.log("Share cancelled or failed", err);
-            }
-        } else {
-            // Web Share API非対応ブラウザ用
-            navigator.clipboard.writeText(code);
-            showToast("共有非対応のためクリップボードにコピーしました");
-        }
-    }
-
-    function updateSidebar() {
-        const list = document.getElementById('candidate-list');
-        list.innerHTML = '';
-        
-        // ユーザー定義アイテム
-        parsedUserItems.forEach(item => {
-            const li = createItemEl(item, 'var(--var-color)');
-            list.appendChild(li);
-        });
-
-        // 区切り
-        if(parsedUserItems.length > 0) {
-            const hr = document.createElement('div');
-            hr.style = "padding:10px; font-size:10px; color:#555; background:#1a1a1a";
-            hr.innerText = "--- GG API ---";
-            list.appendChild(hr);
-        }
-
-        // APIアイテム
-        apiData.forEach(item => {
-            const color = item.t === 'func' ? 'var(--func-color)' : 'var(--const-color)';
-            const li = createItemEl(item, color);
-            list.appendChild(li);
-        });
-    }
-
-    function createItemEl(item, color) {
-        const li = document.createElement('li');
-        li.className = 'candidate-item';
-        li.innerHTML = `
-            <div class="cand-top">
-                <span class="cand-label" style="color:${color}">${item.l}</span>
-                <span class="cand-type">${item.t}</span>
-            </div>
-            <div class="cand-desc">${item.d || ''}</div>
-        `;
-        li.onclick = () => insertCode(item);
-        return li;
+    function checkSelectionCopy() {
+        if(isInserting) { isInserting = false; return; }
+        const sel = editor.getSelection();
+        if(!sel || sel.isEmpty()) return;
+        const txt = editor.getModel().getValueInRange(sel);
+        if(txt) navigator.clipboard.writeText(txt).then(() => showToast("コピーしました")).catch(()=>{});
     }
 
     function insertCode(item) {
+        if (!editor) return;
         isInserting = true;
         editor.focus();
         const pos = editor.getPosition();
         const model = editor.getModel();
         const wordInfo = model.getWordUntilPosition(pos);
-        const range = new monaco.Range(pos.lineNumber, wordInfo.startColumn, pos.lineNumber, wordInfo.endColumn);
+        const lineContent = model.getLineContent(pos.lineNumber);
+        const textBeforeCursor = lineContent.substring(0, pos.column - 1);
         
-        const insertText = item.i || item.l;
-        const contrib = editor.getContribution('snippetController2');
-        if (contrib) {
-            contrib.insert(insertText, 0, 0, 0, range);
-        } else {
-            editor.executeEdits('insert', [{ range: range, text: insertText, forceMoveMarkers: true }]);
-        }
-        setTimeout(() => isInserting = false, 100);
-    }
+        let insertText = item.i || item.l;
+        const rawLabel = item.l; 
 
-    function formatCode() {
-        const model = editor.getModel();
-        let code = model.getValue();
-        // 簡易インデント整形
-        let lines = code.split('\n');
-        let depth = 0;
-        let result = [];
-        lines.forEach(line => {
-            let l = line.trim();
-            if (l.match(/^(end|until|\})/)) depth--;
-            if (depth < 0) depth = 0;
-            result.push("    ".repeat(depth) + l);
-            if (l.match(/^(function|if|while|for|repeat|do|else|elseif)/) || l.includes('{')) {
-                if (!l.match(/end$/)) depth++;
+        if (rawLabel.includes('.')) {
+            const parts = rawLabel.split('.');
+            const prefix = parts[0] + '.'; 
+            const checkStr = textBeforeCursor.trim();
+            if (new RegExp(prefix.replace('.', '\\.') + '[a-zA-Z0-9_]*$').test(checkStr)) {
+                if (insertText.startsWith(prefix)) {
+                    insertText = insertText.substring(prefix.length);
+                }
             }
-        });
-        model.setValue(result.join('\n'));
-        showToast("コードを整形しました");
+        }
+
+        const range = new monaco.Range(pos.lineNumber, wordInfo.startColumn, pos.lineNumber, wordInfo.endColumn);
+        editor.setSelection(range);
+        const contrib = editor.getContribution('snippetController2');
+        if (contrib) contrib.insert(insertText);
+        else editor.trigger('keyboard', 'type', { text: insertText });
+        setTimeout(() => { isInserting = false; }, 100);
     }
 
+    // --- V13 整形機能 (過剰改行廃止 & スマートインデント) ---
+    function formatCode() {
+        if (!editor) return;
+        const model = editor.getModel();
+        const rawCode = model.getValue();
+        
+        // 1. 文字列保護
+        const stringStore = [];
+        const maskedCode = rawCode.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, function(match) {
+            stringStore.push(match);
+            return `__STR_${stringStore.length - 1}__`;
+        });
+
+        // 2. 改行ルールの緩和
+        // V11/V12にあった「カンマや{での強制改行」を廃止。
+        // ブロック制御文のみ改行を促す。
+        let code = maskedCode;
+        code = code.replace(/(\b(then|do|repeat)\b)(?!\s*(--.*)?$)/g, "$1\n");
+        code = code.replace(/(?<!^)(?<!\n)\s*(\b(end|until)\b)/g, "\n$1");
+        code = code.replace(/;\s*/g, ";\n");
+
+        let lines = code.split(/\r?\n/);
+        let formattedLines = [];
+        let depth = 0;
+        const indentStr = "    ";
+
+        // インデント計算用Regex
+        // else/elseif は「現在の深さ-1で表示」し、「次の深さは変わらない(あるいは+1して-1する)」
+        const reElse = /^\s*(else|elseif)\b/;
+        const reBlockEnd = /^\s*(end|until|\}|\))/;
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (!line) continue;
+
+            const cleanLine = line.split('--')[0].trim();
+
+            // この行が「閉じ」または「途中(else)」で始まるなら、表示用深さを減らす
+            let printDepth = depth;
+            if (reBlockEnd.test(cleanLine)) {
+                depth--; // 閉じるので深さを減らす
+                printDepth = depth;
+            } else if (reElse.test(cleanLine)) {
+                printDepth = depth - 1; // elseはブロック内だが1つ左に表示
+            }
+
+            if (printDepth < 0) printDepth = 0;
+            if (depth < 0) depth = 0;
+
+            formattedLines.push(indentStr.repeat(printDepth) + line);
+
+            // 次の行への深さ計算
+            // 開き括弧・キーワードの数
+            const opens = (cleanLine.match(/(\b(function|then|do|repeat)\b|\{|\()/g) || []).length;
+            // 閉じ括弧・キーワードの数
+            const closes = (cleanLine.match(/(\b(end|until)\b|\}|\))/g) || []).length;
+            
+            // 行内での増減
+            let delta = opens - closes;
+            
+            // もし行頭で既に下げていたら(reBlockEnd)、closesのカウントと重複して下げすぎるのを防ぐ？
+            // いえ、depth変数は「次の行の深さ」を保持する。
+            // reBlockEndの判定で depth-- したのは「この行が閉じ括弧で始まるから、この行から下げる」ため。
+            // 行内にさらに閉じ括弧がある場合（例: `end end`）、それはさらに下げる必要がある。
+            // ただし、行頭の閉じ括弧分は既に depth-- で処理済みなので、delta計算では考慮が必要。
+            // 簡易ロジックとして、行頭閉じの場合は closesのカウントから1引く（既に処理したとみなす）
+            
+            if (reBlockEnd.test(cleanLine)) {
+                // 行頭の1つ分は処理済みなのでdeltaへの影響をキャンセル（+1相当）
+                // ただし正規表現マッチは全数マッチなので、単純に opens - closes を足すと
+                // depth = (depth_prev - 1) + (opens - closes) となり、
+                // 例えば `end` だけの行なら closes=1, delta=-1. 
+                // depth = d - 1 + 0 - 1 = d - 2 になってしまう。
+                // よって、行頭で下げた分は delta に加算（補正）する。
+                delta += 1;
+            }
+
+            depth += delta;
+        }
+
+        let finalCode = formattedLines.join("\n");
+        finalCode = finalCode.replace(/__STR_(\d+)__/g, (m, id) => stringStore[id]);
+
+        const fullRange = model.getFullModelRange();
+        editor.executeEdits('formatCode', [{ range: fullRange, text: finalCode, forceMoveMarkers: true }]);
+        showToast("整形完了");
+    }
+
+    // --- V13 リアルタイム・スマート検索 ---
     function doSearch() {
         const query = document.getElementById('search-input').value;
         const model = editor.getModel();
+        
+        // 入力が空ならハイライト解除
         if (!query) {
-            currentDecorations = editor.deltaDecorations(currentDecorations, []);
             document.getElementById('search-count').innerText = "0/0";
+            currentDecorations = editor.deltaDecorations(currentDecorations, []);
+            searchMatches = [];
             return;
         }
-        searchMatches = model.findMatches(query, false, false, false, null, true);
-        document.getElementById('search-count').innerText = `0/${searchMatches.length}`;
+
+        // 部分一致ロジックの強化
+        const isFuzzy = document.getElementById('search-fuzzy').checked;
+        let regexQuery;
         
-        const decorations = searchMatches.map(m => ({
-            range: m.range,
-            options: { inlineClassName: 'search-match-text', isWholeLine: false }
+        if (isFuzzy) {
+            // 文字列をトークンに分割（スペース区切り）
+            // "local gg=gg" -> "local", "gg=gg"
+            // 記号も分割したいが、単純にスペースを [\s\S]*? (非貪欲マッチ) にする
+            // ユーザー要望「local gg = gg」で「local gg=gg --hello」を検索したい？
+            // いえ、「local gg=gg」というコードを、「local gg = gg --hello」というクエリで探すのは無理（クエリの方が情報量が多い）。
+            // ユーザーの要望は逆。「local gg = gg」のようなコードを「local gg = gg -- hello」のように検索すると検索できない、
+            // つまり「local gg = gg」まで入力した時点でヒットしてほしい、あるいは
+            // 「local gg = gg」を探したいのにスペースが違ってヒットしないのを直してほしい、のどちらか。
+            // 文脈的に「入力された情報に最も近いコード」＝「入力された文字が含まれるコード」
+            
+            // スペースを「任意の空白または記号」として扱う柔軟なRegex
+            const parts = query.split(/\s+/).filter(p => p);
+            const escapedParts = parts.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            // 単語間に柔軟なマッチを挿入
+            regexQuery = escapedParts.join('[\\s\\S]*?'); 
+        } else {
+            regexQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        try {
+            searchMatches = model.findMatches(regexQuery, false, true, false, null, true);
+        } catch(e) {
+            searchMatches = [];
+        }
+
+        const countEl = document.getElementById('search-count');
+        countEl.innerText = searchMatches.length > 0 ? `1/${searchMatches.length}` : "0/0";
+
+        // ハイライト更新
+        const decorations = searchMatches.map(match => ({
+            range: match.range,
+            options: {
+                className: 'search-match-text', // 文字白
+                isWholeLine: false,
+                overviewRuler: { color: 'red', position: 1 } // スクロールバーに表示
+            }
         }));
-        currentDecorations = editor.deltaDecorations(currentDecorations, decorations);
+        
+        // 行ハイライトも追加（最初の1件だけでなく全件）
+        const lineDecorations = searchMatches.map(match => ({
+            range: match.range,
+            options: {
+                isWholeLine: true,
+                className: 'search-line-highlight' // 行赤
+            }
+        }));
+
+        currentDecorations = editor.deltaDecorations(currentDecorations, [...decorations, ...lineDecorations]);
     }
 
-    function searchNext(forward) {
-        if (searchMatches.length === 0) return;
-        if (forward) currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
-        else currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
-        
-        const match = searchMatches[currentMatchIdx];
-        editor.revealRangeInCenter(match.range);
+    function searchNext(isNext) {
+        if (searchMatches.length === 0) {
+            doSearch(); // 念のため再検索
+            if (searchMatches.length === 0) return;
+        }
+
+        if (isNext) {
+            currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
+        } else {
+            currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+        }
+
         document.getElementById('search-count').innerText = `${currentMatchIdx + 1}/${searchMatches.length}`;
+        const range = searchMatches[currentMatchIdx].range;
+        editor.revealRangeInCenter(range);
     }
 
     function execCmd(cmd) {
         editor.focus();
-        if(cmd === 'undo') editor.trigger('keyboard', 'undo');
-        else if(cmd === 'redo') editor.trigger('keyboard', 'redo');
+        if(cmd==='undo') editor.trigger('k','undo');
+        else if(cmd==='redo') editor.trigger('k','redo');
+        else editor.trigger('s', cmd);
     }
 
     function autoComment() {
         const m = editor.getModel();
-        const lines = m.getLineCount();
         const edits = [];
-        const dict = {}; apiData.forEach(i => dict[i.l] = i.d);
-        for(let i=1; i<=lines; i++) {
-            let txt = m.getLineContent(i);
-            if(txt.includes('--')) continue;
-            for(let key in dict) {
-                if(txt.includes(key)) {
-                    edits.push({ range: new monaco.Range(i, txt.length+1, i, txt.length+1), text: " -- " + dict[key] });
+        const dict = {}; apiData.forEach(i=>dict[i.l]=i.d);
+        for(let i=1; i<=m.getLineCount(); i++){
+            const l = m.getLineContent(i);
+            if(l.includes('--')) continue;
+            for(let k in dict){
+                if(l.includes(k+'(') || l.includes(k+' ')){
+                    edits.push({ range: new monaco.Range(i, l.length+1, i, l.length+1), text: ` -- ${dict[k]}` });
                     break;
                 }
             }
         }
-        editor.executeEdits('comment', edits);
+        if(edits.length) { editor.executeEdits('autoComment', edits); showToast("解説を追加しました"); }
+    }
+
+    function startHintCycle() {
+        const hints = [
+            "ヒント: リアルタイム検索で素早くコードを特定",
+            "ヒント: '整形'は過剰な改行をせず見やすく修正",
+            "ヒント: 範囲選択を終えると自動でコピー",
+            "ヒント: Ctrl+Z で変更を元に戻せます"
+        ];
+        let idx = 0;
+        const el = document.getElementById('hint-msg');
+        setInterval(() => { idx = (idx + 1) % hints.length; el.innerText = hints[idx]; }, 4000);
     }
 
     function showToast(msg) {
@@ -430,38 +540,68 @@
     }
 
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    
+    function parseUserVars() {
+        if(!editor) return;
+        const c = editor.getValue();
+        const v = new Set();
+        let m;
+        const r1 = /local\s+([a-zA-Z_]\w*)/g; while((m=r1.exec(c))) v.add(m[1]);
+        const r2 = /function\s+([a-zA-Z_]\w*)/g; while((m=r2.exec(c))) v.add(m[1]);
+        userDefinedVars = v;
+    }
+
+    function updateSidebar() { if(editor) updateSidebarPosition(editor.getPosition()); }
+    function updateSidebarPosition(pos) {
+        if(!editor) return;
+        const model = editor.getModel();
+        const word = model.getWordUntilPosition(pos).word.toLowerCase();
+        let candidates = [];
+        const userVars = Array.from(userDefinedVars).map(v => ({l:v, d:'User Var', t:'var'}));
+        const allItems = [...userVars, ...apiData];
+        if (!word) candidates = allItems.slice(0, 50);
+        else candidates = allItems.filter(i => i.l.toLowerCase().includes(word)).slice(0, 50);
+        const list = document.getElementById('candidate-list');
+        list.innerHTML = '';
+        candidates.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'candidate-item';
+            let c = '#ccc';
+            if(item.t==='func') c='var(--func-color)';
+            else if(item.t==='const') c='var(--const-color)';
+            li.innerHTML = `<div class="cand-top"><span class="cand-label" style="color:${c}">${item.l}</span><span class="cand-type">${item.t}</span></div><div class="cand-desc">${item.d || ''}</div>`;
+            li.onclick = () => insertCode(item);
+            list.appendChild(li);
+        });
+    }
 
     function getKind(t) {
         if(t==='func') return monaco.languages.CompletionItemKind.Function;
         if(t==='const') return monaco.languages.CompletionItemKind.Constant;
-        return monaco.languages.CompletionItemKind.Keyword;
+        if(t==='key') return monaco.languages.CompletionItemKind.Keyword;
+        return monaco.languages.CompletionItemKind.Variable;
     }
 
     function saveFile() {
-        const blob = new Blob([editor.getValue()], {type: "text/plain"});
+        const val = editor.getValue();
+        let name = document.getElementById('filename').value || 'script.lua';
+        if(!name.match(/\.(lua|txt)$/)) name += '.lua';
+        const blob = new Blob([val], {type: "text/plain;charset=utf-8"});
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = document.getElementById('filename').value || "script.lua";
+        a.download = name;
         a.click();
+        showToast("保存: " + name);
     }
 
     function importFile(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            editor.setValue(e.target.result);
-            document.getElementById('filename').value = file.name;
-        };
-        reader.readAsText(file);
-    }
-
-    function startHintCycle() {
-        const hints = ["ヒント: '共有'ボタンで他のアプリにコードを送信！", "ヒント: 変数を作ると右側に値が表示されます", "ヒント: 関数を作ると引数が解析されます"];
-        let i = 0;
-        setInterval(() => {
-            document.getElementById('hint-msg').innerText = hints[i % hints.length];
-            i++;
-        }, 5000);
+        const f = input.files[0]; if(!f) return;
+        const r = new FileReader(); r.onload=e=>{
+            const fullRange = editor.getModel().getFullModelRange();
+            editor.executeEdits('import', [{ range: fullRange, text: e.target.result }]);
+            document.getElementById('filename').value=f.name;
+        }; 
+        r.readAsText(f);
     }
 </script>
 </body>
