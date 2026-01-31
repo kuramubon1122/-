@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GameGuardian Lua Editor V15 (Readable Format & Share Fix)</title>
+    <title>GameGuardian Lua Editor V16 (Multi-line Search & Share)</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -57,7 +57,7 @@
             display: flex; align-items: center; background: #333; padding: 2px 5px; border-radius: 4px; border: 1px solid #555;
         }
         #search-input {
-            background: transparent; border: none; color: white; width: 120px; font-size: 12px; margin-right: 5px;
+            background: transparent; border: none; color: white; width: 140px; font-size: 12px; margin-right: 5px;
         }
         .search-badge {
             font-size: 10px; color: #aaa; margin-right: 5px; min-width: 40px; text-align: center;
@@ -120,7 +120,7 @@
         }
         .modal-box {
             background: #252526; padding: 15px; border-radius: 5px; border: 1px solid #444;
-            width: 300px; color: #eee;
+            width: 320px; color: #eee;
         }
         .modal-box input { width: 100%; margin-bottom: 10px; padding: 6px; background: #333; border: 1px solid #555; color: white; }
         .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
@@ -146,7 +146,7 @@
     </div>
     
     <div class="btn-group">
-        <button onclick="formatCode()" title="可読性重視で整形 (end後空行追加)">整形</button>
+        <button onclick="formatCode()" title="整形 (end後空行追加)">整形</button>
         <button onclick="autoComment()" title="解説を追加">解説</button>
         <button onclick="showReplaceModal()" title="変数を指定文字列に一括置換">変数置換</button>
     </div>
@@ -166,7 +166,7 @@
         <button onclick="document.getElementById('fileInput').click()">開く</button>
         <input type="text" id="filename" value="script.lua" placeholder="ファイル名">
         <button onclick="saveFile()">保存</button>
-        <button onclick="shareScript()" style="background-color:#007acc;" title="ファイルとして共有 (ChromeOS対応)">共有</button>
+        <button onclick="shareScript()" style="background-color:#007acc;" title="共有 (ChromeOS/Android対応)">共有</button>
         <input type="file" id="fileInput" accept=".txt,.lua" style="display:none" onchange="importFile(this)">
     </div>
 </div>
@@ -180,7 +180,7 @@
 </div>
 
 <div id="statusbar">
-    <span id="hint-msg">GameGuardian Lua Editor V15</span>
+    <span id="hint-msg">GameGuardian Lua Editor V16</span>
     <span id="cursor-pos">Ln 1, Col 1</span>
 </div>
 
@@ -190,8 +190,8 @@
 <div id="modal-overlay">
     <div class="modal-box">
         <h3>変数一括置換</h3>
-        <p style="font-size:11px; color:#aaa;">変数を指定した文字列に置き換えます。</p>
-        <label>対象の変数名:</label>
+        <p style="font-size:11px; color:#aaa;">変数を指定した文字列に置き換えます(全置換)。</p>
+        <label>対象の変数名 (難読化文字列など):</label>
         <input type="text" id="replace-target" placeholder="例: _a">
         <label>置き換え後の文字列:</label>
         <input type="text" id="replace-with" placeholder="例: myValue">
@@ -205,7 +205,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 
 <script>
-    // --- API Data ---
     const apiData = [
         {l:'gg.alert', d:'警告ダイアログ', t:'func', i:'gg.alert("${1:msg}")'},
         {l:'gg.toast', d:'通知を表示', t:'func', i:'gg.toast("${1:msg}")'},
@@ -286,7 +285,7 @@
         });
 
         editor = monaco.editor.create(document.getElementById('editor-container'), {
-            value: '-- GameGuardian Script V15\n\nfunction main()\n    local _count = 0\n    if _count < 10 then\n        gg.toast("Start")\n    end\nend\n\nmain()\n',
+            value: '-- GameGuardian Script V16\n\nlocal myVar = 100\n\nfunction test()\n    if myVar > 50 then\n        print("OK")\n    end\nend\n',
             language: 'lua',
             theme: 'vs-dark',
             automaticLayout: true,
@@ -297,7 +296,7 @@
             suggest: { filterGraceful: true, snippetsPreventQuickSuggestions: false }
         });
 
-        editor.onDidChangeModelContent(() => { parseUserVars(); updateSidebar(); });
+        editor.onDidChangeModelContent(() => { parseUserVars(); updateSidebar(); doSearch(); }); // 内容変更時も検索更新
         editor.onDidChangeCursorPosition((e) => {
             updateSidebarPosition(e.position);
             document.getElementById('cursor-pos').innerText = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
@@ -311,7 +310,7 @@
         startHintCycle();
     });
 
-    // --- 変数一括置換機能 ---
+    // --- 変数一括置換機能 (全置換・単語単位) ---
     function showReplaceModal() {
         const sel = editor.getSelection();
         const txt = editor.getModel().getValueInRange(sel);
@@ -327,13 +326,13 @@
         const target = document.getElementById('replace-target').value;
         const replaceWith = document.getElementById('replace-with').value;
         
-        if (!target) {
-            showToast("対象の変数名を入力してください");
-            return;
-        }
+        if (!target) { showToast("対象の変数名を入力してください"); return; }
 
         const model = editor.getModel();
-        const matches = model.findMatches(target, false, false, true, null, true); // matchWord=true で単語単位で検索
+        // findMatches(searchString, searchOnlyEditableRange, isRegex, matchCase, wordSeparators, captureMatches)
+        // ここでは matchWord (単語単位) で検索したい。MonacoのfindMatches引数は:
+        // (searchString, matchCase, isRegex, matchWord, wordSeparators, captureMatches)
+        const matches = model.findMatches(target, false, false, true, null, true); 
         
         if (matches.length === 0) {
             showToast("対象の変数が見つかりません");
@@ -390,7 +389,7 @@
         setTimeout(() => { isInserting = false; }, 100);
     }
 
-    // --- V15 改良版 整形機能 (end後に空行2行追加) ---
+    // --- 整形機能 ---
     function formatCode() {
         if (!editor) return;
         const model = editor.getModel();
@@ -402,7 +401,6 @@
             return `__STR_${stringStore.length - 1}__`;
         });
 
-        // 制御構造のみ改行
         let code = maskedCode;
         code = code.replace(/(\b(then|do|repeat)\b)(?!\s*(--.*)?$)/g, "$1\n");
         code = code.replace(/(?<!^)(?<!\n)\s*(\b(end|until)\b)/g, "\n$1");
@@ -417,7 +415,7 @@
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i].trim();
-            if (!line) continue; // 一旦空行はすべて詰めて再配置する
+            if (!line) continue;
 
             const cleanLine = line.split('--')[0].trim();
             let printDepth = depth;
@@ -439,10 +437,8 @@
             let delta = opens - closes;
             if (reBlockEnd.test(cleanLine)) delta += 1;
             
-            // --- V15: end でブロックが閉じた後、空行を2行追加 ---
-            // 行が end または until で終わっている場合 (コメント除く)
+            // end後に空行追加
             if (/\b(end|until)\b(\s*--.*)?$/.test(cleanLine)) {
-                // 次の行に空行を追加 (formattedLinesにプッシュ)
                 formattedLines.push("");
                 formattedLines.push(""); 
             }
@@ -451,17 +447,15 @@
         }
 
         let finalCode = formattedLines.join("\n");
-        // 連続しすぎた空行(3行以上)は2行にまとめる
         finalCode = finalCode.replace(/\n{4,}/g, "\n\n\n");
-
         finalCode = finalCode.replace(/__STR_(\d+)__/g, (m, id) => stringStore[id]);
 
         const fullRange = model.getFullModelRange();
         editor.executeEdits('formatCode', [{ range: fullRange, text: finalCode, forceMoveMarkers: true }]);
-        showToast("可読性重視で整形しました");
+        showToast("整形完了");
     }
 
-    // --- 検索機能 ---
+    // --- V16 強化版検索機能 (改行跨ぎ & インクリメンタル) ---
     function doSearch() {
         const query = document.getElementById('search-input').value;
         const model = editor.getModel();
@@ -477,14 +471,20 @@
         let regexQuery;
         
         if (isFuzzy) {
-            const parts = query.split(/\s+/).filter(p => p);
+            // 入力された文字列のスペースを「改行を含むあらゆる空白」に置換し、
+            // 文字列全体を正規表現として構築する
+            // 例: "local gg" -> "local[\s\n]*gg"
+            // まず特殊文字をエスケープ
+            const parts = query.trim().split(/\s+/);
             const escapedParts = parts.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-            regexQuery = escapedParts.join('[\\s\\S]*?'); 
+            // 間に改行込みの空白マッチを挟む
+            regexQuery = escapedParts.join('[\\s\\n]*'); 
         } else {
             regexQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
         try {
+            // findMatches: (searchString, matchCase, isRegex, matchWord, wordSeparators, captureMatches)
             searchMatches = model.findMatches(regexQuery, false, true, false, null, true);
         } catch(e) { searchMatches = []; }
 
@@ -542,9 +542,9 @@
 
     function startHintCycle() {
         const hints = [
-            "ヒント: '変数置換'で一括リネームが可能",
-            "ヒント: 共有ボタンでChromeOSやスマホと連携",
-            "ヒント: 整形でend後に空行を追加し読みやすくします",
+            "ヒント: '変数置換'はすべての変数を一括で書き換えます",
+            "ヒント: 共有ボタンでChromeOSやAndroid間でファイルを共有可能",
+            "ヒント: 検索機能は改行をまたいだコードもヒットします",
             "ヒント: Ctrl+Z で元に戻すことができます"
         ];
         let idx = 0;
@@ -650,7 +650,7 @@
         showToast("保存: " + name);
     }
 
-    // --- V15 強化版共有機能 (Chrome/ChromeOS対応) ---
+    // --- V16 強化版共有機能 (ChromeOS / Android / PC対応) ---
     async function shareScript() {
         const val = editor.getValue();
         let name = document.getElementById('filename').value || 'script.lua';
@@ -659,24 +659,26 @@
         const file = new File([val], name, { type: "text/plain" });
         const shareData = {
             title: name,
-            text: 'GG Lua Editorスクリプト',
+            text: 'GG Lua Script',
             files: [file]
         };
 
-        // Web Share API 対応かつファイル共有可能な場合
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        // ChromeOSではnavigator.canShareがtrueでも共有シートが出ない場合があるが、
+        // navigator.shareを呼ぶことが標準のAndroidアプリ連携手順。
+        // PC版Chromeなどではエラーになるためcatchしてダウンロードに回す。
+        if (navigator.share) {
             try {
                 await navigator.share(shareData);
+                showToast("共有しました");
             } catch (err) {
+                // ユーザーキャンセル(AbortError)以外はダウンロードへ
                 if (err.name !== 'AbortError') {
-                    showToast("共有失敗: ダウンロードに切り替えます");
-                    saveFile(); // フォールバック
+                    console.log("Share API failed, falling back to download.", err);
+                    saveFile();
                 }
             }
         } else {
-            // PC版ChromeやChromeOSなどAPI非対応/制限環境
-            showToast("共有非対応環境です。ファイルを保存します。");
-            saveFile(); // 自動的に保存処理へ
+            saveFile();
         }
     }
 
